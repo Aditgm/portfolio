@@ -48,7 +48,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 ::selection {
@@ -322,13 +322,13 @@ body {
 
 @media (min-width: 768px) {
   .section-container {
-    padding: 8rem 4rem;
+    padding: 7rem 3rem;
   }
 }
 
 @media (min-width: 1024px) {
   .section-container {
-    padding: 10rem 5rem;
+    padding: 9rem 5rem;
   }
 }
 
@@ -339,9 +339,9 @@ body {
   margin: 0 auto;
 }
 
-/* Geometric section dividers */
 .geo-divider-top {
   position: relative;
+  padding-top: 1rem;
 }
 
 .geo-divider-top::before {
@@ -360,16 +360,18 @@ body {
   background: linear-gradient(165deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  backdrop-filter: blur(8px);
-  padding: 2.5rem;
+  backdrop-filter: blur(12px);
+  padding: 3rem;
   /* Spacious interior */
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card:hover {
   border-color: var(--border-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.4);
+  transform: translateY(-4px);
+  box-shadow:
+    0 20px 60px -15px rgba(0, 0, 0, 0.5),
+    0 0 40px -10px rgba(59, 130, 246, 0.08);
 }
 
 /* Achievement carousel card */
@@ -461,13 +463,14 @@ body {
 .section-label {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   font-family: var(--font-mono), monospace;
   font-size: 0.85rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.25em;
   color: var(--accent-cyan);
+  margin-bottom: 0.75rem;
 }
 
 .section-label::before {
@@ -484,10 +487,43 @@ body {
   color: var(--text-primary);
   letter-spacing: -0.02em;
   line-height: 1.15;
+  margin-top: 0.5rem;
 }
 
 @media (min-width: 768px) {
   .section-title {
     font-size: 3rem;
   }
+}
+
+/* Premium hover glow effect for interactive elements */
+.hover-glow {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-glow:hover {
+  box-shadow:
+    0 0 20px -5px rgba(59, 130, 246, 0.2),
+    0 0 40px -10px rgba(139, 92, 246, 0.1);
+}
+
+/* Smooth interactive link with animated underline */
+.link-premium {
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.link-premium::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+  transition: width 0.3s ease;
+}
+
+.link-premium:hover::after {
+  width: 100%;
 }

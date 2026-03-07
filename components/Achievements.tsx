@@ -232,7 +232,7 @@ export default function Achievements() {
                                     className={`pointer-events-none absolute -top-20 -right-20 h-60 w-60 rounded-full bg-gradient-to-br ${a.glowFrom} ${a.glowTo} opacity-40 blur-[80px] transition-opacity duration-500 group-hover:opacity-70`}
                                 />
 
-                                <div className="relative z-10 flex flex-col gap-8 p-8 md:flex-row md:items-start md:gap-12 md:p-12">
+                                <div className="relative z-10 flex flex-col gap-10 p-10 md:flex-row md:items-start md:gap-14 md:p-14">
                                     {/* Left: Icon + Rating */}
                                     <div className="flex flex-col items-center gap-4 md:items-start">
                                         {/* Icon container */}
@@ -259,7 +259,7 @@ export default function Achievements() {
                                     </div>
 
                                     {/* Right: Content */}
-                                    <div className="flex-1 space-y-4">
+                                    <div className="flex-1 space-y-5">
                                         {/* Platform + Title */}
                                         <div>
                                             <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
@@ -303,7 +303,7 @@ export default function Achievements() {
                     </div>
 
                     {/* Controls */}
-                    <div className="mt-8 flex items-center justify-between">
+                    <div className="mt-10 flex items-center justify-between">
                         {/* Dot indicators */}
                         <div className="flex items-center gap-2">
                             {achievements.map((_, i) => (
@@ -363,24 +363,27 @@ export default function Achievements() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: 0.2 }}
-                    className="mt-12 flex flex-wrap items-center justify-center gap-4"
+                    className="mt-40 flex flex-wrap items-center justify-center gap-8"
                 >
                     {[
-                        { name: "LeetCode", url: "https://leetcode.com/u/adityagm/", color: "text-amber-400 hover:text-amber-300 border-amber-500/15 hover:border-amber-500/30" },
-                        { name: "Codeforces", url: "https://codeforces.com/profile/aditya2005", color: "text-orange-400 hover:text-orange-300 border-orange-500/15 hover:border-orange-500/30" },
-                        { name: "CodeChef", url: "https://www.codechef.com/users/adityagm", color: "text-green-400 hover:text-green-300 border-green-500/15 hover:border-green-500/30" },
-                        { name: "VJudge", url: "https://vjudge.net/user/aditya6789", color: "text-blue-400 hover:text-blue-300 border-blue-500/15 hover:border-blue-500/30" },
+                        { name: "LeetCode", url: "https://leetcode.com/u/adityagm/", color: "text-amber-400 hover:text-amber-200", border: "border-amber-500/20 hover:border-amber-400/50", glow: "hover:shadow-[0_0_24px_rgba(245,158,11,0.18)]" },
+                        { name: "Codeforces", url: "https://codeforces.com/profile/aditya2005", color: "text-orange-400 hover:text-orange-200", border: "border-orange-500/20 hover:border-orange-400/50", glow: "hover:shadow-[0_0_24px_rgba(249,115,22,0.18)]" },
+                        { name: "CodeChef", url: "https://www.codechef.com/users/adityagm", color: "text-green-400 hover:text-green-200", border: "border-green-500/20 hover:border-green-400/50", glow: "hover:shadow-[0_0_24px_rgba(16,185,129,0.18)]" },
+                        { name: "VJudge", url: "https://vjudge.net/user/aditya6789", color: "text-blue-400 hover:text-blue-200", border: "border-blue-500/20 hover:border-blue-400/50", glow: "hover:shadow-[0_0_24px_rgba(59,130,246,0.18)]" },
                     ].map((p) => (
-                        <a
+                        <motion.a
                             key={p.name}
                             href={p.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`inline-flex items-center gap-2 rounded-xl border bg-white/[0.02] px-5 py-3 text-sm font-semibold transition-all duration-300 hover:bg-white/[0.05] ${p.color}`}
+                            whileHover={{ y: -3, scale: 1.04 }}
+                            whileTap={{ scale: 0.97 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                            className={`group inline-flex items-center gap-2.5 rounded-2xl border bg-white/[0.03] px-6 py-3.5 text-sm font-semibold transition-all duration-300 hover:bg-white/[0.07] ${p.color} ${p.border} ${p.glow}`}
                         >
                             {p.name}
-                            <ArrowUpRight size={14} />
-                        </a>
+                            <ArrowUpRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                        </motion.a>
                     ))}
                 </motion.div>
             </div>

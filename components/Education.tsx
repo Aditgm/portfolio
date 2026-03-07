@@ -36,8 +36,8 @@ export default function Education() {
           {/* Top gradient accent */}
           <div className="h-px w-full bg-gradient-to-r from-cyan-500/30 via-blue-500/20 to-transparent" />
 
-          <div className="p-8 md:p-10">
-            <div className="flex items-start gap-5 md:gap-6">
+          <div className="p-10 md:p-16">
+            <div className="flex items-start gap-6 md:gap-8">
               {/* Icon with geometric container */}
               <div className="relative flex h-14 w-14 shrink-0 items-center justify-center">
                 <div className="absolute inset-0 rounded-2xl border border-cyan-500/15 bg-gradient-to-br from-cyan-500/[0.08] to-transparent transition-all duration-300 group-hover:border-cyan-500/25" />
@@ -52,7 +52,7 @@ export default function Education() {
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
                     <h3 className="text-xl font-bold text-white">DIT University</h3>
-                    <p className="mt-1.5 text-sm text-slate-400">B.Tech in Computer Science &amp; Engineering</p>
+                    <p className="mt-2 text-sm text-slate-400">B.Tech in Computer Science &amp; Engineering</p>
                     <div className="mt-1.5 flex items-center gap-2">
                       <span className="h-1 w-1 rotate-45 rounded-[1px] bg-cyan-400/60" />
                       <span className="text-xs font-semibold text-cyan-400">AI/ML Specialization</span>
@@ -91,9 +91,9 @@ export default function Education() {
                 </div>
 
                 {/* Courses */}
-                <div className="mt-7 border-t border-white/[0.04] pt-6">
-                  <p className="mb-3 text-[0.65rem] font-medium uppercase tracking-[0.15em] text-slate-500">Key Coursework</p>
-                  <div className="flex flex-wrap gap-2.5">
+                <div className="mt-12 border-t border-white/[0.04] pt-10">
+                  <p className="mb-4 text-[0.65rem] font-medium uppercase tracking-[0.15em] text-slate-500">Key Coursework</p>
+                  <div className="flex flex-wrap gap-4">
                     {courses.map((c, i) => (
                       <motion.span
                         key={c}

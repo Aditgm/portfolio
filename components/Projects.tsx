@@ -84,7 +84,7 @@ export default function Projects() {
         </motion.div>
 
         {/* Bento grid */}
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
           {projects.map((p, i) => (
             <motion.article
               key={p.title}
@@ -99,7 +99,7 @@ export default function Projects() {
               <div className={`h-px w-full bg-gradient-to-r ${p.accentGradient}`} />
 
               <div className={`flex flex-1 flex-col ${p.featured ? "md:flex-row" : ""}`}>
-                <div className="flex-1 p-8 md:p-12">
+                <div className="flex-1 p-10 md:p-14">
                   {/* Top row */}
                   <div className="mb-5 flex items-start justify-between">
                     <span className={`geo-tag ${p.tagColor}`}>
@@ -126,11 +126,11 @@ export default function Projects() {
                   <h3 className="text-xl font-bold text-white transition-colors duration-300 group-hover:text-blue-300">
                     {p.title}
                   </h3>
-                  <p className="mt-1.5 text-sm text-slate-500">{p.subtitle}</p>
-                  <p className="mt-4 text-sm leading-7 text-slate-400">{p.desc}</p>
+                  <p className="mt-2 text-sm text-slate-500">{p.subtitle}</p>
+                  <p className="mt-5 text-sm leading-[1.8] text-slate-400">{p.desc}</p>
 
                   {/* Highlights */}
-                  <ul className="mt-6 flex flex-col gap-2.5">
+                  <ul className="mt-10 flex flex-col gap-4">
                     {p.highlights.map((h) => (
                       <li key={h} className="flex gap-3 text-sm text-slate-400">
                         <span className="mt-2 h-1.5 w-1.5 shrink-0 rotate-45 rounded-[1px] bg-cyan-400/50" />
@@ -166,7 +166,7 @@ export default function Projects() {
                 )}
               </div>
 
-              <div className="flex flex-wrap gap-3 border-t border-white/[0.04] px-8 py-6 md:px-12">
+              <div className="flex flex-wrap gap-4 border-t border-white/[0.04] px-10 py-12 md:px-14">
                 {p.stack.map((t) => (
                   <span
                     key={t}

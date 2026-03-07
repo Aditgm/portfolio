@@ -58,13 +58,13 @@ export default function Stats() {
           <h2 className="section-title">
             Competitive <span className="text-gradient-static">Programming</span>
           </h2>
-          <p className="mt-5 text-sm leading-7 text-slate-400 md:text-base md:leading-8">
+          <p className="mt-6 text-sm leading-7 text-slate-400 md:text-base md:leading-8">
             Consistently ranked among the top competitive programmers globally across all major platforms.
           </p>
         </motion.div>
 
         {/* Stat cards — 4 columns */}
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5">
+        <div className="grid grid-cols-2 gap-6 lg:grid-cols-4 lg:gap-8">
           {stats.map((s, i) => (
             <motion.div
               key={s.label}
@@ -72,29 +72,42 @@ export default function Stats() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-              className="card border-trace group p-8 md:p-10"
+              whileHover={{ y: -4, transition: { duration: 0.25, ease: "easeOut" } }}
+              className="card border-trace group relative overflow-hidden p-10 md:p-12 cursor-default"
               style={{
                 ["--hover-glow" as string]: s.glowColor,
               }}
             >
+              {/* Shimmer sweep on hover */}
+              <div className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.04] to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+
               {/* Geometric accent dot */}
-              <div className="mb-4 flex items-center gap-2">
-                <div className="h-2 w-2 rotate-45 rounded-[2px] bg-gradient-to-br from-blue-500/30 to-purple-500/30 transition-all duration-300 group-hover:from-blue-500/60 group-hover:to-purple-500/60" />
-                <div className="h-px flex-1 bg-gradient-to-r from-white/[0.06] to-transparent" />
+              <div className="mb-7 flex items-center gap-2">
+                <div className="h-2 w-2 rotate-45 rounded-[2px] bg-gradient-to-br from-blue-500/30 to-purple-500/30 transition-all duration-300 group-hover:from-blue-500/70 group-hover:to-purple-500/70 group-hover:scale-125" />
+                <div className="h-px flex-1 bg-gradient-to-r from-white/[0.08] to-transparent transition-all duration-300 group-hover:from-white/[0.16]" />
               </div>
 
               <Counter value={s.value} suffix={s.suffix} color={s.color} active={inView} />
-              <p className="mt-2.5 text-sm font-semibold text-white">{s.label}</p>
-              <p className="mt-1 text-xs leading-5 text-slate-500">{s.sub}</p>
+              <p className="mt-3.5 text-sm font-semibold text-white tracking-wide">{s.label}</p>
+              <p className="mt-2 text-xs leading-5 text-slate-500 group-hover:text-slate-400 transition-colors duration-300">{s.sub}</p>
             </motion.div>
           ))}
         </div>
 
+        {/* Divider with label */}
+        <div className="mt-16 mb-10 flex items-center gap-5">
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+          <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-5 py-1.5 font-mono text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-slate-500">
+            Contest Highlights
+          </span>
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+        </div>
+
         {/* Contest highlights */}
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:gap-5">
+        <div className="grid gap-6 sm:grid-cols-2 lg:gap-8">
           {[
-            { rank: "#169", contest: "LeetCode Weekly Contest 462", detail: "Ranked 169 / 30,000+", pct: "Top 0.005%", accent: "text-amber-300", bg: "from-amber-500/15 to-amber-500/5", borderAccent: "border-amber-500/10 hover:border-amber-500/20" },
-            { rank: "#45", contest: "Codeforces Round 1068, Div. 2", detail: "Ranked 45 / 20,000+", pct: "Top 0.003%", accent: "text-orange-300", bg: "from-orange-500/15 to-orange-500/5", borderAccent: "border-orange-500/10 hover:border-orange-500/20" },
+            { rank: "#169", contest: "LeetCode Weekly Contest 462", detail: "Ranked 169 / 30,000+", pct: "Top 0.005%", accent: "text-amber-300", bg: "from-amber-500/15 to-amber-500/5", borderAccent: "border-amber-500/10 hover:border-amber-500/30", glow: "group-hover:shadow-[0_0_40px_rgba(245,158,11,0.08)]" },
+            { rank: "#45", contest: "Codeforces Round 1068, Div. 2", detail: "Ranked 45 / 20,000+", pct: "Top 0.003%", accent: "text-orange-300", bg: "from-orange-500/15 to-orange-500/5", borderAccent: "border-orange-500/10 hover:border-orange-500/30", glow: "group-hover:shadow-[0_0_40px_rgba(249,115,22,0.08)]" },
           ].map((c, i) => (
             <motion.div
               key={c.rank}
@@ -102,17 +115,21 @@ export default function Stats() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.1 + i * 0.08 }}
-              className={`card group flex items-start gap-6 p-8 md:p-10 ${c.borderAccent}`}
+              whileHover={{ y: -3, transition: { duration: 0.22, ease: "easeOut" } }}
+              className={`card group relative overflow-hidden flex items-start gap-8 p-10 md:p-12 transition-shadow duration-500 ${c.borderAccent} ${c.glow}`}
             >
+              {/* Shimmer */}
+              <div className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.03] to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+
               {/* Rank badge — diamond shaped */}
-              <div className={`relative flex h-12 w-12 shrink-0 items-center justify-center`}>
-                <div className={`absolute inset-0 rotate-45 rounded-lg bg-gradient-to-br ${c.bg} transition-all duration-300 group-hover:scale-110`} />
-                <span className={`relative z-10 text-xs font-bold ${c.accent}`}>{c.rank}</span>
+              <div className="relative flex h-14 w-14 shrink-0 items-center justify-center">
+                <div className={`absolute inset-0 rotate-45 rounded-xl bg-gradient-to-br ${c.bg} transition-all duration-400 group-hover:scale-115 group-hover:rotate-[50deg]`} />
+                <span className={`relative z-10 text-sm font-bold ${c.accent}`}>{c.rank}</span>
               </div>
 
-              <div>
-                <p className="text-sm font-semibold text-white">{c.contest}</p>
-                <p className="mt-1.5 text-xs text-slate-400">
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-white tracking-wide">{c.contest}</p>
+                <p className="mt-2 text-xs leading-6 text-slate-400">
                   {c.detail} — <span className={`font-bold ${c.accent}`}>{c.pct}</span>
                 </p>
               </div>

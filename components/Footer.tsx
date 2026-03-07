@@ -37,7 +37,7 @@ export default function Footer() {
           <h2 className="section-title text-center">
             Get In <span className="text-gradient-static">Touch</span>
           </h2>
-          <p className="mx-auto mt-5 block w-full max-w-2xl self-center px-2 text-center text-sm leading-7 text-slate-400 md:px-0 md:text-base md:leading-8">
+          <p className="mx-auto mt-6 block w-full max-w-2xl self-center px-2 text-center text-sm leading-[1.85] text-slate-400 md:px-0 md:text-base md:leading-8">
             I&apos;m currently open to new opportunities. Whether you have a question,
             a project idea, or just want to say hi — my inbox is always open.
           </p>
@@ -54,7 +54,7 @@ export default function Footer() {
           {/* Top gradient accent */}
           <div className="h-px w-full bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
 
-          <div className="w-full px-8 pt-6 pb-8 md:px-10 md:pt-8 md:pb-10 flex flex-col items-center text-center gap-8">
+          <div className="w-full px-10 pt-8 pb-10 md:px-12 md:pt-10 md:pb-12 flex flex-col items-center text-center gap-10">
             {/* Email CTA */}
             <a
               href="mailto:arajsinha4@gmail.com"
@@ -67,7 +67,7 @@ export default function Footer() {
             </a>
 
             {/* Social links */}
-            <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-4">
               {socialLinks.map((link) => (
                 <a
                   key={link.label}
@@ -91,7 +91,7 @@ export default function Footer() {
         </motion.div>
 
         {/* Footer bottom */}
-        <div className="mt-14 flex w-full flex-col items-center justify-between gap-4 pt-8 md:flex-row">
+        <div className="mt-16 flex w-full flex-col items-center justify-between gap-5 pt-8 md:flex-row">
           {/* Geometric divider */}
           <div className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" style={{ marginTop: '-2rem' }} />
 

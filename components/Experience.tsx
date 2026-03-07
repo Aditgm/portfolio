@@ -56,7 +56,7 @@ export default function Experience() {
           {/* Timeline line with gradient */}
           <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-blue-500/20 via-purple-500/20 to-transparent" />
 
-          <div className="flex flex-col gap-10">
+          <div className="flex flex-col gap-12">
             {experiences.map((exp, i) => (
               <motion.div
                 key={exp.company}
@@ -77,7 +77,7 @@ export default function Experience() {
                   {/* Gradient top accent */}
                   <div className={`h-px w-full bg-gradient-to-r ${exp.accentColor} opacity-30`} />
 
-                  <div className="p-8 md:p-10">
+                  <div className="p-10 md:p-12">
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <div>
                         <h3 className="text-lg font-bold text-white transition-colors group-hover:text-blue-300">
@@ -93,7 +93,7 @@ export default function Experience() {
                       </div>
                     </div>
 
-                    <ul className="mt-6 flex flex-col gap-3">
+                    <ul className="mt-8 flex flex-col gap-4">
                       {exp.bullets.map((b, j) => (
                         <li key={j} className="flex gap-3 text-sm leading-7 text-slate-400">
                           <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rotate-45 rounded-[1px] bg-cyan-400/50" />

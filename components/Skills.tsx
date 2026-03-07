@@ -54,7 +54,7 @@ export default function Skills() {
           </h2>
         </motion.div>
 
-        <div className="grid gap-8 sm:grid-cols-2 lg:gap-10">
+        <div className="grid gap-8 sm:grid-cols-2 lg:gap-12">
           {groups.map((g, i) => (
             <motion.div
               key={g.cat}
@@ -67,7 +67,7 @@ export default function Skills() {
               {/* Top gradient line */}
               <div className={`h-1.5 w-full bg-gradient-to-r ${g.borderAccent} opacity-80`} />
 
-              <div className="flex-1 p-8 md:p-10 flex flex-col gap-8">
+              <div className="flex-1 p-10 md:p-12 flex flex-col gap-10">
                 {/* Header */}
                 <div className="flex items-center gap-5">
                   <div className="relative flex h-14 w-14 shrink-0 items-center justify-center">
@@ -83,7 +83,7 @@ export default function Skills() {
                 </div>
 
                 {/* Skills grid */}
-                <div className="flex flex-wrap gap-4 mt-auto pt-2">
+                <div className="flex flex-wrap gap-4 mt-auto pt-4">
                   {g.skills.map((s, j) => (
                     <motion.span
                       key={s}

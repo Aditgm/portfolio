@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowDown, ArrowUpRight, Github, Mail } from "lucide-react";
+import { ArrowUpRight, Github, Mail } from "lucide-react";
 
 const roles = [
-  "Senior-Focused AI/ML Engineer",
-  "Product-Oriented Full-Stack Developer",
-  "Performance-Driven Problem Solver",
-  "Systems Thinking Builder",
+  "Aspiring Software Engineer",
+  "Full-Stack Developer",
+  "AI/ML Enthusiast",
+  "Competitive Programmer",
 ];
 
 /* Floating geometric shapes */
@@ -77,7 +77,7 @@ export default function Hero() {
       <GeoShapes />
 
       <div className="relative z-10 mx-auto max-w-4xl text-center">
-        <div className="flex flex-col items-center gap-8">
+        <div className="flex flex-col items-center gap-10">
           {/* Status badge */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -89,7 +89,7 @@ export default function Hero() {
               <span className="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" style={{ animation: "pulse-ring 1.5s ease-out infinite" }} />
               <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-blue-400" />
             </span>
-            Open to Senior Engineering Roles
+            Open to SDE Internships &amp; New Grad Roles
           </motion.div>
 
           {/* Name */}
@@ -105,7 +105,7 @@ export default function Hero() {
           </motion.div>
 
           {/* Rotating role */}
-          <div className="h-12 overflow-hidden">
+          <div className="mt-2 h-12 overflow-hidden">
             <AnimatePresence mode="wait">
               <motion.div
                 key={roleIdx}
@@ -129,11 +129,11 @@ export default function Hero() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25, duration: 0.6 }}
-            className="mx-auto max-w-2xl text-[1.05rem] leading-[1.9] text-slate-400 md:text-lg"
+            className="mx-auto max-w-2xl text-[1.05rem] leading-[1.85] text-slate-400 md:text-lg"
           >
-            I design and ship production-grade systems across AI/ML and modern
-            web stacks. My focus is high-impact engineering — fast iteration,
-            reliable architecture, and measurable outcomes from day one.
+            I am a Computer Science student passionate about building scalable digital experiences.
+            I focus on solving complex problems through elegant code, fast iteration, and robust
+            architecture across AI/ML and modern web stacks.
           </motion.p>
 
           {/* CTA buttons */}
@@ -141,23 +141,28 @@ export default function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35, duration: 0.5 }}
-            className="mt-4 flex flex-wrap justify-center items-center gap-6"
+            className="mt-8 flex flex-wrap justify-center items-center gap-7"
           >
             <a
               href="https://github.com/Aditgm"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-3 whitespace-nowrap rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-10 py-5 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-600/30"
+              className="group relative inline-flex items-center gap-3 overflow-hidden whitespace-nowrap rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-10 py-5 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-xl hover:shadow-blue-600/40"
             >
-              View Projects
-              <ArrowUpRight size={18} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ animation: "shimmer 2s infinite" }} />
+              <span className="relative flex items-center gap-3">
+                View Projects
+                <ArrowUpRight size={18} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </span>
             </a>
             <a
               href="#contact"
-              className="group inline-flex items-center gap-3 whitespace-nowrap rounded-xl border border-white/[0.12] bg-white/[0.06] px-10 py-5 text-base font-bold text-slate-200 transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.25] hover:bg-white/[0.1] hover:text-white hover:shadow-lg hover:shadow-white/[0.05]"
+              className="group relative inline-flex items-center gap-3 overflow-hidden whitespace-nowrap rounded-xl border border-white/[0.12] bg-white/[0.06] backdrop-blur-sm px-10 py-5 text-base font-bold text-slate-200 transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:border-white/[0.25] hover:bg-white/[0.1] hover:text-white hover:shadow-lg hover:shadow-white/[0.05]"
             >
-              Get in Touch
-              <Mail size={18} className="transition-transform group-hover:translate-x-0.5" />
+              <span className="relative flex items-center gap-3">
+                Get in Touch
+                <Mail size={18} className="transition-transform group-hover:translate-x-0.5" />
+              </span>
             </a>
           </motion.div>
 
@@ -166,7 +171,7 @@ export default function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="mt-8 flex flex-wrap items-center justify-center gap-6 text-[0.9rem] font-medium text-slate-500"
+            className="mt-12 flex flex-wrap items-center justify-center gap-8 text-[0.9rem] font-medium text-slate-500"
           >
             <a href="https://github.com/Aditgm" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 transition-all duration-300 hover:text-white">
               <Github size={18} /> GitHub
@@ -178,25 +183,6 @@ export default function Hero() {
           </motion.div>
         </div>
       </div>
-
-      {/* Scroll cue */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-        className="absolute bottom-10 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 md:flex"
-      >
-        <span className="text-[0.7rem] font-semibold uppercase tracking-[0.25em] text-slate-500">
-          Scroll
-        </span>
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
-          className="flex h-10 w-6 items-start justify-center rounded-full border-2 border-slate-700 pt-2"
-        >
-          <div className="h-2 w-1 rounded-full bg-slate-400" />
-        </motion.div>
-      </motion.div>
     </section>
   );
 }
