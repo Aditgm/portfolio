@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Github, ExternalLink } from "lucide-react";
+import Image from "next/image";
 
 const projects = [
   {
@@ -15,7 +16,9 @@ const projects = [
       "OAuth 2.0 secure authentication",
     ],
     stack: ["MongoDB", "Express.js", "React.js", "Node.js", "Python", "Socket.io", "Roboflow"],
-    github: "https://github.com/Aditgm",
+    github: "https://github.com/Aditgm/dengue-spot",
+    live: "https://dengue-spot-gi3p.onrender.com/",
+    image: "/projects/denguespot.png",
     tag: "Full-Stack + AI/CV",
     tagColor: "border-red-500/20 bg-red-500/[0.07] text-red-400",
     accentGradient: "from-red-500/20 to-orange-500/5",
@@ -32,7 +35,9 @@ const projects = [
       "92% retrieval accuracy across 1,000+ docs",
     ],
     stack: ["Next.js", "Llama 3.3", "Pinecone", "MongoDB"],
-    github: "https://github.com/Aditgm",
+    github: "https://github.com/Aditgm/Legal_Lens",
+    live: "https://aditgm.github.io/Legal_Lens/",
+    image: "/projects/legallens.png",
     tag: "AI/ML + RAG",
     tagColor: "border-purple-500/20 bg-purple-500/[0.07] text-purple-400",
     accentGradient: "from-purple-500/20 to-blue-500/5",
@@ -49,10 +54,31 @@ const projects = [
       "Structured context-rich summaries",
     ],
     stack: ["React.js", "Node.js", "Google Gemini API", "Render"],
-    github: "https://github.com/Aditgm",
+    github: "https://github.com/Aditgm/Youtubey",
+    live: "https://youtubey-beige.vercel.app/",
+    image: "/projects/youtubey.png",
     tag: "AI + Full-Stack",
     tagColor: "border-blue-500/20 bg-blue-500/[0.07] text-blue-400",
     accentGradient: "from-blue-500/20 to-cyan-500/5",
+    featured: false,
+  },
+  {
+    title: "Indian Economic Dashboard",
+    subtitle: "Real-time Financial Analysis Platform",
+    desc: "A comprehensive dashboard for Indian economic indicators and stock market analysis. Delivers enterprise-grade performance monitoring with 73% faster load times via parallel data fetching.",
+    highlights: [
+      "Real-time technical & correlation analysis",
+      "Advanced Risk Analytics (VaR, Sharpe Ratio)",
+      "40+ BSE stocks with dynamic search",
+      "Ultra-fast parallel data fetching architecture",
+    ],
+    stack: ["Python", "Streamlit", "Plotly", "Pandas", "yFinance API"],
+    github: "https://github.com/Aditgm/indian-economic-dashboard",
+    live: "https://aditgm-indian-economic-dashboard-app-oxnhak.streamlit.app/",
+    image: "/projects/indian-economic-dashboard.png",
+    tag: "Data Science & FinTech",
+    tagColor: "border-emerald-500/20 bg-emerald-500/[0.07] text-emerald-400",
+    accentGradient: "from-emerald-500/20 to-teal-500/5",
     featured: false,
   },
 ];
@@ -98,6 +124,18 @@ export default function Projects() {
               {/* Top gradient accent */}
               <div className={`h-px w-full bg-gradient-to-r ${p.accentGradient}`} />
 
+              {/* Project Image */}
+              {"image" in p && p.image && (
+                <div className="relative h-48 w-full shrink-0 overflow-hidden border-b border-white/[0.04] sm:h-64">
+                  <Image
+                    src={p.image}
+                    alt={p.title}
+                    fill
+                    className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                  />
+                </div>
+              )}
+
               <div className={`flex flex-1 flex-col ${p.featured ? "md:flex-row" : ""}`}>
                 <div className="flex-1 p-10 md:p-14">
                   {/* Top row */}
@@ -113,12 +151,14 @@ export default function Projects() {
                       >
                         <Github size={14} />
                       </a>
-                      <a href={p.github} target="_blank" rel="noopener noreferrer"
-                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.06] text-slate-500 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white"
-                        aria-label="Live"
-                      >
-                        <ExternalLink size={14} />
-                      </a>
+                      {"live" in p && p.live && (
+                        <a href={p.live} target="_blank" rel="noopener noreferrer"
+                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.06] text-slate-500 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white"
+                          aria-label="Live Demo"
+                        >
+                          <ExternalLink size={14} />
+                        </a>
+                      )}
                     </div>
                   </div>
 
