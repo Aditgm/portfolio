@@ -4,6 +4,18 @@ import { motion } from "framer-motion";
 
 const experiences = [
   {
+    role: "Competitive Programmer",
+    company: "LeetCode, Codeforces & CodeChef",
+    period: "Mar 2024 – Present",
+    badge: "Top 0.4% Global",
+    badgeColor: "border-blue-500/20 bg-blue-500/[0.07] text-blue-400",
+    accentColor: "from-blue-500 to-cyan-500",
+    bullets: [
+      "Achieved Guardian rank on LeetCode (Top 0.4% globally) and Master rank on Codeforces (Ranked 56 in India).",
+      "Consistently solved complex algorithmic challenges under strict time constraints, mastering advanced data structures and dynamic programming.",
+    ],
+  },
+  {
     role: "Machine Learning Research Mentee",
     company: "Amazon ML Summer School",
     period: "Aug 2025 – Sep 2025",
