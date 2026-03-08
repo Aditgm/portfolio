@@ -1,7 +1,14 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Github, Mail, Brain, Code2, MapPin, Zap } from "lucide-react";
+
+const achievements = [
+  "Top 0.4% on LeetCode · Guardian",
+  "Codeforces Master · Ranked 56 in India",
+  "CodeChef · Ranked 379 in India",
+];
 
 /* Floating geometric shapes */
 function GeoShapes() {
@@ -57,6 +64,13 @@ function GeoShapes() {
 }
 
 export default function Hero() {
+  const [achievementIdx, setAchievementIdx] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setAchievementIdx((i) => (i + 1) % achievements.length), 3000);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <section className="relative isolate flex min-h-[100dvh] items-center justify-center overflow-hidden px-6 pt-32 pb-24 md:px-12 lg:px-16">
       <GeoShapes />
@@ -93,12 +107,25 @@ export default function Hero() {
               <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-wide">
                 Full-Stack Developer & AI Engineer
               </h2>
-              <div className="flex items-center gap-3 text-sm sm:text-base font-medium text-cyan-300">
-                <span className="hidden h-px w-8 bg-gradient-to-r from-transparent to-cyan-500 sm:block" />
-                <span>Top 0.4% globally on LeetCode &middot; Guardian</span>
-                <span className="hidden h-px w-8 bg-gradient-to-l from-transparent to-cyan-500 sm:block" />
+
+              <div className="mt-1 h-8 overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={achievementIdx}
+                    initial={{ opacity: 0, y: 15, filter: "blur(3px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, y: -15, filter: "blur(3px)" }}
+                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base font-medium text-cyan-300"
+                  >
+                    <span className="hidden h-px w-8 bg-gradient-to-r from-transparent to-cyan-500 sm:block" />
+                    <span className="text-center">{achievements[achievementIdx]}</span>
+                    <span className="hidden h-px w-8 bg-gradient-to-l from-transparent to-cyan-500 sm:block" />
+                  </motion.div>
+                </AnimatePresence>
               </div>
-              <p className="mt-2 text-lg sm:text-xl font-medium text-slate-300 italic">
+
+              <p className="mt-3 text-lg sm:text-xl font-medium text-slate-300 italic">
                 &quot;Building AI-powered products that ship.&quot;
               </p>
             </div>
@@ -109,7 +136,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25, duration: 0.6 }}
-            className="mx-auto mt-12 grid max-w-5xl gap-5 text-left md:gap-6 sm:grid-cols-2 md:grid-cols-3"
+            className="mx-auto mt-12 grid max-w-5xl gap-y-6 gap-x-6 text-left md:gap-y-8 md:gap-x-10 sm:grid-cols-2 md:grid-cols-3"
           >
             {/* Card 1: Identity & Domains */}
             <div className="card-geo-accent group relative flex flex-col justify-center rounded-3xl border border-white/[0.08] bg-white/[0.02] p-8 md:p-10 transition-all hover:bg-white/[0.04] sm:col-span-2 md:col-span-2">
@@ -134,7 +161,7 @@ export default function Hero() {
             </div>
 
             {/* Card 3: Current Focus */}
-            <div className="card-geo-accent group relative flex flex-col justify-center rounded-3xl border border-white/[0.08] bg-white/[0.02] p-8 md:p-10 transition-all hover:bg-white/[0.04] sm:col-span-2 md:col-span-2">
+            <div className="card-geo-accent group relative flex flex-col justify-center rounded-3xl border border-white/[0.08] bg-white/[0.02] p-8 md:p-10 transition-all hover:bg-white/[0.04] sm:col-span-2 md:col-span-3">
               <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
                 <Code2 className="text-purple-400" size={24} /> Current Focus
@@ -142,20 +169,6 @@ export default function Hero() {
               <p className="text-base leading-[1.8] text-slate-400">
                 Currently exploring <strong className="font-medium text-slate-200">LangChain and Azure</strong>, contributing to open source, and building something new. Fuelled by algorithms and late-night problem sets.
               </p>
-            </div>
-
-            {/* Card 4: Location */}
-            <div className="card-geo-accent group relative flex flex-col justify-center items-center text-center rounded-3xl border border-white/[0.08] bg-white/[0.02] p-8 md:p-10 transition-all hover:bg-white/[0.04]">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-green-500/5 to-emerald-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-              <div className="flex flex-col items-center gap-4">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white/[0.03] border border-white/[0.08] text-xl shadow-inner transition-colors group-hover:bg-white/[0.06] group-hover:border-white/[0.15]">
-                  <MapPin size={28} className="text-green-400" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium uppercase tracking-wider text-slate-500">Based in</p>
-                  <p className="mt-1 text-lg font-semibold text-white">Dehradun, IN</p>
-                </div>
-              </div>
             </div>
           </motion.div>
 
