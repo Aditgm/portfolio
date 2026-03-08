@@ -1,15 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowUpRight, Github, Mail } from "lucide-react";
-
-const roles = [
-  "Aspiring Software Engineer",
-  "Full-Stack Developer",
-  "AI/ML Enthusiast",
-  "Competitive Programmer",
-];
 
 /* Floating geometric shapes */
 function GeoShapes() {
@@ -65,13 +57,6 @@ function GeoShapes() {
 }
 
 export default function Hero() {
-  const [roleIdx, setRoleIdx] = useState(0);
-
-  useEffect(() => {
-    const id = setInterval(() => setRoleIdx((i) => (i + 1) % roles.length), 2800);
-    return () => clearInterval(id);
-  }, []);
-
   return (
     <section className="relative isolate flex min-h-[100dvh] items-center justify-center overflow-hidden px-6 pt-32 pb-24 md:px-12 lg:px-16">
       <GeoShapes />
@@ -92,49 +77,50 @@ export default function Hero() {
             Open to SDE Internships &amp; New Grad Roles
           </motion.div>
 
-          {/* Name */}
+          {/* Name and Titles */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="flex flex-col items-center gap-6"
           >
             <h1 className="text-[4rem] font-extrabold leading-[1.05] tracking-tight sm:text-7xl md:text-8xl lg:text-[6.5rem]">
               <span className="text-white">Aditya</span>{" "}
               <span className="text-gradient block sm:inline">Raj</span>
             </h1>
+
+            <div className="flex flex-col items-center gap-3">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-wide">
+                Full-Stack Developer & AI Engineer
+              </h2>
+              <div className="flex items-center gap-3 text-sm sm:text-base font-medium text-cyan-300">
+                <span className="hidden h-px w-8 bg-gradient-to-r from-transparent to-cyan-500 sm:block" />
+                <span>Top 0.4% globally on LeetCode &middot; Guardian</span>
+                <span className="hidden h-px w-8 bg-gradient-to-l from-transparent to-cyan-500 sm:block" />
+              </div>
+              <p className="mt-2 text-lg sm:text-xl font-medium text-slate-300 italic">
+                &quot;Building AI-powered products that ship.&quot;
+              </p>
+            </div>
           </motion.div>
 
-          {/* Rotating role */}
-          <div className="mt-2 h-12 overflow-hidden">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={roleIdx}
-                initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -20, filter: "blur(8px)" }}
-                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                className="flex items-center justify-center gap-4"
-              >
-                <span className="hidden h-px w-10 bg-gradient-to-r from-transparent to-cyan-500 sm:block" />
-                <p className="font-mono text-base text-cyan-300 md:text-xl font-medium tracking-wide">
-                  {roles[roleIdx]}
-                </p>
-                <span className="hidden h-px w-10 bg-gradient-to-l from-transparent to-cyan-500 sm:block" />
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Description */}
-          <motion.p
+          {/* Bio */}
+          <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25, duration: 0.6 }}
-            className="mx-auto max-w-2xl text-[1.05rem] leading-[1.85] text-slate-400 md:text-lg"
+            className="mx-auto max-w-3xl text-[1.05rem] leading-[1.85] text-slate-400 space-y-4 text-left md:text-center md:text-lg"
           >
-            I am a Computer Science student passionate about building scalable digital experiences.
-            I focus on solving complex problems through elegant code, fast iteration, and robust
-            architecture across AI/ML and modern web stacks.
-          </motion.p>
+            <p>
+              Top 0.4% competitive programmer on LeetCode who builds AI products that solve real problems. I&apos;m drawn to challenges at the intersection of LLMs, RAG systems, and domains that matter &mdash; healthcare, law, and finance &mdash; where good engineering can genuinely change outcomes.
+            </p>
+            <p>
+              Currently exploring LangChain and Azure, contributing to open source, and building something new. I approach every project the way I approach competitive programming &mdash; find the most elegant solution, then make it fast.
+            </p>
+            <p>
+              Based in Dehradun, fuelled by algorithms and late-night problem sets.
+            </p>
+          </motion.div>
 
           {/* CTA buttons */}
           <motion.div

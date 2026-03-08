@@ -8,7 +8,11 @@ const projects = [
   {
     title: "Dengue-spot",
     subtitle: "Community Dengue Prevention App",
-    desc: "A MERN-based disease surveillance platform with real-time community chat, AI-powered mosquito breeding ground detection, and enterprise-grade security.",
+    desc: [
+      { label: "Problem", text: "Mosquito breeding spots go unreported until outbreaks happen, lacking real-time tracking." },
+      { label: "Approach", text: "Built a MERN surveillance platform integrating Roboflow CV API for automated detection and Socket.io for live chat." },
+      { label: "Result", text: "Enabled fast reporting with enterprise-grade security (RBAC & rate-limiting)." },
+    ],
     highlights: [
       "Socket.io bi-directional real-time chat",
       "Roboflow CV API for mosquito detection",
@@ -27,7 +31,11 @@ const projects = [
   {
     title: "Legal Lens",
     subtitle: "AI-Powered Legal Help Platform",
-    desc: "A RAG pipeline using Llama 3.3 (70B) for context-aware legal insights with a high-performance semantic search engine over 1,000+ legal documents.",
+    desc: [
+      { label: "Problem", text: "Statutory research is slow, tedious, and often inaccessible for everyday users needing legal help." },
+      { label: "Approach", text: "Engineered a context-aware RAG pipeline using Llama 3.3 (70B) and Pinecone Vector DB for semantic search over 1,000+ docs." },
+      { label: "Result", text: "Achieved 92% retrieval accuracy, sub-150ms query latency, and 85% faster research workflows." },
+    ],
     highlights: [
       "RAG pipeline with Llama 3.3 (70B)",
       "85% faster statutory research workflows",
@@ -46,7 +54,11 @@ const projects = [
   {
     title: "YouTubey",
     subtitle: "AI Video Summarizer for Students",
-    desc: "An automated pipeline leveraging Google Gemini API to process YouTube transcripts and generate structured educational summaries with optimized concurrent handling.",
+    desc: [
+      { label: "Problem", text: "Students spend hours watching long educational videos just to extract key concepts." },
+      { label: "Approach", text: "Developed an automated pipeline leveraging Google Gemini API and Node.js to concurrently process YouTube transcripts." },
+      { label: "Result", text: "Supported 100+ concurrent connections while achieving a 30% reduction in processing latency." },
+    ],
     highlights: [
       "Google Gemini API transcript processing",
       "30% reduction in processing latency",
@@ -65,7 +77,11 @@ const projects = [
   {
     title: "Indian Economic Dashboard",
     subtitle: "Real-time Financial Analysis Platform",
-    desc: "A comprehensive dashboard for Indian economic indicators and stock market analysis. Delivers enterprise-grade performance monitoring with 73% faster load times via parallel data fetching.",
+    desc: [
+      { label: "Problem", text: "Financial analysts lack unified, high-performance dashboards for tracking Indian macro indicators." },
+      { label: "Approach", text: "Built a comprehensive Streamlit dashboard featuring parallel data fetching to analyze 40+ BSE stocks." },
+      { label: "Result", text: "Delivered real-time risk analytics with 73% faster load times." },
+    ],
     highlights: [
       "Real-time technical & correlation analysis",
       "Advanced Risk Analytics (VaR, Sharpe Ratio)",
@@ -167,7 +183,15 @@ export default function Projects() {
                     {p.title}
                   </h3>
                   <p className="mt-2 text-sm text-slate-500">{p.subtitle}</p>
-                  <p className="mt-5 text-sm leading-[1.8] text-slate-400">{p.desc}</p>
+
+                  {/* Case Study Description */}
+                  <div className="mt-6 flex flex-col gap-3 text-sm leading-[1.6] text-slate-400">
+                    {p.desc.map((d, idx) => (
+                      <p key={idx}>
+                        <strong className="font-semibold text-slate-200">{d.label}:</strong> {d.text}
+                      </p>
+                    ))}
+                  </div>
 
                   {/* Highlights */}
                   <ul className="mt-10 flex flex-col gap-4">
