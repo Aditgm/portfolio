@@ -109,51 +109,51 @@ export default function Hero() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25, duration: 0.6 }}
-            className="mx-auto mt-8 grid max-w-4xl gap-4 text-left sm:grid-cols-2 md:grid-cols-3"
+            className="mx-auto mt-12 grid max-w-5xl gap-5 text-left md:gap-6 sm:grid-cols-2 md:grid-cols-3"
           >
             {/* Card 1: Identity & Domains */}
-            <div className="card-geo-accent group relative flex flex-col rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 transition-all hover:bg-white/[0.04] sm:col-span-2 md:col-span-2">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-              <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-white">
-                <Brain className="text-blue-400" size={20} /> Product & AI
+            <div className="card-geo-accent group relative flex flex-col justify-center rounded-3xl border border-white/[0.08] bg-white/[0.02] p-8 md:p-10 transition-all hover:bg-white/[0.04] sm:col-span-2 md:col-span-2">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
+                <Brain className="text-blue-400" size={24} /> Product & AI
               </h3>
-              <p className="text-[0.95rem] leading-relaxed text-slate-400">
+              <p className="text-base leading-[1.8] text-slate-400">
                 Top <strong className="font-medium text-slate-200">0.4% competitive programmer</strong> on LeetCode who builds AI products that solve real problems. I&apos;m drawn to challenges at the intersection of <strong className="font-medium text-slate-200">LLMs, RAG systems</strong>, and domains that matter &mdash; healthcare, law, and finance &mdash; where good engineering can genuinely change outcomes.
               </p>
             </div>
 
             {/* Card 2: Philosophy */}
-            <div className="card-geo-accent group relative flex flex-col rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 transition-all hover:bg-white/[0.04]">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-blue-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-              <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-white">
-                <Zap className="text-cyan-400" size={20} /> Philosophy
+            <div className="card-geo-accent group relative flex flex-col justify-center rounded-3xl border border-white/[0.08] bg-white/[0.02] p-8 md:p-10 transition-all hover:bg-white/[0.04]">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-500/5 to-blue-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
+                <Zap className="text-cyan-400" size={24} /> Philosophy
               </h3>
-              <p className="text-[0.95rem] leading-relaxed text-slate-400">
+              <p className="text-base leading-[1.8] text-slate-400">
                 I approach every project the way I approach competitive programming &mdash; find the <strong className="font-medium text-slate-200">most elegant solution</strong>, then make it fast.
               </p>
             </div>
 
             {/* Card 3: Current Focus */}
-            <div className="card-geo-accent group relative flex flex-col rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 transition-all hover:bg-white/[0.04] sm:col-span-2 md:col-span-2">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-              <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-white">
-                <Code2 className="text-purple-400" size={20} /> Current Focus
+            <div className="card-geo-accent group relative flex flex-col justify-center rounded-3xl border border-white/[0.08] bg-white/[0.02] p-8 md:p-10 transition-all hover:bg-white/[0.04] sm:col-span-2 md:col-span-2">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
+                <Code2 className="text-purple-400" size={24} /> Current Focus
               </h3>
-              <p className="text-[0.95rem] leading-relaxed text-slate-400">
+              <p className="text-base leading-[1.8] text-slate-400">
                 Currently exploring <strong className="font-medium text-slate-200">LangChain and Azure</strong>, contributing to open source, and building something new. Fuelled by algorithms and late-night problem sets.
               </p>
             </div>
 
             {/* Card 4: Location */}
-            <div className="card-geo-accent group relative flex flex-col justify-center rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 transition-all hover:bg-white/[0.04]">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-green-500/5 to-emerald-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/[0.03] border border-white/[0.08] text-xl shadow-inner transition-colors group-hover:bg-white/[0.06] group-hover:border-white/[0.15]">
-                  <MapPin size={22} className="text-green-400" />
+            <div className="card-geo-accent group relative flex flex-col justify-center items-center text-center rounded-3xl border border-white/[0.08] bg-white/[0.02] p-8 md:p-10 transition-all hover:bg-white/[0.04]">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-green-500/5 to-emerald-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              <div className="flex flex-col items-center gap-4">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white/[0.03] border border-white/[0.08] text-xl shadow-inner transition-colors group-hover:bg-white/[0.06] group-hover:border-white/[0.15]">
+                  <MapPin size={28} className="text-green-400" />
                 </div>
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Based in</p>
-                  <p className="font-semibold text-white">Dehradun, IN</p>
+                  <p className="text-sm font-medium uppercase tracking-wider text-slate-500">Based in</p>
+                  <p className="mt-1 text-lg font-semibold text-white">Dehradun, IN</p>
                 </div>
               </div>
             </div>
