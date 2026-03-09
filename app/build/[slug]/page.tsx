@@ -222,17 +222,19 @@ export default async function BuildPage({ params }: { params: Promise<{ slug: st
             <div className="fixed top-[-20%] left-[-10%] h-[600px] w-[600px] rounded-full bg-blue-600/[0.04] blur-[150px] z-0" />
             <div className="fixed bottom-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-purple-600/[0.04] blur-[120px] z-0" />
 
-            <div className="relative z-10 mx-auto max-w-4xl px-6 py-24 sm:py-32 md:px-12">
+            <div className="relative z-10 mx-auto w-full max-w-5xl px-6 py-24 sm:py-32 md:px-12 flex flex-col items-center">
                 {/* Back Link */}
-                <Link
-                    href="/#projects"
-                    className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition-colors mb-12 group"
-                >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.05] border border-white/[0.1] transition-all group-hover:bg-white/[0.1] group-hover:border-white/[0.2]">
-                        <span className="group-hover:-translate-x-0.5 transition-transform">&larr;</span>
-                    </div>
-                    Back to Projects
-                </Link>
+                <div className="flex justify-center w-full mb-12">
+                    <Link
+                        href="/#projects"
+                        className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition-colors group"
+                    >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.05] border border-white/[0.1] transition-all group-hover:bg-white/[0.1] group-hover:border-white/[0.2]">
+                            <span className="group-hover:-translate-x-0.5 transition-transform">&larr;</span>
+                        </div>
+                        Back to Projects
+                    </Link>
+                </div>
 
                 {/* Header */}
                 <div className="mb-20 flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-1000">
