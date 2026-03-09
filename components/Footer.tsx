@@ -55,20 +55,39 @@ export default function Footer() {
           <div className="h-px w-full bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
 
           <div className="w-full px-10 pt-8 pb-10 md:px-12 md:pt-10 md:pb-12 flex flex-col items-center text-center gap-10">
-            {/* Contact Form */}
-            <form action="https://formsubmit.co/arajsinha4@gmail.com" method="POST" className="w-full max-w-md flex flex-col gap-4">
-              <input type="hidden" name="_captcha" value="false" />
-              <input type="hidden" name="_next" value="https://aditgm-portfolio.vercel.app" />
-              <div className="flex flex-col md:flex-row gap-4">
-                <input type="text" name="name" required placeholder="Your Name" className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-5 py-3.5 text-sm text-slate-200 placeholder-slate-500 transition-colors focus:border-blue-500/50 focus:bg-white/[0.05] focus:outline-none" />
-                <input type="email" name="email" required placeholder="Your Email" className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-5 py-3.5 text-sm text-slate-200 placeholder-slate-500 transition-colors focus:border-blue-500/50 focus:bg-white/[0.05] focus:outline-none" />
+            {/* Direct Email Links */}
+            <div className="w-full max-w-sm flex flex-col gap-4">
+              <a
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=arajsinha4@gmail.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative inline-flex w-full items-center justify-center gap-3 rounded-xl border border-red-500/30 bg-red-500/10 px-8 py-4 text-sm font-semibold text-red-100 shadow-lg shadow-red-500/5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-red-500/20 hover:shadow-red-500/20 hover:border-red-500/50"
+              >
+                <span className="relative flex items-center justify-center gap-3">Compose in Gmail <Mail size={16} className="text-red-300" /></span>
+              </a>
+
+              <a
+                href="https://outlook.live.com/mail/0/deeplink/compose?to=arajsinha4@gmail.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative inline-flex w-full items-center justify-center gap-3 rounded-xl border border-blue-500/30 bg-blue-500/10 px-8 py-4 text-sm font-semibold text-blue-100 shadow-lg shadow-blue-500/5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500/20 hover:shadow-blue-500/20 hover:border-blue-500/50"
+              >
+                <span className="relative flex items-center justify-center gap-3">Compose in Outlook <Mail size={16} className="text-blue-300" /></span>
+              </a>
+
+              <div className="flex items-center gap-4 my-2">
+                <div className="h-px bg-white/10 flex-1" />
+                <span className="text-xs text-slate-500 uppercase tracking-widest font-semibold">Or</span>
+                <div className="h-px bg-white/10 flex-1" />
               </div>
-              <textarea name="message" required placeholder="Your Message" rows={4} className="w-full resize-none rounded-xl border border-white/[0.08] bg-white/[0.03] px-5 py-4 text-sm text-slate-200 placeholder-slate-500 transition-colors focus:border-blue-500/50 focus:bg-white/[0.05] focus:outline-none"></textarea>
-              <button type="submit" className="group relative inline-flex w-full items-center justify-center gap-3 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/30">
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ animation: "shimmer 2s infinite" }} />
-                <span className="relative flex items-center justify-center gap-2">Send Message <Mail size={16} /></span>
-              </button>
-            </form>
+
+              <a
+                href="mailto:arajsinha4@gmail.com"
+                className="group relative inline-flex w-full items-center justify-center gap-3 overflow-hidden rounded-xl border border-white/10 bg-white/5 px-8 py-4 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10 hover:border-white/20"
+              >
+                <span className="relative flex items-center justify-center gap-2">Open Default Mail App <Mail size={16} className="text-slate-400" /></span>
+              </a>
+            </div>
 
             {/* Social links */}
             <div className="flex flex-wrap items-center justify-center gap-4">
