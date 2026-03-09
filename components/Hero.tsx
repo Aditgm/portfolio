@@ -141,7 +141,7 @@ export default function Hero() {
             className="mx-auto mt-8 grid max-w-[56rem] gap-y-4 gap-x-4 text-left md:gap-y-5 md:gap-x-5 sm:grid-cols-2 md:grid-cols-3"
           >
             {/* Card 1: Identity & Domains */}
-            <div className="card-geo-accent group relative flex flex-col justify-center rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 md:p-8 transition-all hover:bg-white/[0.04] sm:col-span-2 md:col-span-2">
+            <div className="card-geo-accent group relative flex flex-col justify-center rounded-2xl border border-white/[0.08] bg-slate-900/40 backdrop-blur-md p-6 md:p-8 transition-all hover:bg-slate-800/60 sm:col-span-2 md:col-span-2">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
                 <Brain className="text-blue-400" size={24} /> Product & AI
@@ -152,7 +152,7 @@ export default function Hero() {
             </div>
 
             {/* Card 2: Philosophy */}
-            <div className="card-geo-accent group relative flex flex-col justify-center rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 md:p-8 transition-all hover:bg-white/[0.04]">
+            <div className="card-geo-accent group relative flex flex-col justify-center rounded-2xl border border-white/[0.08] bg-slate-900/40 backdrop-blur-md p-6 md:p-8 transition-all hover:bg-slate-800/60">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-blue-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
                 <Zap className="text-cyan-400" size={24} /> Philosophy
@@ -163,7 +163,7 @@ export default function Hero() {
             </div>
 
             {/* Card 3: Current Focus */}
-            <div className="card-geo-accent group relative flex flex-col justify-center rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 md:p-8 transition-all hover:bg-white/[0.04] sm:col-span-2 md:col-span-3">
+            <div className="card-geo-accent group relative flex flex-col justify-center rounded-2xl border border-white/[0.08] bg-slate-900/40 backdrop-blur-md p-6 md:p-8 transition-all hover:bg-slate-800/60 sm:col-span-2 md:col-span-3">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
                 <Code2 className="text-purple-400" size={24} /> Current Focus

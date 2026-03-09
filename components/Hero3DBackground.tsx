@@ -72,23 +72,22 @@ varying vec2 vUv;
 varying float vElevation;
 
 void main() {
-  // Base grid color - very dim blue
-  vec3 colorBase = vec3(0.05, 0.1, 0.25); 
+  // Base grid color - much darker so it doesn't compete with text
+  vec3 colorBase = vec3(0.02, 0.05, 0.15); 
   
   // Neon highlight color - bright cyan/blue
   vec3 colorHigh = vec3(0.0, 0.7, 1.0); 
   
   // Mix color based heavily on how high the terrain is (elevation)
-  // The mouse pushes elevation up by 1.5, so it hits the high color immediately
   float mixStrength = clamp(vElevation * 0.8, 0.0, 1.0);
   vec3 finalColor = mix(colorBase, colorHigh, mixStrength);
   
-  // Fade out aggressively towards the edges so it looks like it emerges from darkness
+  // Fade out aggressively towards the edges
   float edgeFade = smoothstep(0.0, 0.3, vUv.x) * smoothstep(1.0, 0.7, vUv.x) * 
                    smoothstep(0.0, 0.3, vUv.y) * smoothstep(1.0, 0.7, vUv.y);
 
-  // Boost opacity where it's glowing
-  float alpha = clamp(edgeFade * (0.3 + mixStrength * 0.7), 0.0, 1.0);
+  // Lower baseline opacity significantly, boost when glowing (hovered)
+  float alpha = clamp(edgeFade * (0.15 + mixStrength * 0.85), 0.0, 1.0);
 
   gl_FragColor = vec4(finalColor, alpha);
 }
