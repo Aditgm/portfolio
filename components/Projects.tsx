@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Github, ExternalLink } from "lucide-react";
+import { Github, ExternalLink, Hammer, ChevronRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 const projects = [
   {
@@ -26,6 +27,7 @@ const projects = [
     tag: "Full-Stack + AI/CV",
     tagColor: "border-red-500/20 bg-red-500/[0.07] text-red-400",
     accentGradient: "from-red-500/20 to-orange-500/5",
+    slug: "dengue-spot",
     featured: true,
   },
   {
@@ -49,6 +51,7 @@ const projects = [
     tag: "AI/ML + RAG",
     tagColor: "border-purple-500/20 bg-purple-500/[0.07] text-purple-400",
     accentGradient: "from-purple-500/20 to-blue-500/5",
+    slug: "legal-lens",
     featured: false,
   },
   {
@@ -72,6 +75,7 @@ const projects = [
     tag: "AI + Full-Stack",
     tagColor: "border-blue-500/20 bg-blue-500/[0.07] text-blue-400",
     accentGradient: "from-blue-500/20 to-cyan-500/5",
+    slug: "youtubey",
     featured: false,
   },
   {
@@ -95,6 +99,7 @@ const projects = [
     tag: "Data Science & FinTech",
     tagColor: "border-emerald-500/20 bg-emerald-500/[0.07] text-emerald-400",
     accentGradient: "from-emerald-500/20 to-teal-500/5",
+    slug: "indian-economic-dashboard",
     featured: false,
   },
 ];
@@ -239,6 +244,18 @@ export default function Projects() {
                     {t}
                   </span>
                 ))}
+
+                <div className="ml-auto w-full md:w-auto mt-4 md:mt-0">
+                  <Link
+                    href={`/build/${p.slug}`}
+                    className="group relative flex w-full md:w-auto items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600/80 to-purple-600/80 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_25px_rgba(59,130,246,0.3)] border border-white/10 hover:border-white/20"
+                  >
+                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ animation: "shimmer 2.5s infinite" }} />
+                    <Hammer size={16} className="transition-transform group-hover:-rotate-12" />
+                    <span>Build with me</span>
+                    <ChevronRight size={16} className="transition-transform group-hover:translate-x-1 opacity-70" />
+                  </Link>
+                </div>
               </div>
             </motion.article>
           ))}
