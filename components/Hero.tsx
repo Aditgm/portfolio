@@ -78,18 +78,19 @@ export default function Hero() {
       <div className="relative z-10 mx-auto max-w-4xl text-center">
         <div className="flex flex-col items-center gap-10">
           {/* Status badge */}
-          <motion.div
+          <motion.a
+            href="mailto:arajsinha4@gmail.com"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-3 rounded-full border border-blue-500/20 bg-blue-500/[0.06] px-6 py-3 text-sm font-semibold tracking-wide text-blue-300"
+            className="inline-flex cursor-pointer hover:bg-blue-500/[0.1] transition-colors duration-300 items-center gap-3 rounded-full border border-blue-500/20 bg-blue-500/[0.06] px-6 py-3 text-sm font-semibold tracking-wide text-blue-300"
           >
             <span className="relative flex h-2.5 w-2.5">
               <span className="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" style={{ animation: "pulse-ring 1.5s ease-out infinite" }} />
               <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-blue-400" />
             </span>
             Open to SDE Internships &amp; New Grad Roles
-          </motion.div>
+          </motion.a>
 
           {/* Name and Titles */}
           <motion.div
