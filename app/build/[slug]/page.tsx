@@ -235,21 +235,50 @@ export default async function BuildPage({ params }: { params: Promise<{ slug: st
                 </Link>
 
                 {/* Header */}
-                <div className="mb-16">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/[0.08] px-4 py-1.5 text-xs font-semibold text-blue-300 mb-6">
-                        <Hammer size={12} />
+                <div className="mb-20 flex flex-col items-center text-center">
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/[0.08] px-5 py-2 text-sm font-semibold text-blue-300 mb-6 shadow-[0_0_15px_rgba(59,130,246,0.15)]"
+                    >
+                        <Hammer size={14} className="animate-pulse" />
                         <span>Build with me</span>
-                    </div>
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-4">
+                    </motion.div>
+
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.1 }}
+                        className="text-4xl md:text-5xl lg:text-7xl font-extrabold text-white tracking-tight mb-5"
+                    >
                         {project.title}
-                    </h1>
-                    <p className="text-xl text-slate-400 font-medium mb-8">
+                    </motion.h1>
+
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                        className="text-xl md:text-2xl text-slate-400 font-medium mb-8 max-w-2xl"
+                    >
                         {project.subtitle}
-                    </p>
-                    <div className="h-px w-24 bg-gradient-to-r from-blue-500 to-transparent mb-8" />
-                    <p className="text-base md:text-lg leading-relaxed text-slate-300 max-w-3xl">
+                    </motion.p>
+
+                    <motion.div
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ duration: 0.8, delay: 0.3 }}
+                        className="h-px w-32 bg-gradient-to-r from-transparent via-blue-500/80 to-transparent mb-10"
+                    />
+
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.8, delay: 0.4 }}
+                        className="text-base md:text-lg leading-relaxed text-slate-300 max-w-3xl"
+                    >
                         {project.overview}
-                    </p>
+                    </motion.p>
                 </div>
 
                 {/* Timeline Component */}
