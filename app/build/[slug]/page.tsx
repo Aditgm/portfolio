@@ -222,7 +222,7 @@ export default async function BuildPage({ params }: { params: Promise<{ slug: st
             <div className="fixed top-[-20%] left-[-10%] h-[600px] w-[600px] rounded-full bg-blue-600/[0.04] blur-[150px] z-0" />
             <div className="fixed bottom-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-purple-600/[0.04] blur-[120px] z-0" />
 
-            <div className="relative z-10 mx-auto w-full max-w-4xl px-6 py-24 sm:py-32 md:px-12">
+            <div className="relative z-10 mx-auto w-full max-w-4xl px-6 py-24 sm:py-32 md:px-12 flex flex-col items-center">
                 {/* Back Link */}
                 <div className="text-center mb-12">
                     <Link
