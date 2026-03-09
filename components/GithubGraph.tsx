@@ -42,7 +42,7 @@ export default function GithubGraph() {
                     {/* Top gradient accent line */}
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
 
-                    <div className="w-full overflow-x-auto overflow-y-hidden text-sm text-slate-300 flex justify-center pb-2">
+                    <div className="w-full overflow-x-auto overflow-y-hidden text-sm text-slate-300 flex justify-center pb-2 [&_.react-activity-calendar\_\_count]:rounded-xl [&_.react-activity-calendar\_\_count]:border [&_.react-activity-calendar\_\_count]:border-blue-500/20 [&_.react-activity-calendar\_\_count]:bg-blue-500/10 [&_.react-activity-calendar\_\_count]:px-4 [&_.react-activity-calendar\_\_count]:py-1.5 [&_.react-activity-calendar\_\_count]:text-blue-300 [&_.react-activity-calendar\_\_count]:font-bold [&_.react-activity-calendar\_\_count]:shadow-lg [&_.react-activity-calendar\_\_count]:shadow-blue-500/10 [&_.react-activity-calendar\_\_count]:tracking-wide">
                         <div className="min-w-max px-2">
                             <GitHubCalendar
                                 username="Aditgm"
