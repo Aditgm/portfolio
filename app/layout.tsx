@@ -47,6 +47,9 @@ export const metadata: Metadata = {
   },
 };
 
+import { TransitionProvider } from "@/components/TransitionContext";
+import { LiquidOverlay } from "@/components/LiquidOverlay";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -57,7 +60,10 @@ export default function RootLayout({
       <body
         className={`${outfit.variable} ${firaCode.variable} antialiased noise-bg`}
       >
-        {children}
+        <TransitionProvider>
+          {children}
+          <LiquidOverlay />
+        </TransitionProvider>
       </body>
     </html>
   );

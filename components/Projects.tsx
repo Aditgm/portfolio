@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Github, ExternalLink, Hammer } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { TransitionLink } from "./TransitionLink";
 
 const projects = [
   {
@@ -180,12 +181,12 @@ export default function Projects() {
                           <ExternalLink size={14} />
                         </a>
                       )}
-                      <Link href={`/build/${p.slug}`}
+                      <TransitionLink href={`/build/${p.slug}`}
                         className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.06] text-slate-500 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white"
                         aria-label="Build with me"
                       >
                         <Hammer size={14} />
-                      </Link>
+                      </TransitionLink>
                     </div>
                   </div>
 

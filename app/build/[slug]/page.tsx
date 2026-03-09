@@ -1,5 +1,6 @@
 import { Hammer, CircleDashed, CheckCircle2, Server, Database, Brain, Sparkles, LayoutPanelLeft } from "lucide-react";
 import Link from "next/link";
+import { TransitionLink } from "@/components/TransitionLink";
 import { notFound } from "next/navigation";
 import BuildTimeline from "./BuildTimeline";
 
@@ -225,7 +226,7 @@ export default async function BuildPage({ params }: { params: Promise<{ slug: st
             <div className="relative z-10 mx-auto w-full max-w-4xl px-6 py-24 sm:py-32 md:px-12 flex flex-col items-center">
                 {/* Back Link */}
                 <div className="text-center mb-12">
-                    <Link
+                    <TransitionLink
                         href="/#projects"
                         className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition-colors group"
                     >
@@ -233,7 +234,7 @@ export default async function BuildPage({ params }: { params: Promise<{ slug: st
                             <span className="group-hover:-translate-x-0.5 transition-transform">&larr;</span>
                         </div>
                         Back to Projects
-                    </Link>
+                    </TransitionLink>
                 </div>
 
                 {/* Header */}
