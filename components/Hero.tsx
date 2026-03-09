@@ -73,7 +73,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative isolate flex min-h-[100dvh] items-center justify-center overflow-hidden px-6 pt-32 pb-24 md:px-12 lg:px-16">
+    <section className="relative isolate flex min-h-[100dvh] items-center justify-center overflow-hidden px-6 pt-24 pb-16 md:px-10 lg:px-12">
       <Hero3DBackground />
 
       <div className="relative z-10 mx-auto max-w-4xl text-center">
@@ -138,11 +138,11 @@ export default function Hero() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25, duration: 0.6 }}
-            className="mx-auto mt-12 grid max-w-5xl gap-y-6 gap-x-6 text-left md:gap-y-8 md:gap-x-10 sm:grid-cols-2 md:grid-cols-3"
+            className="mx-auto mt-8 grid max-w-[56rem] gap-y-4 gap-x-4 text-left md:gap-y-5 md:gap-x-5 sm:grid-cols-2 md:grid-cols-3"
           >
             {/* Card 1: Identity & Domains */}
-            <div className="card-geo-accent group relative flex flex-col justify-center rounded-3xl border border-white/[0.08] bg-white/[0.02] p-8 md:p-10 transition-all hover:bg-white/[0.04] sm:col-span-2 md:col-span-2">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+            <div className="card-geo-accent group relative flex flex-col justify-center rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 md:p-8 transition-all hover:bg-white/[0.04] sm:col-span-2 md:col-span-2">
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
                 <Brain className="text-blue-400" size={24} /> Product & AI
               </h3>
@@ -152,8 +152,8 @@ export default function Hero() {
             </div>
 
             {/* Card 2: Philosophy */}
-            <div className="card-geo-accent group relative flex flex-col justify-center rounded-3xl border border-white/[0.08] bg-white/[0.02] p-8 md:p-10 transition-all hover:bg-white/[0.04]">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-500/5 to-blue-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+            <div className="card-geo-accent group relative flex flex-col justify-center rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 md:p-8 transition-all hover:bg-white/[0.04]">
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-blue-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
                 <Zap className="text-cyan-400" size={24} /> Philosophy
               </h3>
@@ -163,8 +163,8 @@ export default function Hero() {
             </div>
 
             {/* Card 3: Current Focus */}
-            <div className="card-geo-accent group relative flex flex-col justify-center rounded-3xl border border-white/[0.08] bg-white/[0.02] p-8 md:p-10 transition-all hover:bg-white/[0.04] sm:col-span-2 md:col-span-3">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+            <div className="card-geo-accent group relative flex flex-col justify-center rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 md:p-8 transition-all hover:bg-white/[0.04] sm:col-span-2 md:col-span-3">
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
                 <Code2 className="text-purple-400" size={24} /> Current Focus
               </h3>

@@ -49,21 +49,20 @@ void main() {
   vUv = uv;
   vec3 pos = position;
 
-  // Animate the plane surface
-  float noiseFreq = 1.5;
-  float noiseAmp = 0.4;
-  vec2 noisePos = vec2(pos.x * noiseFreq + uTime * 0.2, pos.y * noiseFreq + uTime * 0.2);
+  // Animate the plane surface moving towards camera
+  float noiseFreq = 2.0;
+  float noiseAmp = 0.6;
+  vec2 noisePos = vec2(pos.x * noiseFreq, pos.y * noiseFreq + uTime * 0.8);
   float elevation = snoise(noisePos) * noiseAmp;
 
-  // Mouse interaction: push points up slightly where mouse is
+  // Mouse interaction: push terrain up sharply where mouse is
   float d = distance(vUv, uMouse);
-  float mouseEffect = smoothstep(0.4, 0.0, d) * 0.8;
+  float mouseEffect = smoothstep(0.3, 0.0, d) * 1.5;
   
   pos.z += elevation + mouseEffect;
   vElevation = elevation + mouseEffect;
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-  gl_PointSize = (10.0 + mouseEffect * 15.0) * (1.0 / -gl_Position.z); // Scale size by distance
 }
 `;
 
@@ -73,46 +72,48 @@ varying vec2 vUv;
 varying float vElevation;
 
 void main() {
-  // Circular particle shape
-  float strength = distance(gl_PointCoord, vec2(0.5));
-  strength = 1.0 - step(0.5, strength);
+  // Base grid color - very dim blue
+  vec3 colorBase = vec3(0.05, 0.1, 0.25); 
   
-  if (strength == 0.0) discard;
+  // Neon highlight color - bright cyan/blue
+  vec3 colorHigh = vec3(0.0, 0.7, 1.0); 
+  
+  // Mix color based heavily on how high the terrain is (elevation)
+  // The mouse pushes elevation up by 1.5, so it hits the high color immediately
+  float mixStrength = clamp(vElevation * 0.8, 0.0, 1.0);
+  vec3 finalColor = mix(colorBase, colorHigh, mixStrength);
+  
+  // Fade out aggressively towards the edges so it looks like it emerges from darkness
+  float edgeFade = smoothstep(0.0, 0.3, vUv.x) * smoothstep(1.0, 0.7, vUv.x) * 
+                   smoothstep(0.0, 0.3, vUv.y) * smoothstep(1.0, 0.7, vUv.y);
 
-  // Base grid color
-  vec3 colorBase = vec3(0.05, 0.1, 0.3); // Deep blue
-  vec3 colorHigh = vec3(0.1, 0.4, 1.0); // Bright neon blue
-  
-  // Mix color based on elevation
-  vec3 finalColor = mix(colorBase, colorHigh, vElevation * 1.5);
-  
-  // Fade out towards edges
-  float edgeFade = smoothstep(0.0, 0.4, vUv.x) * smoothstep(1.0, 0.6, vUv.x) * 
-                   smoothstep(0.0, 0.4, vUv.y) * smoothstep(1.0, 0.6, vUv.y);
+  // Boost opacity where it's glowing
+  float alpha = clamp(edgeFade * (0.3 + mixStrength * 0.7), 0.0, 1.0);
 
-  gl_FragColor = vec4(finalColor, strength * edgeFade * 0.8);
+  gl_FragColor = vec4(finalColor, alpha);
 }
 `;
 
-function ParticleGrid() {
-    const pointsRef = useRef<THREE.Points>(null);
+function TerrainGrid() {
+    const meshRef = useRef<THREE.Mesh>(null);
     const materialRef = useRef<THREE.ShaderMaterial>(null);
     const { viewport, mouse } = useThree();
 
-    useFrame((state) => {
-        if (!materialRef.current || !pointsRef.current) return;
+    useFrame((state, delta) => {
+        if (!materialRef.current || !meshRef.current) return;
 
         materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
 
-        // Map mouse coordinates (-1 to 1) to UV coordinates (0 to 1)
-        materialRef.current.uniforms.uMouse.value.set(
-            mouse.x * 0.5 + 0.5,
-            mouse.y * 0.5 + 0.5
-        );
+        // Smoothly lerp the mouse position into the uniform so it trails beautifully
+        // In ThreeJS, mouse is -1 to 1. In standard UV, it's 0 to 1.
+        const targetX = mouse.x * 0.5 + 0.5;
+        const targetY = mouse.y * 0.5 + 0.5;
+
+        materialRef.current.uniforms.uMouse.value.x += (targetX - materialRef.current.uniforms.uMouse.value.x) * delta * 5.0;
+        materialRef.current.uniforms.uMouse.value.y += (targetY - materialRef.current.uniforms.uMouse.value.y) * delta * 5.0;
 
         // Add a gentle floating rotation
-        pointsRef.current.rotation.x = -Math.PI * 0.15 + Math.sin(state.clock.elapsedTime * 0.2) * 0.05;
-        pointsRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.1) * 0.05;
+        meshRef.current.rotation.x = -Math.PI * 0.25 + Math.sin(state.clock.elapsedTime * 0.1) * 0.05;
     });
 
     const uniforms = useMemo(
@@ -123,18 +124,18 @@ function ParticleGrid() {
         []
     );
 
-    // Grid geometry - using large plane with wide grid
+    // Plane geometry with lots of segments to show the wireframe distortion clearly
     const geometry = useMemo(() => {
         return new THREE.PlaneGeometry(
-            viewport.width * 2,
-            viewport.height * 2,
-            Math.floor(viewport.width * 5),
-            Math.floor(viewport.height * 5)
+            viewport.width * 1.5,
+            viewport.height * 1.5,
+            100, // width segments
+            100  // height segments
         );
     }, [viewport.width, viewport.height]);
 
     return (
-        <points ref={pointsRef} position={[0, -0.5, 0]}>
+        <mesh ref={meshRef} position={[0, -1, -2]}>
             <primitive object={geometry} attach="geometry" />
             <shaderMaterial
                 ref={materialRef}
@@ -143,9 +144,10 @@ function ParticleGrid() {
                 uniforms={uniforms}
                 transparent={true}
                 depthWrite={false}
+                wireframe={true} // THE KEY: this makes it a glowing Tron-like grid!
                 blending={THREE.AdditiveBlending}
             />
-        </points>
+        </mesh>
     );
 }
 
@@ -157,8 +159,7 @@ export default function Hero3DBackground() {
                 gl={{ alpha: true, antialias: true }}
                 dpr={[1, 2]}
             >
-                <ambientLight intensity={0.5} />
-                <ParticleGrid />
+                <TerrainGrid />
             </Canvas>
         </div>
     );
