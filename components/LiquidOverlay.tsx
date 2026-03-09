@@ -154,8 +154,9 @@ function ShaderPlane() {
 
 export function LiquidOverlay() {
     return (
-        <div className="fixed inset-0 z-[9999] pointer-events-none">
+        <div className="fixed inset-0 z-[9999] pointer-events-none" style={{ pointerEvents: 'none' }}>
             <Canvas
+                style={{ pointerEvents: 'none' }}
                 orthographic
                 camera={{ zoom: 1, position: [0, 0, 1] }}
                 gl={{ alpha: true, antialias: false }}

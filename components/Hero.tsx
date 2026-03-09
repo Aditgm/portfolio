@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Github, Mail, Brain, Code2, MapPin, Zap } from "lucide-react";
+import { ArrowUpRight, Github, Mail, Brain, Code2, Zap } from "lucide-react";
+import Hero3DBackground from "./Hero3DBackground";
 
 const achievements = [
   "Top 0.4% on LeetCode · Guardian",
@@ -73,7 +74,7 @@ export default function Hero() {
 
   return (
     <section className="relative isolate flex min-h-[100dvh] items-center justify-center overflow-hidden px-6 pt-32 pb-24 md:px-12 lg:px-16">
-      <GeoShapes />
+      <Hero3DBackground />
 
       <div className="relative z-10 mx-auto max-w-4xl text-center">
         <div className="flex flex-col items-center gap-10">

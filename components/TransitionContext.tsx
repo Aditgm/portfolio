@@ -16,25 +16,23 @@ export function TransitionProvider({ children }: { children: React.ReactNode }) 
     const pathname = usePathname();
 
     const triggerTransition = useCallback((href: string) => {
-        if (pathname === href) return; // Don't transition if already on the page
+        if (pathname === href) return;
 
         setIsTransitioning(true);
 
-        // 400ms is the duration requested by the user for a snappy transition
+        // Wait for the liquid wave to cover the screen
         setTimeout(() => {
             router.push(href);
-        }, 400); // 400ms waiting for the wipe to cover the screen
+
+            // Failsafe: if navigation is instant/fails, ensure we unclog the screen
+            setTimeout(() => setIsTransitioning(false), 500);
+        }, 400);
     }, [pathname, router]);
 
-    // When the pathname changes (page fully loaded), remove the transition after a short delay
+    // Only retract the transition when the pathname ACTUALLY changes
     useEffect(() => {
-        if (isTransitioning) {
-            const timer = setTimeout(() => {
-                setIsTransitioning(false);
-            }, 100); // Small buffer to ensure the new page is rendered before pulling back the curtain
-            return () => clearTimeout(timer);
-        }
-    }, [pathname, isTransitioning]);
+        setIsTransitioning(false);
+    }, [pathname]);
 
     return (
         <TransitionContext.Provider value={{ isTransitioning, triggerTransition }}>
