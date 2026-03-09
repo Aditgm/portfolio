@@ -201,8 +201,15 @@ const buildSteps = {
     }
 };
 
-export default function BuildPage({ params }: { params: { slug: string } }) {
-    const project = buildSteps[params.slug as keyof typeof buildSteps];
+export async function generateStaticParams() {
+    return Object.keys(buildSteps).map((slug) => ({
+        slug,
+    }));
+}
+
+export default async function BuildPage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
+    const project = buildSteps[slug as keyof typeof buildSteps];
 
     if (!project) {
         notFound();
