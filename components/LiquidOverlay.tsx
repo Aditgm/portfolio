@@ -139,7 +139,7 @@ function ShaderPlane() {
 
     return (
         <mesh>
-            <planeGeometry args={[viewport.width, viewport.height, 32, 32]} />
+            <planeGeometry args={[viewport.width, viewport.height, 1, 1]} />
             <shaderMaterial
                 ref={materialRef}
                 vertexShader={vertexShader}
@@ -159,7 +159,13 @@ export function LiquidOverlay() {
                 style={{ pointerEvents: 'none' }}
                 orthographic
                 camera={{ zoom: 1, position: [0, 0, 1] }}
-                gl={{ alpha: true, antialias: false }}
+                gl={{
+                    alpha: true,
+                    antialias: false,
+                    powerPreference: "high-performance"
+                }}
+                dpr={[1, 1.5]}
+                performance={{ min: 0.5 }}
             >
                 <ShaderPlane />
             </Canvas>

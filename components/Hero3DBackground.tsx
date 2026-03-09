@@ -123,13 +123,17 @@ function TerrainGrid() {
         []
     );
 
-    // Plane geometry with lots of segments to show the wireframe distortion clearly
+    // Plane geometry with dynamic segments based on device performance
     const geometry = useMemo(() => {
+        // Use lower resolution geometry on mobile to save battery and boost FPS
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+        const segments = isMobile ? 40 : 80; // Reduced from 100x100 for better performance
+
         return new THREE.PlaneGeometry(
             viewport.width * 1.5,
             viewport.height * 1.5,
-            100, // width segments
-            100  // height segments
+            segments,
+            segments
         );
     }, [viewport.width, viewport.height]);
 
@@ -155,8 +159,13 @@ export default function Hero3DBackground() {
         <div className="absolute inset-0 z-0 pointer-events-auto" style={{ width: "100%", height: "100%" }}>
             <Canvas
                 camera={{ position: [0, 0, 5], fov: 75 }}
-                gl={{ alpha: true, antialias: true }}
-                dpr={[1, 2]}
+                gl={{
+                    alpha: true,
+                    antialias: false, // Turned off MSAA for massive performance gain
+                    powerPreference: "high-performance" // Hints to use discrete GPU if available
+                }}
+                dpr={[1, 1.5]} // Capped max resolution multiplier to 1.5 instead of 2.0
+                performance={{ min: 0.5 }} // Allows R3F to downgrade resolution automatically if FPS drops
             >
                 <TerrainGrid />
             </Canvas>
