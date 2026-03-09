@@ -9,6 +9,7 @@ uniform float uTime;
 uniform vec2 uMouse;
 varying vec2 vUv;
 varying float vElevation;
+varying float vEdgeFade;
 
 // Standard simplex noise
 vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -59,8 +60,10 @@ void main() {
   float d = distance(vUv, uMouse);
   float mouseEffect = smoothstep(0.3, 0.0, d) * 1.5;
   
-  pos.z += elevation + mouseEffect;
-  vElevation = elevation + mouseEffect;
+  // Precalculate edge fade in vertex shader to save fragment shader compute
+  float edgeX = smoothstep(0.0, 0.3, uv.x) * smoothstep(1.0, 0.7, uv.x);
+  float edgeY = smoothstep(0.0, 0.3, uv.y) * smoothstep(1.0, 0.7, uv.y);
+  vEdgeFade = edgeX * edgeY;
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
 }
@@ -70,6 +73,7 @@ const fragmentShader = `
 uniform float uTime;
 varying vec2 vUv;
 varying float vElevation;
+varying float vEdgeFade;
 
 void main() {
   // Base grid color - much darker so it doesn't compete with text
@@ -82,12 +86,8 @@ void main() {
   float mixStrength = clamp(vElevation * 0.8, 0.0, 1.0);
   vec3 finalColor = mix(colorBase, colorHigh, mixStrength);
   
-  // Fade out aggressively towards the edges
-  float edgeFade = smoothstep(0.0, 0.3, vUv.x) * smoothstep(1.0, 0.7, vUv.x) * 
-                   smoothstep(0.0, 0.3, vUv.y) * smoothstep(1.0, 0.7, vUv.y);
-
   // Lower baseline opacity significantly, boost when glowing (hovered)
-  float alpha = clamp(edgeFade * (0.15 + mixStrength * 0.85), 0.0, 1.0);
+  float alpha = clamp(vEdgeFade * (0.15 + mixStrength * 0.85), 0.0, 1.0);
 
   gl_FragColor = vec4(finalColor, alpha);
 }
@@ -125,9 +125,9 @@ function TerrainGrid() {
 
     // Plane geometry with dynamic segments based on device performance
     const geometry = useMemo(() => {
-        // Use lower resolution geometry on mobile to save battery and boost FPS
+        // Extreme optimization for mobile: drop to bare minimum wireframe density
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-        const segments = isMobile ? 40 : 80; // Reduced from 100x100 for better performance
+        const segments = isMobile ? 25 : 60; // Drastically reduced for guaranteed 60FPS
 
         return new THREE.PlaneGeometry(
             viewport.width * 1.5,
@@ -161,11 +161,14 @@ export default function Hero3DBackground() {
                 camera={{ position: [0, 0, 5], fov: 75 }}
                 gl={{
                     alpha: true,
-                    antialias: false, // Turned off MSAA for massive performance gain
-                    powerPreference: "high-performance" // Hints to use discrete GPU if available
+                    antialias: false,
+                    powerPreference: "high-performance",
+                    preserveDrawingBuffer: false,
+                    logarithmicDepthBuffer: false
                 }}
-                dpr={[1, 1.5]} // Capped max resolution multiplier to 1.5 instead of 2.0
-                performance={{ min: 0.5 }} // Allows R3F to downgrade resolution automatically if FPS drops
+                dpr={[1, typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : 1.5]} // Strict 1x DPR on mobile
+                performance={{ min: 0.1 }} // Let R3F aggressively downscale if needed
+                frameloop="always"
             >
                 <TerrainGrid />
             </Canvas>
