@@ -15,14 +15,14 @@ interface Step {
 
 export default function BuildTimeline({ steps }: { steps: Step[] }) {
     return (
-        <div className="relative flex flex-col items-center w-full py-8 md:py-16">
+        <div className="relative w-full py-8 md:py-16">
             {/* Central vertical line */}
             <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-blue-500/0 via-blue-500/30 to-blue-500/0 -translate-x-1/2" />
 
-            <div className="flex flex-col items-center gap-28 w-full max-w-2xl px-4 relative z-10">
+            <div className="relative z-10 mx-auto flex flex-col items-center gap-28 w-full max-w-2xl px-4">
                 {steps.map((step, index) => (
                     <div key={step.id} className="relative flex flex-col items-center w-full">
-                        {/* Icon / Node — centered on the line */}
+                        {/* Icon / Node */}
                         <motion.div
                             initial={{ scale: 0, rotate: -45 }}
                             whileInView={{ scale: 1, rotate: 0 }}
@@ -37,7 +37,7 @@ export default function BuildTimeline({ steps }: { steps: Step[] }) {
                             </div>
                         </motion.div>
 
-                        {/* Content Card — centered below icon */}
+                        {/* Content Card */}
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -56,11 +56,11 @@ export default function BuildTimeline({ steps }: { steps: Step[] }) {
                                 transitionSpeed={1200}
                                 scale={1.02}
                             >
-                                <div className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-8 md:p-10 hover:bg-white/[0.06] transition-all duration-500 shadow-[0_8px_30px_rgb(0,0,0,0.5)] backdrop-blur-md">
+                                <div className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-8 md:p-10 hover:bg-white/[0.06] transition-all duration-500 shadow-[0_8px_30px_rgb(0,0,0,0.5)] backdrop-blur-md hover:border-white/[0.15]">
                                     {/* Hover gradient overlay */}
                                     <div className="absolute inset-0 bg-gradient-to-br from-white/[0.06] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                                     {/* Top accent line */}
-                                    <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent ${step.bg.replace('bg-', 'via-').replace('/10', '/50')} to-transparent opacity-60`} />
+                                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500/40 to-transparent opacity-60" />
 
                                     <div className="relative z-10 text-center">
                                         <div className={`text-xs font-mono font-bold tracking-widest mb-4 opacity-90 ${step.color}`}>
