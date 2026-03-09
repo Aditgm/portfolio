@@ -19,15 +19,17 @@ export default function BuildTimeline({ steps }: { steps: Step[] }) {
             {/* Central Line */}
             <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-blue-500/0 via-blue-500/30 to-blue-500/0 -translate-x-1/2" />
 
-            <div className="space-y-32 w-full max-w-3xl px-4 z-10 mt-12">
-                {steps.map((step) => {
+            <div className="space-y-24 w-full max-w-5xl px-4">
+                {steps.map((step, index) => {
+                    const isEven = index % 2 === 0;
+
                     return (
                         <div
                             key={step.id}
-                            className="relative flex flex-col items-center w-full"
+                            className={`relative flex flex-col items-center w-full md:flex-row ${isEven ? 'md:justify-start' : 'md:justify-end'}`}
                         >
                             {/* Icon / Node */}
-                            <div className="absolute left-1/2 -translate-x-1/2 -top-12 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#050510] border border-white/[0.1] shadow-[0_0_30px_rgba(0,0,0,0.8)] z-20 transition-transform duration-500 hover:scale-110">
+                            <div className="absolute left-1/2 -translate-x-1/2 top-0 md:top-1/2 md:-translate-y-1/2 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#050510] border border-white/[0.1] shadow-[0_0_30px_rgba(0,0,0,0.8)] z-20 transition-transform duration-500 hover:scale-110">
                                 <motion.div
                                     initial={{ scale: 0, rotate: -45 }}
                                     whileInView={{ scale: 1, rotate: 0 }}
@@ -39,11 +41,13 @@ export default function BuildTimeline({ steps }: { steps: Step[] }) {
                                 </motion.div>
                             </div>
 
-                            {/* Content Card container */}
-                            <div className="w-full mt-6 text-center">
+                            {/* Content Card container — always left-aligned text inside */}
+                            <div
+                                className={`w-full max-w-xl md:max-w-none md:w-1/2 mt-20 md:mt-0 ${isEven ? "md:pr-12 lg:pr-16" : "md:pl-12 lg:pl-16"} text-left`}
+                            >
                                 <motion.div
-                                    initial={{ opacity: 0, y: 40 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
+                                    initial={{ opacity: 0, x: isEven ? -40 : 40, y: 30 }}
+                                    whileInView={{ opacity: 1, x: 0, y: 0 }}
                                     viewport={{ once: true, margin: "-50px" }}
                                     transition={{ duration: 0.7, delay: 0.1, type: "spring", stiffness: 150, damping: 20 }}
                                 >
@@ -60,12 +64,12 @@ export default function BuildTimeline({ steps }: { steps: Step[] }) {
                                     >
                                         <div className="group relative card overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-8 md:p-10 hover:bg-white/[0.06] transition-all shadow-[0_8px_30px_rgb(0,0,0,0.5)] backdrop-blur-md">
                                             <div className="absolute inset-0 bg-gradient-to-br from-white/[0.06] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                                            <div className="absolute top-0 w-full left-0 h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-60" />
+                                            <div className={`absolute top-0 ${isEven ? 'right-0' : 'left-0'} w-full h-1 bg-gradient-to-r ${step.bg.replace('/10', '/60')} to-transparent opacity-60`} />
 
-                                            <div className="relative z-10 pt-4">
+                                            <div className="relative z-10">
                                                 <div className={`text-xs font-mono font-bold tracking-widest mb-4 opacity-90 ${step.color}`}>STEP // 0{step.id}</div>
                                                 <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-4 transition-colors group-hover:text-blue-200">{step.title}</h3>
-                                                <p className="text-[0.95rem] md:text-base text-slate-300 leading-relaxed font-medium mx-auto max-w-prose">
+                                                <p className="text-[0.95rem] md:text-base text-slate-300 leading-relaxed font-medium">
                                                     {step.description}
                                                 </p>
                                             </div>

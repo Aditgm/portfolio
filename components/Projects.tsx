@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Github, ExternalLink, Hammer, ChevronRight } from "lucide-react";
+import { Github, ExternalLink, Hammer } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -169,7 +169,6 @@ export default function Projects() {
                       <a href={p.github} target="_blank" rel="noopener noreferrer"
                         className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.06] text-slate-500 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white"
                         aria-label="GitHub"
-                        title="GitHub Repo"
                       >
                         <Github size={14} />
                       </a>
@@ -177,20 +176,15 @@ export default function Projects() {
                         <a href={p.live} target="_blank" rel="noopener noreferrer"
                           className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.06] text-slate-500 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white"
                           aria-label="Live Demo"
-                          title="Live Demo"
                         >
                           <ExternalLink size={14} />
                         </a>
                       )}
-                      {/* Build with me button shifted to top right */}
                       <Link href={`/build/${p.slug}`}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.06] text-slate-500 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white group relative"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.06] text-slate-500 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white"
                         aria-label="Build with me"
                       >
                         <Hammer size={14} />
-                        <span className="absolute -top-10 left-1/2 -translate-x-1/2 scale-0 rounded bg-[#050510] border border-white/10 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100 whitespace-nowrap z-50">
-                          Build with me
-                        </span>
                       </Link>
                     </div>
                   </div>
@@ -261,6 +255,6 @@ export default function Projects() {
           ))}
         </div>
       </div>
-    </section >
+    </section>
   );
 }
