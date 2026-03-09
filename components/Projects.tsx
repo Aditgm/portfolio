@@ -169,6 +169,7 @@ export default function Projects() {
                       <a href={p.github} target="_blank" rel="noopener noreferrer"
                         className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.06] text-slate-500 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white"
                         aria-label="GitHub"
+                        title="GitHub Repo"
                       >
                         <Github size={14} />
                       </a>
@@ -176,10 +177,21 @@ export default function Projects() {
                         <a href={p.live} target="_blank" rel="noopener noreferrer"
                           className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.06] text-slate-500 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white"
                           aria-label="Live Demo"
+                          title="Live Demo"
                         >
                           <ExternalLink size={14} />
                         </a>
                       )}
+                      {/* Build with me button shifted to top right */}
+                      <Link href={`/build/${p.slug}`}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.06] text-slate-500 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white group relative"
+                        aria-label="Build with me"
+                      >
+                        <Hammer size={14} />
+                        <span className="absolute -top-10 left-1/2 -translate-x-1/2 scale-0 rounded bg-[#050510] border border-white/10 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100 whitespace-nowrap z-50">
+                          Build with me
+                        </span>
+                      </Link>
                     </div>
                   </div>
 
@@ -244,23 +256,11 @@ export default function Projects() {
                     {t}
                   </span>
                 ))}
-
-                <div className="ml-auto w-full md:w-auto mt-4 md:mt-0">
-                  <Link
-                    href={`/build/${p.slug}`}
-                    className="group relative flex w-full md:w-auto items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600/80 to-purple-600/80 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_25px_rgba(59,130,246,0.3)] border border-white/10 hover:border-white/20"
-                  >
-                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ animation: "shimmer 2.5s infinite" }} />
-                    <Hammer size={16} className="transition-transform group-hover:-rotate-12" />
-                    <span>Build with me</span>
-                    <ChevronRight size={16} className="transition-transform group-hover:translate-x-1 opacity-70" />
-                  </Link>
-                </div>
               </div>
             </motion.article>
           ))}
         </div>
       </div>
-    </section>
+    </section >
   );
 }
