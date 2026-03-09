@@ -43,7 +43,7 @@ export default function BuildTimeline({ steps }: { steps: Step[] }) {
 
                             {/* Content Card container */}
                             <div
-                                className={`w-full max-w-xl md:w-[45%] mt-20 md:mt-0 ${isEven ? "md:pr-12 md:text-right" : "md:pl-12 md:text-left"} text-center`}
+                                className={`w-full max-w-xl md:max-w-none md:w-1/2 mt-20 md:mt-0 ${isEven ? "md:pr-12 lg:pr-16 md:text-right" : "md:pl-12 lg:pl-16 md:text-left"} text-center`}
                             >
                                 <motion.div
                                     initial={{ opacity: 0, x: isEven ? -40 : 40, y: 30 }}
@@ -62,7 +62,7 @@ export default function BuildTimeline({ steps }: { steps: Step[] }) {
                                         transitionSpeed={1200}
                                         scale={1.03}
                                     >
-                                        <div className={`group relative card overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-8 md:p-10 hover:bg-white/[0.06] transition-all shadow-[0_8px_30px_rgb(0,0,0,0.5)] backdrop-blur-md ${isEven ? 'md:items-end md:ml-auto' : 'md:items-start md:mr-auto'} flex flex-col items-center`}>
+                                        <div className={`group relative card overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-8 md:p-10 hover:bg-white/[0.06] transition-all shadow-[0_8px_30px_rgb(0,0,0,0.5)] backdrop-blur-md`}>
                                             <div className="absolute inset-0 bg-gradient-to-br from-white/[0.06] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                                             <div className={`absolute top-0 w-full h-1 bg-gradient-to-r ${step.bg.replace('/10', '/60')} to-transparent opacity-60 ${isEven ? 'right-0' : 'left-0'}`} />
 
