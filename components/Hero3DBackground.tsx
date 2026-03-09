@@ -60,9 +60,12 @@ void main() {
   float d = distance(vUv, uMouse);
   float mouseEffect = smoothstep(0.3, 0.0, d) * 1.5;
   
+  pos.z += elevation + mouseEffect;
+  vElevation = elevation + mouseEffect;
+
   // Precalculate edge fade in vertex shader to save fragment shader compute
-  float edgeX = smoothstep(0.0, 0.3, uv.x) * smoothstep(1.0, 0.7, uv.x);
-  float edgeY = smoothstep(0.0, 0.3, uv.y) * smoothstep(1.0, 0.7, uv.y);
+  float edgeX = smoothstep(0.0, 0.3, vUv.x) * smoothstep(1.0, 0.7, vUv.x);
+  float edgeY = smoothstep(0.0, 0.3, vUv.y) * smoothstep(1.0, 0.7, vUv.y);
   vEdgeFade = edgeX * edgeY;
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
