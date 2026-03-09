@@ -363,8 +363,8 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   backdrop-filter: blur(12px);
-  padding: 3rem;
-  /* Spacious interior */
+  padding: 2rem;
+  /* Tighter interior */
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

@@ -158,7 +158,7 @@ export default function Projects() {
               )}
 
               <div className={`flex flex-1 flex-col ${p.featured ? "md:flex-row" : ""}`}>
-                <div className="flex-1 p-10 md:p-14">
+                <div className="flex-1 p-7 md:p-10">
                   {/* Top row */}
                   <div className="mb-5 flex items-start justify-between">
                     <span className={`geo-tag ${p.tagColor}`}>
@@ -205,7 +205,7 @@ export default function Projects() {
                   </div>
 
                   {/* Highlights */}
-                  <ul className="mt-10 flex flex-col gap-4">
+                  <ul className="mt-6 flex flex-col gap-3">
                     {p.highlights.map((h) => (
                       <li key={h} className="flex gap-3 text-sm text-slate-400">
                         <span className="mt-2 h-1.5 w-1.5 shrink-0 rotate-45 rounded-[1px] bg-cyan-400/50" />
@@ -241,7 +241,7 @@ export default function Projects() {
                 )}
               </div>
 
-              <div className="flex flex-wrap gap-4 border-t border-white/[0.04] px-10 py-12 md:px-14">
+              <div className="flex flex-wrap gap-3 border-t border-white/[0.04] px-7 py-8 md:px-10">
                 {p.stack.map((t) => (
                   <span
                     key={t}
