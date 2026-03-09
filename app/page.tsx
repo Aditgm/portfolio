@@ -18,10 +18,10 @@ export default function Home() {
         <Stats />
         <Achievements />
         <Experience />
-        <GithubGraph />
         <Projects />
         <Skills />
         <Education />
+        <GithubGraph />
         <Footer />
       </div>
     </main>
