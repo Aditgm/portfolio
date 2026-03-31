@@ -1,6 +1,5 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import Stats from "@/components/Stats";
 import Achievements from "@/components/Achievements";
 import Experience from "@/components/Experience";
 import GithubGraph from "@/components/GithubGraph";
@@ -62,7 +61,6 @@ export default function Home() {
       <Navbar />
       <div className="relative z-10">
         <Hero />
-        <Stats />
         <Achievements />
         <Experience />
         <Projects />

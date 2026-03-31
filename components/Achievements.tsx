@@ -14,6 +14,64 @@ import {
 } from "lucide-react";
 import { useGSAP } from "@/hooks/useGSAP";
 
+interface CompetitiveStat {
+  value: number;
+  suffix: string;
+  label: string;
+  sub: string;
+  valueColor: string;
+  ringColor: string;
+  glowColor: string;
+}
+
+const STAT_RING_RADIUS = 24;
+const STAT_RING_CIRCUMFERENCE = 2 * Math.PI * STAT_RING_RADIUS;
+
+const competitiveStats: CompetitiveStat[] = [
+  {
+    value: 2000,
+    suffix: "+",
+    label: "Problems Solved",
+    sub: "LeetCode, CF, CSES, HackerRank",
+    valueColor: "#9fb0ff",
+    ringColor: "rgba(99, 102, 241, 0.9)",
+    glowColor: "rgba(59,130,246,0.12)",
+  },
+  {
+    value: 2360,
+    suffix: "+",
+    label: "LeetCode Rating",
+    sub: "Guardian · Top 0.4% globally",
+    valueColor: "#fbbf24",
+    ringColor: "rgba(251, 191, 36, 0.9)",
+    glowColor: "rgba(245,158,11,0.12)",
+  },
+  {
+    value: 2131,
+    suffix: "",
+    label: "Codeforces Rating",
+    sub: "Master · Top 0.8% globally",
+    valueColor: "#fb923c",
+    ringColor: "rgba(251, 146, 60, 0.88)",
+    glowColor: "rgba(249,115,22,0.12)",
+  },
+  {
+    value: 2101,
+    suffix: "",
+    label: "CodeChef Rating",
+    sub: "5★ · Ranked 470th in India",
+    valueColor: "#34d399",
+    ringColor: "rgba(52, 211, 153, 0.88)",
+    glowColor: "rgba(16,185,129,0.12)",
+  },
+];
+
+const STAT_RING_MAX = Math.max(...competitiveStats.map((stat) => stat.value));
+
+function formatStat(value: number, suffix: string) {
+  return `${Math.round(value).toLocaleString()}${suffix}`;
+}
+
 interface Achievement {
   title: string;
   platform: string;
@@ -159,23 +217,20 @@ export default function Achievements() {
   const [isSectionActive, setIsSectionActive] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+  const statsGridRef = useRef<HTMLDivElement>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef<HTMLDivElement>(null);
+  const statsCardRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const statsValueRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  const statsRingRefs = useRef<Array<SVGCircleElement | null>>([]);
   const linksRef = useRef<Array<HTMLAnchorElement | null>>([]);
   const timerRef = useRef<number | null>(null);
   const transitionRef = useRef(false);
-  const progressTweenRef = useRef<gsap.core.Tween | null>(null);
   const { ScrollTrigger, createRevealAnimation, gsap, prefersReducedMotion, withContext } =
     useGSAP(sectionRef);
 
   const total = achievements.length;
   const activeAchievement = achievements[current];
-
-  const stopProgress = useCallback(() => {
-    progressTweenRef.current?.kill();
-    progressTweenRef.current = null;
-  }, []);
 
   const animateTo = useCallback(
     (nextIndex: number, nextDirection?: number) => {
@@ -187,8 +242,6 @@ export default function Achievements() {
 
       const resolvedDirection =
         nextDirection ?? (normalizedIndex > current ? 1 : -1);
-
-      stopProgress();
 
       if (!cardRef.current || prefersReducedMotion) {
         setCurrent(normalizedIndex);
@@ -232,7 +285,7 @@ export default function Achievements() {
           ease: "power3.out",
         });
     },
-    [current, gsap, prefersReducedMotion, stopProgress, total]
+    [current, gsap, prefersReducedMotion, total]
   );
 
   const next = useCallback(() => {
@@ -252,12 +305,129 @@ export default function Achievements() {
   }, [createRevealAnimation]);
 
   useEffect(() => {
+    createRevealAnimation(statsGridRef, {
+      from: { autoAlpha: 0, y: 26, rotateX: 8, scale: 0.98 },
+      to: { autoAlpha: 1, y: 0, rotateX: 0, scale: 1 },
+      duration: 0.8,
+    });
+  }, [createRevealAnimation]);
+
+  useEffect(() => {
     createRevealAnimation(carouselRef, {
       from: { autoAlpha: 0, y: 30, rotateX: 8, scale: 0.98 },
       to: { autoAlpha: 1, y: 0, rotateX: 0, scale: 1 },
       duration: 0.82,
     });
   }, [createRevealAnimation]);
+
+  useEffect(() => {
+    withContext(() => {
+      const cards = statsCardRefs.current.filter((card): card is HTMLDivElement => Boolean(card));
+
+      if (!statsGridRef.current || cards.length === 0) {
+        return;
+      }
+
+      gsap.set(cards, {
+        transformPerspective: 1200,
+        transformOrigin: "center center",
+        willChange: "transform, opacity",
+      });
+
+      gsap.fromTo(
+        cards,
+        {
+          autoAlpha: 0,
+          y: 54,
+          rotateX: -16,
+          rotateY: (index: number) => (index % 2 === 0 ? -6 : 6),
+          scale: 0.88,
+        },
+        {
+          autoAlpha: 1,
+          y: 0,
+          rotateX: 0,
+          rotateY: 0,
+          scale: 1,
+          stagger: 0.14,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: statsGridRef.current,
+            start: "top 82%",
+            end: prefersReducedMotion ? "top 62%" : "bottom 52%",
+            scrub: prefersReducedMotion ? false : 0.7,
+            once: prefersReducedMotion,
+            invalidateOnRefresh: true,
+          },
+        }
+      );
+
+      competitiveStats.forEach((stat, index) => {
+        const valueNode = statsValueRefs.current[index];
+        const ringNode = statsRingRefs.current[index];
+        const card = cards[index];
+
+        if (!valueNode || !card) {
+          return;
+        }
+
+        valueNode.textContent = formatStat(0, stat.suffix);
+
+        if (ringNode) {
+          ringNode.style.strokeDasharray = `${STAT_RING_CIRCUMFERENCE}`;
+          ringNode.style.strokeDashoffset = `${STAT_RING_CIRCUMFERENCE}`;
+        }
+
+        const counterState = { value: 0, progress: 0 };
+        const ringProgress = stat.value / STAT_RING_MAX;
+
+        gsap.to(counterState, {
+          value: stat.value,
+          progress: ringProgress,
+          duration: prefersReducedMotion ? 0.6 : 1.15,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: card,
+            start: "top 84%",
+            end: prefersReducedMotion ? "top 70%" : "top 36%",
+            scrub: prefersReducedMotion ? false : 0.9,
+            once: prefersReducedMotion,
+            invalidateOnRefresh: true,
+          },
+          onUpdate: () => {
+            valueNode.textContent = formatStat(counterState.value, stat.suffix);
+
+            if (ringNode) {
+              ringNode.style.strokeDashoffset = `${STAT_RING_CIRCUMFERENCE * (1 - counterState.progress)}`;
+            }
+          },
+          onComplete: () => {
+            valueNode.textContent = formatStat(stat.value, stat.suffix);
+
+            if (ringNode) {
+              ringNode.style.strokeDashoffset = `${STAT_RING_CIRCUMFERENCE * (1 - ringProgress)}`;
+            }
+          },
+        });
+      });
+
+      return () => {
+        competitiveStats.forEach((stat, index) => {
+          const valueNode = statsValueRefs.current[index];
+          const ringNode = statsRingRefs.current[index];
+
+          if (valueNode) {
+            valueNode.textContent = formatStat(stat.value, stat.suffix);
+          }
+
+          if (ringNode) {
+            ringNode.style.strokeDashoffset = `${STAT_RING_CIRCUMFERENCE * (1 - stat.value / STAT_RING_MAX)}`;
+          }
+        });
+      };
+    });
+  }, [gsap, prefersReducedMotion, withContext]);
 
   useEffect(() => {
     withContext(() => {
@@ -350,40 +520,9 @@ export default function Achievements() {
     };
   }, [isPaused, isSectionActive, next]);
 
-  useEffect(() => {
-    if (!progressRef.current) {
-      return;
-    }
-
-    stopProgress();
-    gsap.set(progressRef.current, {
-      scaleX: 0,
-      transformOrigin: "left center",
-    });
-
-    if (isPaused || !isSectionActive) {
-      return;
-    }
-
-    progressTweenRef.current = gsap.to(progressRef.current, {
-      scaleX: 1,
-      duration: 2,
-      ease: "none",
-    });
-
-    return () => {
-      stopProgress();
-    };
-  }, [current, gsap, isPaused, isSectionActive, stopProgress]);
-
-  useEffect(() => {
-    return () => {
-      stopProgress();
-    };
-  }, [stopProgress]);
-
   return (
     <section
+      id="about"
       ref={sectionRef}
       className="section-container geo-divider-top relative"
     >
@@ -393,14 +532,83 @@ export default function Achievements() {
 
       <div className="section-inner">
         <div ref={headerRef} className="mb-14 max-w-2xl">
-          <p className="section-label mb-4">Achievements</p>
+          <p className="section-label mb-4">Competitive Programming</p>
           <h2 className="section-title">
             Competitive <span className="text-gradient-static">Programming</span>
           </h2>
           <p className="measure-copy mt-5 text-sm leading-7 text-slate-400 md:text-base md:leading-8">
-            A showcase of milestones across the world&apos;s top competitive
-            programming platforms.
+            Ratings at a glance on top, and contest-specific deep dives below.
           </p>
+        </div>
+
+        <div ref={statsGridRef} className="grid grid-cols-2 gap-6 lg:grid-cols-4 lg:gap-8">
+          {competitiveStats.map((stat, index) => (
+            <div
+              key={stat.label}
+              ref={(element) => {
+                statsCardRefs.current[index] = element;
+              }}
+              className="card border-trace group relative cursor-default overflow-hidden p-10 md:p-12"
+              style={{ ["--hover-glow" as string]: stat.glowColor }}
+            >
+              <div className="absolute right-8 top-8">
+                <svg className="h-14 w-14 -rotate-90" viewBox="0 0 56 56" aria-hidden="true">
+                  <circle
+                    cx="28"
+                    cy="28"
+                    r={STAT_RING_RADIUS}
+                    fill="none"
+                    stroke="rgba(255,255,255,0.08)"
+                    strokeWidth="4"
+                  />
+                  <circle
+                    ref={(element) => {
+                      statsRingRefs.current[index] = element;
+                    }}
+                    cx="28"
+                    cy="28"
+                    r={STAT_RING_RADIUS}
+                    fill="none"
+                    stroke={stat.ringColor}
+                    strokeLinecap="round"
+                    strokeWidth="4"
+                    strokeDasharray={STAT_RING_CIRCUMFERENCE}
+                    strokeDashoffset={STAT_RING_CIRCUMFERENCE}
+                  />
+                </svg>
+              </div>
+
+              <div className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.04] to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+
+              <div className="mb-7 flex items-center gap-2">
+                <div className="h-2 w-2 rotate-45 rounded-[2px] bg-gradient-to-br from-blue-500/30 to-purple-500/30 transition-all duration-300 group-hover:scale-125 group-hover:from-blue-500/70 group-hover:to-purple-500/70" />
+                <div className="h-px flex-1 bg-gradient-to-r from-white/[0.08] to-transparent transition-all duration-300 group-hover:from-white/[0.16]" />
+              </div>
+
+              <span
+                ref={(element) => {
+                  statsValueRefs.current[index] = element;
+                }}
+                aria-label={`${stat.label}: ${formatStat(stat.value, stat.suffix)}`}
+                className="text-3xl font-extrabold tabular-nums md:text-4xl"
+                style={{ color: stat.valueColor }}
+              >
+                {formatStat(stat.value, stat.suffix)}
+              </span>
+              <p className="mt-3.5 text-sm font-semibold tracking-wide text-white">{stat.label}</p>
+              <p className="mt-2 text-xs leading-5 text-slate-500 transition-colors duration-300 group-hover:text-slate-400">
+                {stat.sub}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mb-10 mt-16 flex items-center gap-5">
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+          <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-5 py-1.5 font-mono text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-slate-500">
+            Contest Deep Dives
+          </span>
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
         </div>
 
         <div
@@ -521,15 +729,9 @@ export default function Achievements() {
             </div>
           </div>
 
-          <div className="mt-4 h-px w-full overflow-hidden rounded-full bg-slate-800">
-            <div
-              ref={progressRef}
-              className="h-full origin-left bg-gradient-to-r from-blue-500/60 to-purple-500/60"
-            />
-          </div>
         </div>
 
-        <div className="mt-40 flex flex-wrap items-center justify-center gap-8">
+        <div className="mt-16 flex flex-wrap items-center justify-center gap-8">
           {quickLinks.map((platform, index) => (
             <a
               key={platform.name}
