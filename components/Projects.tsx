@@ -1,12 +1,29 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { Github, ExternalLink, Hammer } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowUpRight, ExternalLink, Github, Hammer, X } from "lucide-react";
 import Image from "next/image";
 import { TransitionLink } from "./TransitionLink";
 import { useGSAP } from "@/hooks/useGSAP";
 
-const projects = [
+type ProjectItem = {
+  title: string;
+  subtitle: string;
+  desc: Array<{ label: string; text: string }>;
+  highlights: string[];
+  stack: string[];
+  github: string;
+  live: string;
+  image: string;
+  tag: string;
+  tagColor: string;
+  accentGradient: string;
+  accentGlow: string;
+  slug: string;
+  featured: boolean;
+};
+
+const projects: ProjectItem[] = [
   {
     title: "Dengue-spot",
     subtitle: "Community Dengue Prevention App",
@@ -21,7 +38,7 @@ const projects = [
       },
       {
         label: "Result",
-        text: "Enabled fast reporting with enterprise-grade security (RBAC & rate-limiting).",
+        text: "Enabled fast reporting with enterprise-grade security through RBAC, rate-limiting, and controlled access flows.",
       },
     ],
     highlights: [
@@ -37,6 +54,7 @@ const projects = [
     tag: "Full-Stack + AI/CV",
     tagColor: "border-red-500/20 bg-red-500/[0.07] text-red-400",
     accentGradient: "from-red-500/20 to-orange-500/5",
+    accentGlow: "rgba(249, 115, 22, 0.18)",
     slug: "dengue-spot",
     featured: true,
   },
@@ -60,7 +78,7 @@ const projects = [
     highlights: [
       "RAG pipeline with Llama 3.3 (70B)",
       "85% faster statutory research workflows",
-      "Pinecone Vector DB · sub-150ms queries",
+      "Pinecone Vector DB with sub-150ms queries",
       "92% retrieval accuracy across 1,000+ docs",
     ],
     stack: ["Next.js", "Llama 3.3", "Pinecone", "MongoDB"],
@@ -70,6 +88,7 @@ const projects = [
     tag: "AI/ML + RAG",
     tagColor: "border-purple-500/20 bg-purple-500/[0.07] text-purple-400",
     accentGradient: "from-purple-500/20 to-blue-500/5",
+    accentGlow: "rgba(124, 58, 237, 0.2)",
     slug: "legal-lens",
     featured: false,
   },
@@ -103,6 +122,7 @@ const projects = [
     tag: "AI + Full-Stack",
     tagColor: "border-blue-500/20 bg-blue-500/[0.07] text-blue-400",
     accentGradient: "from-blue-500/20 to-cyan-500/5",
+    accentGlow: "rgba(45, 212, 191, 0.18)",
     slug: "youtubey",
     featured: false,
   },
@@ -124,18 +144,19 @@ const projects = [
       },
     ],
     highlights: [
-      "Real-time technical & correlation analysis",
-      "Advanced Risk Analytics (VaR, Sharpe Ratio)",
+      "Real-time technical and correlation analysis",
+      "Advanced risk analytics with VaR and Sharpe Ratio",
       "40+ BSE stocks with dynamic search",
-      "Ultra-fast parallel data fetching architecture",
+      "Parallel data fetching architecture",
     ],
     stack: ["Python", "Streamlit", "Plotly", "Pandas", "yFinance API"],
     github: "https://github.com/Aditgm/indian-economic-dashboard",
     live: "https://aditgm-indian-economic-dashboard-app-oxnhak.streamlit.app/",
     image: "/projects/indian-economic-dashboard.png",
-    tag: "Data Science & FinTech",
+    tag: "Data Science + FinTech",
     tagColor: "border-emerald-500/20 bg-emerald-500/[0.07] text-emerald-400",
     accentGradient: "from-emerald-500/20 to-teal-500/5",
+    accentGlow: "rgba(16, 185, 129, 0.2)",
     slug: "indian-economic-dashboard",
     featured: false,
   },
@@ -144,12 +165,106 @@ const projects = [
 export default function Projects() {
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-  const horizontalStageRef = useRef<HTMLDivElement>(null);
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<Array<HTMLElement | null>>([]);
-  const imageLayerRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const modalCardRef = useRef<HTMLDivElement>(null);
+  const modalBodyRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const cardRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const overflowRef = useRef("");
+  const [activeProject, setActiveProject] = useState<ProjectItem | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
   const { createRevealAnimation, gsap, prefersReducedMotion, withContext } = useGSAP(sectionRef);
+
+  const openProject = useCallback(
+    (project: ProjectItem) => {
+      if (activeProject || isClosing) {
+        return;
+      }
+
+      setActiveProject(project);
+    },
+    [activeProject, isClosing]
+  );
+
+  const finishClose = useCallback(() => {
+    document.body.style.overflow = overflowRef.current;
+    setIsClosing(false);
+    setActiveProject(null);
+  }, []);
+
+  const closeProject = useCallback(() => {
+    if (!activeProject || isClosing) {
+      return;
+    }
+
+    const modalCard = modalCardRef.current;
+    const modalBody = modalBodyRef.current;
+    const overlay = overlayRef.current;
+    const sourceCard = cardRefs.current[activeProject.slug];
+
+    setIsClosing(true);
+
+    if (prefersReducedMotion || !modalCard || !overlay || !sourceCard) {
+      const tween = gsap.timeline({
+        onComplete: finishClose,
+      });
+
+      if (modalBody) {
+        tween.to(
+          modalBody,
+          {
+            autoAlpha: 0,
+            y: 12,
+            duration: 0.16,
+            ease: "power2.in",
+          },
+          0
+        );
+      }
+
+      tween.to(
+        [overlay, modalCard],
+        {
+          autoAlpha: 0,
+          duration: 0.2,
+          ease: "power2.in",
+        },
+        0
+      );
+
+      return;
+    }
+
+    if (modalBody) {
+      gsap.to(modalBody, {
+        autoAlpha: 0,
+        y: 18,
+        duration: 0.18,
+        ease: "power2.in",
+      });
+    }
+
+    const modalRect = modalCard.getBoundingClientRect();
+    const sourceRect = sourceCard.getBoundingClientRect();
+
+    gsap.to(overlay, {
+      autoAlpha: 0,
+      duration: 0.22,
+      ease: "power2.in",
+    });
+
+    gsap.to(modalCard, {
+      x: sourceRect.left - modalRect.left,
+      y: sourceRect.top - modalRect.top,
+      scaleX: sourceRect.width / modalRect.width,
+      scaleY: sourceRect.height / modalRect.height,
+      transformOrigin: "top left",
+      duration: 0.56,
+      ease: "power2.inOut",
+      onComplete: finishClose,
+    });
+  }, [activeProject, finishClose, gsap, isClosing, prefersReducedMotion]);
 
   useEffect(() => {
     createRevealAnimation(headerRef, {
@@ -161,14 +276,11 @@ export default function Projects() {
 
   useEffect(() => {
     withContext(() => {
-      const cards = cardRefs.current.filter(
-        (card): card is HTMLElement => Boolean(card)
-      );
-      const imageLayers = imageLayerRefs.current.filter(
-        (imageLayer): imageLayer is HTMLDivElement => Boolean(imageLayer)
+      const cards = Object.values(cardRefs.current).filter(
+        (card): card is HTMLButtonElement => Boolean(card)
       );
 
-      if (!trackRef.current || cards.length === 0) {
+      if (!gridRef.current || cards.length === 0) {
         return;
       }
 
@@ -177,151 +289,199 @@ export default function Projects() {
         transformOrigin: "center center",
       });
 
-      const enableHorizontal =
-        typeof window !== "undefined" &&
-        !prefersReducedMotion &&
-        window.matchMedia("(min-width: 1024px)").matches &&
-        viewportRef.current &&
-        horizontalStageRef.current;
-
-      if (!enableHorizontal || !viewportRef.current || !horizontalStageRef.current) {
-        gsap.set(trackRef.current, { clearProps: "transform" });
-
-        gsap.fromTo(
-          cards,
-          {
-            autoAlpha: 0,
-            y: 48,
-            scale: 0.94,
-            rotateY: (index: number) => (index % 2 === 0 ? -8 : 8),
-          },
-          {
-            autoAlpha: 1,
-            y: 0,
-            scale: 1,
-            rotateY: 0,
-            duration: 0.95,
-            stagger: 0.15,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: trackRef.current,
-              start: "top 82%",
-              end: prefersReducedMotion ? "top 68%" : "bottom 46%",
-              scrub: prefersReducedMotion ? false : 0.65,
-              once: prefersReducedMotion,
-              invalidateOnRefresh: true,
-            },
-          }
-        );
-
-        imageLayers.forEach((imageLayer, index) => {
-          const card = cards[index];
-
-          if (!card) {
-            return;
-          }
-
-          gsap.fromTo(
-            imageLayer,
-            { yPercent: -6, scale: 1.05 },
-            {
-              yPercent: 6,
-              scale: 1.12,
-              ease: "none",
-              scrollTrigger: {
-                trigger: card,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: prefersReducedMotion ? false : 0.6,
-                invalidateOnRefresh: true,
-              },
-            }
-          );
-        });
-
-        return;
-      }
-
-      const getDistance = () =>
-        Math.max(trackRef.current!.scrollWidth - viewportRef.current!.offsetWidth, 0);
-
-      if (getDistance() < 48) {
-        return;
-      }
-
-      const horizontalTween = gsap.to(trackRef.current, {
-        x: () => -getDistance(),
-        ease: "none",
-        scrollTrigger: {
-          trigger: horizontalStageRef.current,
-          start: "top top",
-          end: () => `+=${getDistance()}`,
-          pin: true,
-          scrub: 0.9,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
+      const tween = gsap.fromTo(
+        cards,
+        {
+          autoAlpha: 0,
+          y: 46,
+          scale: 0.95,
+          rotateY: (index: number) => (index % 2 === 0 ? -7 : 7),
         },
-      });
-
-      cards.forEach((card, index) => {
-        gsap.fromTo(
-          card,
-          {
-            autoAlpha: 0.35,
-            scale: 0.82,
-            y: 36,
-            rotateY: index % 2 === 0 ? -10 : 10,
+        {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
+          rotateY: 0,
+          duration: 0.9,
+          stagger: 0.12,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: gridRef.current,
+            start: "top 78%",
+            end: prefersReducedMotion ? "top 68%" : "bottom 56%",
+            scrub: prefersReducedMotion ? false : 0.45,
+            once: prefersReducedMotion,
+            invalidateOnRefresh: true,
           },
-          {
-            autoAlpha: 1,
-            scale: 1,
-            y: 0,
-            rotateY: 0,
-            ease: "none",
-            scrollTrigger: {
-              trigger: card,
-              containerAnimation: horizontalTween,
-              start: "left 88%",
-              end: "center 62%",
-              scrub: 0.55,
-              invalidateOnRefresh: true,
-            },
-          }
-        );
-      });
-
-      imageLayers.forEach((imageLayer, index) => {
-        const card = cards[index];
-
-        if (!card) {
-          return;
         }
+      );
 
-        gsap.fromTo(
-          imageLayer,
-          {
-            xPercent: -8,
-            yPercent: -4,
-            scale: 1.08,
-          },
-          {
-            xPercent: 8,
-            yPercent: 4,
-            scale: 1.16,
-            ease: "none",
-            scrollTrigger: {
-              trigger: card,
-              containerAnimation: horizontalTween,
-              start: "left right",
-              end: "right left",
-              scrub: 0.75,
-              invalidateOnRefresh: true,
-            },
-          }
-        );
-      });
+      return () => {
+        tween.kill();
+      };
     });
   }, [gsap, prefersReducedMotion, withContext]);
+
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = overflowRef.current;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!activeProject || !modalCardRef.current || !overlayRef.current) {
+      return;
+    }
+
+    const modalCard = modalCardRef.current;
+    const modalBody = modalBodyRef.current;
+    const overlay = overlayRef.current;
+    const sourceCard = cardRefs.current[activeProject.slug];
+
+    overflowRef.current = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const timeline = gsap.timeline();
+
+    gsap.set(overlay, {
+      autoAlpha: 0,
+    });
+
+    if (prefersReducedMotion || !sourceCard) {
+      gsap.set(modalCard, {
+        autoAlpha: 0,
+        y: 28,
+        scale: 0.97,
+      });
+
+      if (modalBody) {
+        gsap.set(modalBody, { autoAlpha: 0, y: 18 });
+      }
+
+      timeline
+        .to(overlay, {
+          autoAlpha: 1,
+          duration: 0.18,
+          ease: "power2.out",
+        })
+        .to(
+          modalCard,
+          {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.32,
+            ease: "power3.out",
+          },
+          0
+        );
+
+      if (modalBody) {
+        timeline.to(
+          modalBody,
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.24,
+            ease: "power2.out",
+          },
+          0.08
+        );
+      }
+
+      closeButtonRef.current?.focus();
+
+      return () => {
+        timeline.kill();
+      };
+    }
+
+    if (modalBody) {
+      gsap.set(modalBody, { autoAlpha: 0, y: 18 });
+    }
+
+    const modalRect = modalCard.getBoundingClientRect();
+    const sourceRect = sourceCard.getBoundingClientRect();
+    const deltaX = sourceRect.left - modalRect.left;
+    const deltaY = sourceRect.top - modalRect.top;
+    const scaleX = sourceRect.width / modalRect.width;
+    const scaleY = sourceRect.height / modalRect.height;
+
+    gsap.set(modalCard, {
+      x: deltaX,
+      y: deltaY,
+      scaleX,
+      scaleY,
+      transformOrigin: "top left",
+    });
+
+    timeline.to(
+      overlay,
+      {
+        autoAlpha: 1,
+        duration: 0.22,
+        ease: "power2.out",
+      },
+      0
+    );
+
+    timeline.to(
+      modalCard,
+      {
+        x: 0,
+        y: 0,
+        scaleX: 1,
+        scaleY: 1,
+        transformOrigin: "top left",
+        clearProps: "transform",
+        duration: 0.72,
+        ease: "power3.inOut",
+      },
+      0
+    );
+
+    if (modalBody) {
+      timeline.to(
+        modalBody,
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.32,
+          ease: "power3.out",
+        },
+        0.2
+      );
+    }
+
+    closeButtonRef.current?.focus();
+
+    return () => {
+      timeline.kill();
+    };
+  }, [activeProject, gsap, prefersReducedMotion]);
+
+  useEffect(() => {
+    if (!activeProject) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeProject();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [activeProject, closeProject]);
+
+  const featuredProject = useMemo(
+    () => projects.find((project) => project.featured)?.slug ?? null,
+    []
+  );
 
   return (
     <section
@@ -340,172 +500,245 @@ export default function Projects() {
             Things I&apos;ve <span className="text-gradient-static">Built</span>
           </h2>
           <p className="mt-5 text-sm leading-7 text-slate-400 md:text-base md:leading-8">
-            Production-grade applications combining AI/ML, real-time systems, and
-            modern full-stack architecture.
+            A tighter overview first. Open any card for the full story, deep dive, and build
+            context without fighting the layout.
           </p>
         </div>
 
-        <div ref={horizontalStageRef} className="relative">
-          <div ref={viewportRef} className="overflow-visible lg:overflow-hidden">
-            <div
-              ref={trackRef}
-              className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-8"
-            >
-              {projects.map((project, index) => (
-                <article
-                  key={project.title}
-                  ref={(element) => {
-                    cardRefs.current[index] = element;
-                  }}
-                  className={`card card-geo-accent border-trace group flex w-full shrink-0 flex-col overflow-hidden lg:h-[min(44rem,78vh)] ${project.featured ? "lg:w-[min(56rem,88vw)]" : "lg:w-[min(42rem,74vw)]"}`}
-                >
-                  <div className={`h-px w-full bg-gradient-to-r ${project.accentGradient}`} />
+        <div
+          ref={gridRef}
+          className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-12"
+        >
+          {projects.map((project) => {
+            const isFeatured = project.slug === featuredProject;
 
-                  <div className="relative h-48 w-full shrink-0 overflow-hidden border-b border-white/[0.04] sm:h-64 lg:h-72">
-                    <div
-                      ref={(element) => {
-                        imageLayerRefs.current[index] = element;
-                      }}
-                      className="absolute inset-0 will-change-transform"
-                    >
-                      <Image
-                        src={project.image}
-                        alt={project.title}
-                        fill
-                        className="object-cover object-top"
-                        sizes={
-                          project.featured
-                            ? "(min-width: 1024px) 88vw, 100vw"
-                            : "(min-width: 1024px) 74vw, 100vw"
-                        }
-                      />
-                    </div>
+            return (
+              <button
+                key={project.slug}
+                ref={(element) => {
+                  cardRefs.current[project.slug] = element;
+                }}
+                type="button"
+                data-cursor-hover="true"
+                onClick={() => openProject(project)}
+                className={`card border-trace card-geo-accent group relative overflow-hidden text-left transition-transform duration-300 hover:-translate-y-1 ${isFeatured ? "md:col-span-2 xl:col-span-7" : "xl:col-span-5"}`}
+              >
+                <div className={`h-px w-full bg-gradient-to-r ${project.accentGradient}`} />
+
+                <div className={`grid gap-0 ${isFeatured ? "lg:grid-cols-[1.2fr_0.95fr]" : ""}`}>
+                  <div className="relative aspect-[16/10] overflow-hidden border-b border-white/[0.05] lg:border-b-0">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_50%)]" />
+                    <Image
+                      src={project.image}
+                      alt={project.title}
+                      fill
+                      className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
+                      sizes={
+                        isFeatured
+                          ? "(min-width: 1280px) 52vw, (min-width: 768px) 100vw, 100vw"
+                          : "(min-width: 1280px) 40vw, (min-width: 768px) 50vw, 100vw"
+                      }
+                    />
                   </div>
 
-                  <div className={`min-h-0 flex flex-1 flex-col ${project.featured ? "lg:flex-row" : ""}`}>
-                    <div className="flex min-h-0 flex-1 flex-col p-7 md:p-10">
-                      <div className="mb-5 flex items-start justify-between gap-4">
+                  <div className="flex flex-col justify-between p-6 md:p-7">
+                    <div>
+                      <div className="flex items-start justify-between gap-4">
                         <span className={`geo-tag ${project.tagColor}`}>
                           <span className="h-1 w-1 rounded-full bg-current opacity-60" />
                           {project.tag}
                         </span>
-                        <div className="flex gap-3">
-                          <a
-                            href={project.github}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.06] text-slate-500 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white"
-                            aria-label={`${project.title} on GitHub`}
-                          >
-                            <Github size={14} />
-                          </a>
-                          <a
-                            href={project.live}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.06] text-slate-500 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white"
-                            aria-label={`${project.title} live demo`}
-                          >
-                            <ExternalLink size={14} />
-                          </a>
-                          <TransitionLink
-                            href={`/build/${project.slug}`}
-                            className="signature-outline group/build relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg transition-all duration-300 hover:-translate-y-0.5 hover:text-white"
-                            aria-label={`Build details for ${project.title}`}
-                          >
-                            <span
-                              className="pointer-events-none absolute inset-0 opacity-80 transition-opacity duration-300 group-hover/build:opacity-100"
-                              style={{
-                                background:
-                                  "radial-gradient(circle, rgba(129, 140, 248, 0.34), transparent 68%)",
-                              }}
-                            />
-                            <Hammer size={14} />
-                          </TransitionLink>
-                        </div>
+                        <span className="rounded-full border border-white/[0.08] px-3 py-1 text-[0.68rem] font-mono uppercase tracking-[0.22em] text-slate-500">
+                          Open
+                        </span>
                       </div>
 
-                      <div
-                        data-lenis-prevent
-                        className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 [scrollbar-color:rgba(148,163,184,0.4)_transparent] [scrollbar-width:thin]"
-                      >
-                        <h3 className="text-xl font-bold text-white transition-colors duration-300">
-                          {project.title}
-                        </h3>
-                        <p className="mt-2 text-sm text-slate-500">{project.subtitle}</p>
-
-                        <p className="mt-4 text-[0.68rem] font-mono uppercase tracking-[0.22em] text-slate-500 lg:block">
-                          Scroll inside card to read more
-                        </p>
-
-                        <div className="mt-6 flex flex-col gap-3 text-sm leading-[1.6] text-slate-400">
-                          {project.desc.map((detail) => (
-                            <p key={detail.label}>
-                              <strong className="font-semibold text-slate-200">
-                                {detail.label}:
-                              </strong>{" "}
-                              {detail.text}
-                            </p>
-                          ))}
-                        </div>
-
-                        <ul className="mt-6 flex flex-col gap-3">
-                          {project.highlights.map((highlight) => (
-                            <li key={highlight} className="flex gap-3 text-sm text-slate-400">
-                              <span
-                                className="mt-2 h-1.5 w-1.5 shrink-0 rotate-45 rounded-[1px]"
-                                style={{ backgroundColor: "rgba(45, 212, 191, 0.58)" }}
-                              />
-                              {highlight}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                      <h3 className="mt-6 text-2xl font-bold text-white">{project.title}</h3>
+                      <p className="mt-2 text-sm text-slate-400">{project.subtitle}</p>
+                      <p className="mt-5 max-w-lg text-sm leading-7 text-slate-400">
+                        {project.desc[0]?.text}
+                      </p>
                     </div>
 
-                    {project.featured ? (
-                      <div className="hidden w-px bg-gradient-to-b from-transparent via-white/[0.06] to-transparent lg:block" />
-                    ) : null}
-
-                    {project.featured ? (
-                      <div className="flex flex-wrap items-end gap-3 border-t border-white/[0.04] p-6 lg:w-64 lg:flex-col lg:items-start lg:justify-center lg:border-t-0 lg:p-8">
-                        <div className="flex items-center gap-2 text-xs text-slate-500">
-                          <div
-                            className="h-2 w-2 rounded-full bg-green-400/60"
-                            style={{ animation: "glow-pulse 2s ease-in-out infinite" }}
-                          />
-                          Active Development
-                        </div>
-                        <div className="mt-3 grid w-full grid-cols-2 gap-3">
-                          <div className="rounded-lg border border-white/[0.05] bg-white/[0.02] p-3 text-center">
-                            <p className="text-lg font-bold text-white">7</p>
-                            <p className="text-[0.65rem] text-slate-500">Tech Stack</p>
-                          </div>
-                          <div className="rounded-lg border border-white/[0.05] bg-white/[0.02] p-3 text-center">
-                            <p className="text-lg font-bold text-white">4</p>
-                            <p className="text-[0.65rem] text-slate-500">Key Features</p>
-                          </div>
-                        </div>
+                    <div className="mt-8 flex items-center justify-between gap-4">
+                      <div className="flex flex-wrap gap-2">
+                        {project.stack.slice(0, isFeatured ? 4 : 3).map((tech) => (
+                          <span
+                            key={tech}
+                            className="rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[0.72rem] font-medium tracking-wide text-slate-300"
+                          >
+                            {tech}
+                          </span>
+                        ))}
                       </div>
-                    ) : null}
+
+                      <span className="inline-flex items-center gap-2 text-sm font-semibold text-white/85">
+                        View Details <ArrowUpRight size={16} />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {activeProject ? (
+        <div
+          ref={overlayRef}
+          className={`fixed inset-0 z-[120] flex items-center justify-center bg-[rgba(2,6,23,0.78)] px-4 py-6 backdrop-blur-xl md:px-8 ${isClosing ? "pointer-events-none" : ""}`}
+          onClick={closeProject}
+        >
+          <div
+            ref={modalCardRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="project-modal-title"
+            className="card relative flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-[1.8rem] border border-white/[0.1] shadow-[0_40px_120px_-40px_rgba(2,6,23,0.72)]"
+            onClick={(event) => event.stopPropagation()}
+            style={{
+              boxShadow: `0 40px 120px -40px ${activeProject.accentGlow}`,
+            }}
+          >
+            <div className={`h-px w-full bg-gradient-to-r ${activeProject.accentGradient}`} />
+
+            <button
+              ref={closeButtonRef}
+              type="button"
+              aria-label="Close project details"
+              data-cursor-hover="true"
+              onClick={closeProject}
+              className="absolute right-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.1] bg-[#081120]/82 text-slate-200 backdrop-blur-md transition-colors hover:text-white"
+            >
+              <X size={18} />
+            </button>
+
+            <div
+              ref={modalBodyRef}
+              data-lenis-prevent
+              className="min-h-0 overflow-y-auto overscroll-contain"
+            >
+              <div className="grid min-h-0 lg:grid-cols-[1.15fr_0.95fr]">
+                <div className="relative min-h-[20rem] border-b border-white/[0.06] lg:min-h-full lg:border-b-0 lg:border-r lg:border-r-white/[0.06]">
+                  <Image
+                    src={activeProject.image}
+                    alt={activeProject.title}
+                    fill
+                    className="object-cover object-top"
+                    sizes="(min-width: 1024px) 56vw, 100vw"
+                  />
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,rgba(2,6,23,0.18)_56%,rgba(2,6,23,0.72)_100%)]" />
+                </div>
+
+                <div className="flex min-h-0 flex-col p-6 md:p-8 lg:p-10">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                      <span className={`geo-tag ${activeProject.tagColor}`}>
+                        <span className="h-1 w-1 rounded-full bg-current opacity-60" />
+                        {activeProject.tag}
+                      </span>
+                      <h3
+                        id="project-modal-title"
+                        className="mt-6 text-3xl font-bold leading-tight text-white md:text-[2.35rem]"
+                      >
+                        {activeProject.title}
+                      </h3>
+                      <p className="mt-3 text-base text-slate-400">{activeProject.subtitle}</p>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <a
+                        href={activeProject.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-cursor-hover="true"
+                        className="signature-outline inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold"
+                      >
+                        <Github size={15} />
+                        GitHub
+                      </a>
+                      <a
+                        href={activeProject.live}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-cursor-hover="true"
+                        className="signature-button inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold text-white"
+                      >
+                        <ExternalLink size={15} />
+                        Live
+                      </a>
+                    </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-3 border-t border-white/[0.04] px-7 py-8 md:px-10">
-                    {project.stack.map((tech) => (
-                      <span
-                        key={tech}
-                        className="rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-[0.8rem] font-medium tracking-wide text-slate-300 transition-all duration-300 hover:border-white/[0.2] hover:text-white"
-                      >
-                        {tech}
-                      </span>
+                  <div className="mt-8 space-y-5 text-sm leading-7 text-slate-300">
+                    {activeProject.desc.map((detail) => (
+                      <div key={detail.label}>
+                        <p className="font-mono text-[0.68rem] uppercase tracking-[0.26em] text-slate-500">
+                          {detail.label}
+                        </p>
+                        <p className="mt-2 text-[0.98rem] leading-7 text-slate-300">
+                          {detail.text}
+                        </p>
+                      </div>
                     ))}
                   </div>
-                </article>
-              ))}
+
+                  <div className="mt-8">
+                    <p className="font-mono text-[0.68rem] uppercase tracking-[0.26em] text-slate-500">
+                      Stack
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2.5">
+                      {activeProject.stack.map((tech) => (
+                        <span
+                          key={tech}
+                          className="rounded-full border border-white/[0.08] bg-white/[0.04] px-3.5 py-2 text-[0.78rem] font-medium tracking-wide text-slate-200"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-8">
+                    <p className="font-mono text-[0.68rem] uppercase tracking-[0.26em] text-slate-500">
+                      Key Highlights
+                    </p>
+                    <ul className="mt-4 grid gap-3">
+                      {activeProject.highlights.map((highlight) => (
+                        <li key={highlight} className="flex gap-3 text-sm text-slate-300">
+                          <span
+                            className="mt-2 h-1.5 w-1.5 shrink-0 rotate-45 rounded-[1px]"
+                            style={{ backgroundColor: "rgba(45, 212, 191, 0.58)" }}
+                          />
+                          {highlight}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="mt-8 flex flex-wrap gap-3">
+                    <TransitionLink
+                      href={`/build/${activeProject.slug}`}
+                      className="signature-outline inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold"
+                    >
+                      <Hammer size={15} />
+                      Build Story
+                    </TransitionLink>
+                    <button
+                      type="button"
+                      onClick={closeProject}
+                      className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] px-4 py-2.5 text-sm font-semibold text-slate-300 transition-colors hover:text-white"
+                    >
+                      Back to Grid
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      ) : null}
     </section>
   );
 }
