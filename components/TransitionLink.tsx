@@ -14,7 +14,21 @@ export function TransitionLink({ children, href, className, ...props }: Transiti
     const { triggerTransition } = useTransition();
 
     const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-        e.preventDefault(); // Stop default instant navigation
+        props.onClick?.(e);
+
+        if (
+            e.defaultPrevented ||
+            props.target === "_blank" ||
+            e.metaKey ||
+            e.ctrlKey ||
+            e.shiftKey ||
+            e.altKey ||
+            e.button !== 0
+        ) {
+            return;
+        }
+
+        e.preventDefault();
         triggerTransition(href);
     };
 

@@ -323,6 +323,145 @@ export default function Projects() {
   }, [gsap, prefersReducedMotion, withContext]);
 
   useEffect(() => {
+    withContext(() => {
+      const cards = Object.values(cardRefs.current).filter(
+        (card): card is HTMLButtonElement => Boolean(card)
+      );
+
+      if (cards.length === 0) {
+        return;
+      }
+
+      const cleanups = cards.map((card) => {
+        const mediaSurface = card.querySelector<HTMLElement>("[data-project-media]");
+        const mediaParallax = card.querySelector<HTMLElement>("[data-project-parallax]");
+        const mediaOverlay = card.querySelector<HTMLElement>("[data-project-overlay]");
+        const mediaLabel = card.querySelector<HTMLElement>("[data-project-label]");
+
+        if (!mediaSurface || !mediaParallax || !mediaOverlay || !mediaLabel) {
+          return () => undefined;
+        }
+
+        gsap.set(mediaLabel, { autoAlpha: 0, y: 18 });
+
+        if (prefersReducedMotion) {
+          const handleEnter = () => {
+            gsap.to(mediaOverlay, {
+              autoAlpha: 0.18,
+              duration: 0.24,
+              ease: "power2.out",
+              overwrite: "auto",
+            });
+            gsap.to(mediaLabel, {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.24,
+              ease: "power2.out",
+              overwrite: "auto",
+            });
+          };
+
+          const handleLeave = () => {
+            gsap.to(mediaOverlay, {
+              autoAlpha: 0.44,
+              duration: 0.2,
+              ease: "power2.out",
+              overwrite: "auto",
+            });
+            gsap.to(mediaLabel, {
+              autoAlpha: 0,
+              y: 18,
+              duration: 0.18,
+              ease: "power2.out",
+              overwrite: "auto",
+            });
+          };
+
+          mediaSurface.addEventListener("pointerenter", handleEnter);
+          mediaSurface.addEventListener("pointerleave", handleLeave);
+
+          return () => {
+            mediaSurface.removeEventListener("pointerenter", handleEnter);
+            mediaSurface.removeEventListener("pointerleave", handleLeave);
+          };
+        }
+
+        const xTo = gsap.quickTo(mediaParallax, "x", { duration: 0.45, ease: "power3.out" });
+        const yTo = gsap.quickTo(mediaParallax, "y", { duration: 0.45, ease: "power3.out" });
+
+        const handleEnter = () => {
+          gsap.to(mediaParallax, {
+            scale: 1.08,
+            duration: 0.45,
+            ease: "power3.out",
+            overwrite: "auto",
+          });
+          gsap.to(mediaOverlay, {
+            autoAlpha: 0.14,
+            duration: 0.35,
+            ease: "power2.out",
+            overwrite: "auto",
+          });
+          gsap.to(mediaLabel, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.3,
+            ease: "power3.out",
+            overwrite: "auto",
+          });
+        };
+
+        const handleMove = (event: PointerEvent) => {
+          const rect = mediaSurface.getBoundingClientRect();
+          const offsetX = (event.clientX - rect.left) / rect.width - 0.5;
+          const offsetY = (event.clientY - rect.top) / rect.height - 0.5;
+
+          xTo(offsetX * 22);
+          yTo(offsetY * 18);
+        };
+
+        const handleLeave = () => {
+          xTo(0);
+          yTo(0);
+          gsap.to(mediaParallax, {
+            scale: 1,
+            duration: 0.5,
+            ease: "power3.out",
+            overwrite: "auto",
+          });
+          gsap.to(mediaOverlay, {
+            autoAlpha: 0.44,
+            duration: 0.3,
+            ease: "power2.out",
+            overwrite: "auto",
+          });
+          gsap.to(mediaLabel, {
+            autoAlpha: 0,
+            y: 18,
+            duration: 0.22,
+            ease: "power2.out",
+            overwrite: "auto",
+          });
+        };
+
+        mediaSurface.addEventListener("pointerenter", handleEnter);
+        mediaSurface.addEventListener("pointermove", handleMove);
+        mediaSurface.addEventListener("pointerleave", handleLeave);
+
+        return () => {
+          mediaSurface.removeEventListener("pointerenter", handleEnter);
+          mediaSurface.removeEventListener("pointermove", handleMove);
+          mediaSurface.removeEventListener("pointerleave", handleLeave);
+        };
+      });
+
+      return () => {
+        cleanups.forEach((cleanup) => cleanup());
+      };
+    });
+  }, [gsap, prefersReducedMotion, withContext]);
+
+  useEffect(() => {
     return () => {
       document.body.style.overflow = overflowRef.current;
     };
@@ -499,7 +638,7 @@ export default function Projects() {
           <h2 className="section-title">
             Things I&apos;ve <span className="text-gradient-static">Built</span>
           </h2>
-          <p className="mt-5 text-sm leading-7 text-slate-400 md:text-base md:leading-8">
+          <p className="measure-copy mt-5 text-sm leading-7 text-slate-400 md:text-base md:leading-8">
             A tighter overview first. Open any card for the full story, deep dive, and build
             context without fighting the layout.
           </p>
@@ -526,19 +665,41 @@ export default function Projects() {
                 <div className={`h-px w-full bg-gradient-to-r ${project.accentGradient}`} />
 
                 <div className={`grid gap-0 ${isFeatured ? "lg:grid-cols-[1.2fr_0.95fr]" : ""}`}>
-                  <div className="relative aspect-[16/10] overflow-hidden border-b border-white/[0.05] lg:border-b-0">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_50%)]" />
-                    <Image
-                      src={project.image}
-                      alt={project.title}
-                      fill
-                      className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
-                      sizes={
-                        isFeatured
-                          ? "(min-width: 1280px) 52vw, (min-width: 768px) 100vw, 100vw"
-                          : "(min-width: 1280px) 40vw, (min-width: 768px) 50vw, 100vw"
-                      }
+                  <div
+                    data-cursor-label="View"
+                    data-project-media
+                    className="relative aspect-[16/10] overflow-hidden border-b border-white/[0.05] lg:border-b-0"
+                  >
+                    <div
+                      data-project-parallax
+                      className="absolute inset-0 will-change-transform"
+                    >
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_50%)]" />
+                      <Image
+                        src={project.image}
+                        alt={project.title}
+                        fill
+                        className="object-cover object-top"
+                        sizes={
+                          isFeatured
+                            ? "(min-width: 1280px) 52vw, (min-width: 768px) 100vw, 100vw"
+                            : "(min-width: 1280px) 40vw, (min-width: 768px) 50vw, 100vw"
+                        }
+                      />
+                    </div>
+                    <div
+                      data-project-overlay
+                      className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,10,24,0.08),rgba(5,10,24,0.32)_52%,rgba(5,10,24,0.62))] opacity-45"
                     />
+                    <div className="absolute inset-x-0 bottom-0 flex items-end p-5 md:p-6">
+                      <span
+                        data-project-label
+                        className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-[#081120]/76 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/90 backdrop-blur-md"
+                      >
+                        View Case Study
+                        <ArrowUpRight size={14} />
+                      </span>
+                    </div>
                   </div>
 
                   <div className="flex flex-col justify-between p-6 md:p-7">
@@ -555,7 +716,7 @@ export default function Projects() {
 
                       <h3 className="mt-6 text-2xl font-bold text-white">{project.title}</h3>
                       <p className="mt-2 text-sm text-slate-400">{project.subtitle}</p>
-                      <p className="mt-5 max-w-lg text-sm leading-7 text-slate-400">
+                      <p className="measure-copy mt-5 text-sm leading-7 text-slate-400">
                         {project.desc[0]?.text}
                       </p>
                     </div>

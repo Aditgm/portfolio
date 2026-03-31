@@ -17,6 +17,7 @@ type CustomCursorProps = {
  * Hover integration:
  * - `data-cursor-hover="true"` enables hover morphing.
  * - `data-magnetic="true"` enables the stronger hover state used for CTAs.
+ * - `data-cursor-label="View"` swaps the ring into a compact label state for cards/images.
  * - `data-cursor-theme="light" | "dark"` switches cursor contrast for bright/dark areas.
  *
  * Manual QA:
@@ -32,6 +33,7 @@ export default function CustomCursor({
   const rootRef = useRef<HTMLDivElement>(null);
   const outerRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (
@@ -39,7 +41,8 @@ export default function CustomCursor({
       !enabled ||
       !rootRef.current ||
       !outerRef.current ||
-      !dotRef.current
+      !dotRef.current ||
+      !labelRef.current
     ) {
       return;
     }
@@ -59,6 +62,7 @@ export default function CustomCursor({
     const root = rootRef.current;
     const outer = outerRef.current;
     const dot = dotRef.current;
+    const label = labelRef.current;
 
     const pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const outerPosition = { x: pointer.x, y: pointer.y };
@@ -68,12 +72,40 @@ export default function CustomCursor({
     const setDotX = gsap.quickSetter(dot, "x", "px");
     const setDotY = gsap.quickSetter(dot, "y", "px");
     let visible = false;
+    let activeState: "idle" | "hover" | "magnetic" | "preview" = "idle";
+    let activeLabel = "";
 
     const setTheme = (theme: "light" | "dark") => {
       root.dataset.theme = theme;
     };
 
+    const setLabel = (value: string | null) => {
+      const nextLabel = value ?? "";
+
+      if (activeLabel === nextLabel) {
+        return;
+      }
+
+      activeLabel = nextLabel;
+      label.textContent = nextLabel;
+
+      gsap.to(label, {
+        autoAlpha: nextLabel ? 1 : 0,
+        scale: nextLabel ? 1 : 0.9,
+        duration: 0.16,
+        ease: "power2.out",
+        overwrite: "auto",
+      });
+    };
+
     const applyIdleState = () => {
+      if (activeState === "idle" && !activeLabel) {
+        return;
+      }
+
+      activeState = "idle";
+      root.dataset.mode = "idle";
+      setLabel(null);
       gsap.to(outer, {
         width: "var(--cursor-size)",
         height: "var(--cursor-size)",
@@ -94,6 +126,15 @@ export default function CustomCursor({
     };
 
     const applyHoverState = (isMagnetic: boolean) => {
+      const nextState = isMagnetic ? "magnetic" : "hover";
+
+      if (activeState === nextState && !activeLabel) {
+        return;
+      }
+
+      activeState = nextState;
+      root.dataset.mode = nextState;
+      setLabel(null);
       gsap.to(outer, {
         width: isMagnetic ? "calc(var(--cursor-size) * 1.34)" : "calc(var(--cursor-size) * 1.16)",
         height: isMagnetic ? "calc(var(--cursor-size) * 1.34)" : "calc(var(--cursor-size) * 1.16)",
@@ -115,16 +156,48 @@ export default function CustomCursor({
       });
     };
 
-    const updateTargetState = (event: PointerEvent) => {
+    const applyPreviewState = (previewLabel: string) => {
+      if (activeState === "preview" && activeLabel === previewLabel) {
+        return;
+      }
+
+      activeState = "preview";
+      root.dataset.mode = "preview";
+      setLabel(previewLabel);
+      gsap.to(outer, {
+        width: "var(--cursor-preview-size)",
+        height: "var(--cursor-preview-size)",
+        borderRadius: "18px",
+        scale: hoverScale + 0.08,
+        opacity: 1,
+        duration: 0.18,
+        ease: "power2.out",
+        overwrite: "auto",
+      });
+      gsap.to(dot, {
+        scale: 0.4,
+        opacity: 0,
+        duration: 0.14,
+        ease: "power2.out",
+        overwrite: "auto",
+      });
+    };
+
+    const updateTargetStateAtPoint = (clientX: number, clientY: number) => {
       const hovered = document
-        .elementFromPoint(event.clientX, event.clientY)
-        ?.closest<HTMLElement>("[data-cursor-hover], [data-magnetic]");
+        .elementFromPoint(clientX, clientY)
+        ?.closest<HTMLElement>("[data-cursor-label], [data-cursor-hover], [data-magnetic]");
 
       const themeNode = document
-        .elementFromPoint(event.clientX, event.clientY)
+        .elementFromPoint(clientX, clientY)
         ?.closest<HTMLElement>("[data-cursor-theme]");
 
       setTheme((themeNode?.dataset.cursorTheme as "light" | "dark") ?? "dark");
+
+      if (hovered?.dataset.cursorLabel) {
+        applyPreviewState(hovered.dataset.cursorLabel);
+        return;
+      }
 
       if (hovered) {
         const isMagnetic = hovered.dataset.magnetic === "true";
@@ -148,7 +221,7 @@ export default function CustomCursor({
         });
       }
 
-      updateTargetState(event);
+      updateTargetStateAtPoint(event.clientX, event.clientY);
     };
 
     const handlePointerDown = () => {
@@ -167,11 +240,15 @@ export default function CustomCursor({
     };
 
     const handlePointerUp = () => {
-      applyIdleState();
+      updateTargetStateAtPoint(pointer.x, pointer.y);
     };
 
     const handleLeave = () => {
       visible = false;
+      activeState = "idle";
+      activeLabel = "";
+      root.dataset.mode = "idle";
+      label.textContent = "";
       gsap.to(root, {
         autoAlpha: 0,
         duration: 0.16,
@@ -216,7 +293,9 @@ export default function CustomCursor({
       data-theme="dark"
       className="custom-cursor pointer-events-none fixed inset-0 z-[120] hidden opacity-0 md:block"
     >
-      <div ref={outerRef} className="custom-cursor__outer" />
+      <div ref={outerRef} className="custom-cursor__outer">
+        <span ref={labelRef} className="custom-cursor__label" />
+      </div>
       <div ref={dotRef} className="custom-cursor__dot" />
     </div>
   );

@@ -27,7 +27,7 @@ export default function GithubGraph() {
                     <h2 className="section-title">
                         GitHub <span className="text-gradient-static">Graph</span>
                     </h2>
-                    <p className="mt-5 text-sm leading-7 text-slate-400 md:text-base md:leading-8">
+                    <p className="measure-copy mt-5 text-sm leading-7 text-slate-400 md:text-base md:leading-8">
                         A visual representation of my open-source contributions, consistent coding habits, and project commitments.
                     </p>
                 </motion.div>

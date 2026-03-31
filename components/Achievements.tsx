@@ -397,7 +397,7 @@ export default function Achievements() {
           <h2 className="section-title">
             Competitive <span className="text-gradient-static">Programming</span>
           </h2>
-          <p className="mt-5 text-sm leading-7 text-slate-400 md:text-base md:leading-8">
+          <p className="measure-copy mt-5 text-sm leading-7 text-slate-400 md:text-base md:leading-8">
             A showcase of milestones across the world&apos;s top competitive
             programming platforms.
           </p>

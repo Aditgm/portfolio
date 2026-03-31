@@ -26,6 +26,14 @@ const nameParts = [
   { word: "Raj", accent: true },
 ];
 
+const heroQuoteWords = [
+  "Building",
+  "AI-powered",
+  "products",
+  "that",
+  "ship.",
+];
+
 export default function Hero() {
   const [achievementIdx, setAchievementIdx] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
@@ -66,6 +74,7 @@ export default function Hero() {
         return;
       }
 
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const q = gsap.utils.selector(sectionRef);
       const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
 
@@ -80,6 +89,12 @@ export default function Hero() {
         ),
         { autoAlpha: 0, y: 24 }
       );
+      gsap.set(q("[data-hero-quote-word]"), {
+        autoAlpha: 0.15,
+        yPercent: 22,
+        filter: "blur(10px)",
+        clipPath: "inset(0 0 100% 0)",
+      });
 
       tl.to(q("[data-hero-badge]"), {
         autoAlpha: 1,
@@ -159,6 +174,22 @@ export default function Hero() {
         repeat: -1,
         yoyo: true,
       });
+
+      gsap.to(q("[data-hero-quote-word]"), {
+        autoAlpha: 1,
+        yPercent: 0,
+        filter: "blur(0px)",
+        clipPath: "inset(0 0 0% 0)",
+        duration: prefersReducedMotion ? 0.35 : 0.8,
+        stagger: prefersReducedMotion ? 0.02 : 0.08,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 68%",
+          end: prefersReducedMotion ? "top 52%" : "top 18%",
+          scrub: prefersReducedMotion ? false : 0.45,
+        },
+      });
     },
     { scope: sectionRef }
   );
@@ -207,7 +238,7 @@ export default function Hero() {
           </a>
 
           <div className="flex flex-col items-center gap-6">
-            <h1 className="display-title text-[4rem] font-extrabold leading-[0.92] text-white sm:text-7xl md:text-8xl lg:text-[6.9rem]">
+            <h1 className="display-title text-[clamp(4.35rem,11vw,8rem)] font-black leading-[0.88] text-white">
               <span className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
                 {nameParts.map((part) => (
                   <span
@@ -263,9 +294,19 @@ export default function Hero() {
 
               <p
                 data-hero-quote
-                className="mt-3 text-lg font-medium italic text-slate-300 sm:text-xl"
+                className="measure-copy mt-3 text-lg font-medium italic text-slate-300 sm:text-xl"
               >
-                &quot;Building AI-powered products that ship.&quot;
+                <span className="sr-only">Building AI-powered products that ship.</span>
+                <span aria-hidden="true">
+                  {heroQuoteWords.map((word, index) => (
+                    <span key={word} className="inline-block overflow-hidden">
+                      <span data-hero-quote-word className="inline-block will-change-transform">
+                        {word}
+                      </span>
+                      {index < heroQuoteWords.length - 1 ? <span>&nbsp;</span> : null}
+                    </span>
+                  ))}
+                </span>
               </p>
             </div>
           </div>
@@ -285,7 +326,7 @@ export default function Hero() {
               <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
                 <Brain size={24} style={{ color: "var(--signature)" }} /> Product &amp; AI
               </h3>
-              <p className="text-base leading-[1.8] text-slate-400">
+              <p className="measure-copy text-base leading-[1.8] text-slate-400">
                 Top <strong className="font-medium text-slate-200">0.4% competitive programmer</strong> on LeetCode who builds AI products that solve real problems. I&apos;m drawn to challenges at the intersection of <strong className="font-medium text-slate-200">LLMs and RAG systems</strong> in healthcare, law, and finance.
               </p>
             </div>
@@ -304,7 +345,7 @@ export default function Hero() {
               <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
                 <Zap size={24} style={{ color: "var(--secondary-accent)" }} /> Philosophy
               </h3>
-              <p className="text-base leading-[1.8] text-slate-400">
+              <p className="measure-copy text-base leading-[1.8] text-slate-400">
                 I approach every project the way I approach competitive programming: find the <strong className="font-medium text-slate-200">most elegant solution</strong>, then make it fast.
               </p>
             </div>
@@ -323,7 +364,7 @@ export default function Hero() {
               <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
                 <Code2 size={24} style={{ color: "var(--accent-ultraviolet)" }} /> Current Focus
               </h3>
-              <p className="text-base leading-[1.8] text-slate-400">
+              <p className="measure-copy text-base leading-[1.8] text-slate-400">
                 Currently exploring <strong className="font-medium text-slate-200">LangChain and Azure</strong>, contributing to open source, and building something new with production-ready AI workflows.
               </p>
             </div>

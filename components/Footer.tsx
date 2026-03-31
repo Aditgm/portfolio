@@ -190,7 +190,7 @@ export default function Footer() {
             <span>{titleLetters}</span>
             <span className="text-gradient-static">{accentLetters}</span>
           </h2>
-          <p className="mx-auto mt-6 block w-full max-w-2xl self-center px-2 text-center text-sm leading-[1.85] text-slate-400 md:px-0 md:text-base md:leading-8">
+          <p className="measure-copy mx-auto mt-6 block w-full self-center px-2 text-center text-sm leading-[1.85] text-slate-400 md:px-0 md:text-base md:leading-8">
             I&apos;m currently open to new opportunities. Whether you have a question,
             a project idea, or just want to say hi, my inbox is always open.
           </p>

@@ -1,5 +1,4 @@
-import { Hammer, CircleDashed, CheckCircle2, Server, Database, Brain, Sparkles, LayoutPanelLeft } from "lucide-react";
-import Link from "next/link";
+import { Hammer, Server, Database, Brain, Sparkles, LayoutPanelLeft } from "lucide-react";
 import { TransitionLink } from "@/components/TransitionLink";
 import { notFound } from "next/navigation";
 import BuildTimeline from "./BuildTimeline";
@@ -275,12 +274,12 @@ export default async function BuildPage({ params }: { params: Promise<{ slug: st
                 {/* Footer CTA */}
                 <div className="mt-32 text-center pb-12">
                     <h3 className="text-2xl font-bold text-white mb-6">Inspired to build something similar?</h3>
-                    <Link
+                    <TransitionLink
                         href="/#contact"
                         className="inline-flex items-center gap-3 overflow-hidden rounded-xl border border-white/[0.12] bg-white/[0.06] px-8 py-4 text-sm font-bold text-slate-200 transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.25] hover:bg-white/[0.1] hover:text-white hover:shadow-lg"
                     >
                         Let&apos;s collaborate
-                    </Link>
+                    </TransitionLink>
                 </div>
             </div>
         </main>

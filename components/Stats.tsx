@@ -8,9 +8,13 @@ interface Stat {
   suffix: string;
   label: string;
   sub: string;
-  color: string;
+  valueColor: string;
+  ringColor: string;
   glowColor: string;
 }
+
+const STAT_RING_RADIUS = 24;
+const STAT_RING_CIRCUMFERENCE = 2 * Math.PI * STAT_RING_RADIUS;
 
 const stats: Stat[] = [
   {
@@ -18,7 +22,8 @@ const stats: Stat[] = [
     suffix: "+",
     label: "Problems Solved",
     sub: "LeetCode, CF, CSES, HackerRank",
-    color: "text-blue-400",
+    valueColor: "#9fb0ff",
+    ringColor: "rgba(99, 102, 241, 0.9)",
     glowColor: "rgba(59,130,246,0.12)",
   },
   {
@@ -26,7 +31,8 @@ const stats: Stat[] = [
     suffix: "+",
     label: "LeetCode Rating",
     sub: "Guardian · Top 0.4% globally",
-    color: "text-amber-400",
+    valueColor: "#fbbf24",
+    ringColor: "rgba(251, 191, 36, 0.9)",
     glowColor: "rgba(245,158,11,0.12)",
   },
   {
@@ -34,7 +40,8 @@ const stats: Stat[] = [
     suffix: "",
     label: "Codeforces Rating",
     sub: "Master · Top 0.8% globally",
-    color: "text-orange-400",
+    valueColor: "#fb923c",
+    ringColor: "rgba(251, 146, 60, 0.88)",
     glowColor: "rgba(249,115,22,0.12)",
   },
   {
@@ -42,10 +49,13 @@ const stats: Stat[] = [
     suffix: "",
     label: "CodeChef Rating",
     sub: "5★ · Ranked 470th in India",
-    color: "text-green-400",
+    valueColor: "#34d399",
+    ringColor: "rgba(52, 211, 153, 0.88)",
     glowColor: "rgba(16,185,129,0.12)",
   },
 ];
+
+const STAT_RING_MAX = Math.max(...stats.map((stat) => stat.value));
 
 const contestHighlights = [
   {
@@ -83,6 +93,7 @@ export default function Stats() {
   const highlightsGridRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
   const valueRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  const ringRefs = useRef<Array<SVGCircleElement | null>>([]);
   const highlightRefs = useRef<Array<HTMLDivElement | null>>([]);
   const { createRevealAnimation, gsap, prefersReducedMotion, withContext } = useGSAP(sectionRef);
 
@@ -180,6 +191,7 @@ export default function Stats() {
 
       stats.forEach((stat, index) => {
         const valueNode = valueRefs.current[index];
+        const ringNode = ringRefs.current[index];
         const card = statCards[index];
 
         if (!valueNode || !card) {
@@ -187,11 +199,17 @@ export default function Stats() {
         }
 
         valueNode.textContent = formatStat(0, stat.suffix);
+        if (ringNode) {
+          ringNode.style.strokeDasharray = `${STAT_RING_CIRCUMFERENCE}`;
+          ringNode.style.strokeDashoffset = `${STAT_RING_CIRCUMFERENCE}`;
+        }
 
-        const counterState = { value: 0 };
+        const counterState = { value: 0, progress: 0 };
+        const ringProgress = stat.value / STAT_RING_MAX;
 
         gsap.to(counterState, {
           value: stat.value,
+          progress: ringProgress,
           duration: prefersReducedMotion ? 0.6 : 1.15,
           ease: "power2.out",
           scrollTrigger: {
@@ -204,9 +222,17 @@ export default function Stats() {
           },
           onUpdate: () => {
             valueNode.textContent = formatStat(counterState.value, stat.suffix);
+
+            if (ringNode) {
+              ringNode.style.strokeDashoffset = `${STAT_RING_CIRCUMFERENCE * (1 - counterState.progress)}`;
+            }
           },
           onComplete: () => {
             valueNode.textContent = formatStat(stat.value, stat.suffix);
+
+            if (ringNode) {
+              ringNode.style.strokeDashoffset = `${STAT_RING_CIRCUMFERENCE * (1 - ringProgress)}`;
+            }
           },
         });
       });
@@ -250,9 +276,14 @@ export default function Stats() {
       return () => {
         stats.forEach((stat, index) => {
           const valueNode = valueRefs.current[index];
+          const ringNode = ringRefs.current[index];
 
           if (valueNode) {
             valueNode.textContent = formatStat(stat.value, stat.suffix);
+          }
+
+          if (ringNode) {
+            ringNode.style.strokeDashoffset = `${STAT_RING_CIRCUMFERENCE * (1 - stat.value / STAT_RING_MAX)}`;
           }
         });
       };
@@ -274,7 +305,7 @@ export default function Stats() {
           <h2 className="section-title">
             Competitive <span className="text-gradient-static">Programming</span>
           </h2>
-          <p className="mt-6 text-sm leading-7 text-slate-400 md:text-base md:leading-8">
+          <p className="measure-copy mt-6 text-sm leading-7 text-slate-400 md:text-base md:leading-8">
             Consistently ranked among the top competitive programmers globally across
             all major platforms.
           </p>
@@ -290,6 +321,33 @@ export default function Stats() {
               className="card border-trace group relative cursor-default overflow-hidden p-10 md:p-12"
               style={{ ["--hover-glow" as string]: stat.glowColor }}
             >
+              <div className="absolute right-8 top-8">
+                <svg className="h-14 w-14 -rotate-90" viewBox="0 0 56 56" aria-hidden="true">
+                  <circle
+                    cx="28"
+                    cy="28"
+                    r={STAT_RING_RADIUS}
+                    fill="none"
+                    stroke="rgba(255,255,255,0.08)"
+                    strokeWidth="4"
+                  />
+                  <circle
+                    ref={(element) => {
+                      ringRefs.current[index] = element;
+                    }}
+                    cx="28"
+                    cy="28"
+                    r={STAT_RING_RADIUS}
+                    fill="none"
+                    stroke={stat.ringColor}
+                    strokeLinecap="round"
+                    strokeWidth="4"
+                    strokeDasharray={STAT_RING_CIRCUMFERENCE}
+                    strokeDashoffset={STAT_RING_CIRCUMFERENCE}
+                  />
+                </svg>
+              </div>
+
               <div className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.04] to-transparent transition-transform duration-700 group-hover:translate-x-full" />
 
               <div className="mb-7 flex items-center gap-2">
@@ -302,7 +360,8 @@ export default function Stats() {
                   valueRefs.current[index] = element;
                 }}
                 aria-label={`${stat.label}: ${formatStat(stat.value, stat.suffix)}`}
-                className={`text-3xl font-extrabold tabular-nums md:text-4xl ${stat.color}`}
+                className="text-3xl font-extrabold tabular-nums md:text-4xl"
+                style={{ color: stat.valueColor }}
               >
                 {formatStat(stat.value, stat.suffix)}
               </span>

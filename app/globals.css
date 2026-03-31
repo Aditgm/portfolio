@@ -35,6 +35,7 @@
   --cursor-size: 26px;
   --cursor-dot-size: 7px;
   --cursor-shape-radius: 12px;
+  --cursor-preview-size: 58px;
   --cursor-ring-color-dark: rgba(199, 205, 255, 0.82);
   --cursor-ring-color-light: rgba(7, 16, 30, 0.76);
   --cursor-fill-dark: rgba(99, 102, 241, 0.12);
@@ -69,7 +70,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   overflow-y: auto;
-  line-height: 1.5;
+  line-height: 1.7;
   margin: 0;
   padding: 0;
 }
@@ -364,8 +365,12 @@ html.lenis, html.lenis body {
 
 .display-title {
   font-family: var(--font-display), var(--font-sans), sans-serif;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.04em;
   text-wrap: balance;
+}
+
+.measure-copy {
+  max-width: 42ch;
 }
 
 .signature-pill {
@@ -584,7 +589,7 @@ html.lenis, html.lenis body {
 .section-title {
   font-family: var(--font-display), var(--font-sans), sans-serif;
   font-size: 2.25rem;
-  font-weight: 800;
+  font-weight: 900;
   color: var(--text-primary);
   letter-spacing: -0.045em;
   line-height: 1.15;
@@ -667,6 +672,8 @@ html.lenis, html.lenis body {
 }
 
 .custom-cursor__outer {
+  display: grid;
+  place-items: center;
   width: var(--cursor-size);
   height: var(--cursor-size);
   border: 1px solid var(--cursor-ring-color);
@@ -692,6 +699,18 @@ html.lenis, html.lenis body {
   border-radius: 999px;
   background: var(--cursor-dot-color);
   box-shadow: 0 0 18px color-mix(in srgb, var(--cursor-dot-color) 24%, transparent);
+}
+
+.custom-cursor__label {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.54rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cursor-dot-color);
+  opacity: 0;
+  transform: scale(0.9);
+  will-change: transform, opacity;
 }
 
 /* Horizontal scroll helpers */
