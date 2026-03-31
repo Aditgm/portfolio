@@ -17,7 +17,7 @@ const Hero3DBackground = dynamic(() => import("./Hero3DBackground"), {
 
 const nameParts = [
   { word: "Aditya", accent: false },
-  { word: "Raj", accent: true },
+  { word: "Raj", accent: false },
 ];
 
 const heroQuoteWords = [
@@ -282,12 +282,12 @@ export default function Hero() {
           <div className="flex flex-col items-center gap-6">
             <div ref={nameRef} className="group relative">
               <div className="pointer-events-none absolute inset-x-[10%] bottom-[10%] h-12 rounded-full bg-[rgba(99,102,241,0.18)] blur-[44px] transition-opacity duration-500 group-hover:opacity-100" />
-              <h1 className="display-title relative select-none text-[clamp(4.8rem,13vw,9.4rem)] font-black uppercase leading-[0.84] text-white">
+              <h1 className="display-title relative text-[clamp(4.8rem,13vw,9.4rem)] font-black uppercase leading-[0.84] text-white">
                 <span className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
                   {nameParts.map((part, partIndex) => (
                     <span
                       key={part.word}
-                      className={`inline-flex overflow-hidden ${part.accent ? "text-gradient opacity-0 transition-opacity duration-300 group-hover:opacity-100" : ""}`}
+                      className={`inline-flex overflow-hidden ${part.accent ? "text-gradient" : ""}`}
                     >
                       {Array.from(part.word).map((letter, index) => {
                         const letterIndex =
@@ -364,11 +364,18 @@ export default function Hero() {
             <MagneticButton intensity={0.3} range={140}>
               <a
                 href="#contact"
-                className="signature-outline group relative inline-flex items-center gap-3 overflow-hidden whitespace-nowrap rounded-xl px-10 py-5 text-base font-bold backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:text-white"
+                className="signature-button group relative inline-flex items-center gap-3 overflow-hidden whitespace-nowrap rounded-xl px-10 py-5 text-base font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:scale-105"
               >
+                <span
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  style={{ animation: "shimmer 2s infinite" }}
+                />
                 <span className="relative flex items-center gap-3">
                   Get in Touch
-                  <Mail size={18} className="transition-transform group-hover:translate-x-0.5" />
+                  <Mail
+                    size={18}
+                    className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  />
                 </span>
               </a>
             </MagneticButton>

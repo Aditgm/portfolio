@@ -8,6 +8,7 @@ import Projects from "@/components/Projects";
 import Skills from "@/components/Skills";
 import Education from "@/components/Education";
 import Footer from "@/components/Footer";
+import ChatbotRAG from "@/components/ChatbotRAG";
 import Scene3D, { type Scene3DAccent } from "@/components/Scene3D";
 
 const ambientAccents: Scene3DAccent[] = [
@@ -69,6 +70,7 @@ export default function Home() {
         <Education />
         <GithubGraph />
         <Footer />
+        <ChatbotRAG />
       </div>
     </main>
   );
