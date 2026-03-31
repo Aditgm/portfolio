@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { NavbarLogo3D } from "./Scene3D";
 
 const links = [
   { label: "About", href: "#about" },
@@ -40,18 +41,14 @@ export default function Navbar() {
       >
         <nav className="relative flex h-[70px] items-center justify-between px-8">
         {/* Logo */}
-        <a href="#" className="group relative flex items-center gap-2 shrink-0">
-          <div className="relative flex h-9 w-9 items-center justify-center">
-            {/* Rotating geometric accent */}
-            <div
-              className="absolute inset-0 rounded-lg border border-blue-500/20 transition-colors group-hover:border-blue-500/40"
-              style={{ animation: "geo-rotate 12s linear infinite" }}
-            />
-            <div
-              className="absolute inset-1 rounded-md border border-cyan-500/15 transition-colors group-hover:border-cyan-500/30"
-              style={{ animation: "geo-rotate-reverse 8s linear infinite" }}
-            />
-            <span className="relative text-sm font-bold text-white tracking-tight">AR</span>
+        <a
+          href="#"
+          aria-label="Aditya Raj portfolio home"
+          className="group relative flex shrink-0 items-center gap-2"
+        >
+          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-blue-500/18 bg-gradient-to-br from-[#0b1325]/70 via-[#07101e]/60 to-[#0b1325]/75 transition-colors group-hover:border-blue-400/35">
+            <NavbarLogo3D color="#8ea8c4" label="AR" />
+            <span className="sr-only">Aditya Raj</span>
           </div>
           <span className="hidden text-[0.7rem] font-medium text-slate-500 tracking-widest uppercase sm:block transition-colors group-hover:text-slate-400">
             Portfolio
