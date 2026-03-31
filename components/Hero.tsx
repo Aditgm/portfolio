@@ -6,6 +6,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowDown, ArrowUpRight, Brain, Code2, Github, Mail, Zap } from "lucide-react";
+import MagneticButton from "./MagneticButton";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -295,30 +296,34 @@ export default function Hero() {
             data-hero-cta
             className="mt-6 flex flex-wrap items-center justify-center gap-7"
           >
-            <a
-              href="https://github.com/Aditgm"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative inline-flex items-center gap-3 overflow-hidden whitespace-nowrap rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-10 py-5 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-xl hover:shadow-blue-600/40"
-            >
-              <span
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                style={{ animation: "shimmer 2s infinite" }}
-              />
-              <span className="relative flex items-center gap-3">
-                View Projects
-                <ArrowUpRight size={18} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </span>
-            </a>
-            <a
-              href="#contact"
-              className="group relative inline-flex items-center gap-3 overflow-hidden whitespace-nowrap rounded-xl border border-white/12 bg-white/6 px-10 py-5 text-base font-bold text-slate-200 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:border-white/25 hover:bg-white/10 hover:text-white hover:shadow-lg hover:shadow-white/5"
-            >
-              <span className="relative flex items-center gap-3">
-                Get in Touch
-                <Mail size={18} className="transition-transform group-hover:translate-x-0.5" />
-              </span>
-            </a>
+            <MagneticButton intensity={0.34} range={150}>
+              <a
+                href="https://github.com/Aditgm"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative inline-flex items-center gap-3 overflow-hidden whitespace-nowrap rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-10 py-5 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-xl hover:shadow-blue-600/40"
+              >
+                <span
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  style={{ animation: "shimmer 2s infinite" }}
+                />
+                <span className="relative flex items-center gap-3">
+                  View Projects
+                  <ArrowUpRight size={18} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </span>
+              </a>
+            </MagneticButton>
+            <MagneticButton intensity={0.3} range={140}>
+              <a
+                href="#contact"
+                className="group relative inline-flex items-center gap-3 overflow-hidden whitespace-nowrap rounded-xl border border-white/12 bg-white/6 px-10 py-5 text-base font-bold text-slate-200 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:border-white/25 hover:bg-white/10 hover:text-white hover:shadow-lg hover:shadow-white/5"
+              >
+                <span className="relative flex items-center gap-3">
+                  Get in Touch
+                  <Mail size={18} className="transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </a>
+            </MagneticButton>
           </div>
 
           <div

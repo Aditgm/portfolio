@@ -357,7 +357,7 @@ export default function Projects() {
                   ref={(element) => {
                     cardRefs.current[index] = element;
                   }}
-                  className={`card card-geo-accent border-trace group flex w-full shrink-0 flex-col overflow-hidden lg:min-h-[42rem] ${project.featured ? "lg:w-[min(56rem,88vw)]" : "lg:w-[min(42rem,74vw)]"}`}
+                  className={`card card-geo-accent border-trace group flex w-full shrink-0 flex-col overflow-hidden lg:h-[min(44rem,78vh)] ${project.featured ? "lg:w-[min(56rem,88vw)]" : "lg:w-[min(42rem,74vw)]"}`}
                 >
                   <div className={`h-px w-full bg-gradient-to-r ${project.accentGradient}`} />
 
@@ -382,8 +382,8 @@ export default function Projects() {
                     </div>
                   </div>
 
-                  <div className={`flex flex-1 flex-col ${project.featured ? "lg:flex-row" : ""}`}>
-                    <div className="flex-1 p-7 md:p-10">
+                  <div className={`min-h-0 flex flex-1 flex-col ${project.featured ? "lg:flex-row" : ""}`}>
+                    <div className="flex min-h-0 flex-1 flex-col p-7 md:p-10">
                       <div className="mb-5 flex items-start justify-between gap-4">
                         <span className={`geo-tag ${project.tagColor}`}>
                           <span className="h-1 w-1 rounded-full bg-current opacity-60" />
@@ -410,38 +410,48 @@ export default function Projects() {
                           </a>
                           <TransitionLink
                             href={`/build/${project.slug}`}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.06] text-slate-500 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white"
+                            className="group/build relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg border border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200 shadow-[0_0_20px_rgba(56,189,248,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-300/70 hover:bg-cyan-400/[0.16] hover:text-white hover:shadow-[0_0_30px_rgba(34,211,238,0.36)]"
                             aria-label={`Build details for ${project.title}`}
                           >
+                            <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,rgba(103,232,249,0.34),transparent_68%)] opacity-80 transition-opacity duration-300 group-hover/build:opacity-100" />
                             <Hammer size={14} />
                           </TransitionLink>
                         </div>
                       </div>
 
-                      <h3 className="text-xl font-bold text-white transition-colors duration-300 group-hover:text-blue-300">
-                        {project.title}
-                      </h3>
-                      <p className="mt-2 text-sm text-slate-500">{project.subtitle}</p>
+                      <div
+                        data-lenis-prevent
+                        className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 [scrollbar-color:rgba(148,163,184,0.4)_transparent] [scrollbar-width:thin]"
+                      >
+                        <h3 className="text-xl font-bold text-white transition-colors duration-300 group-hover:text-blue-300">
+                          {project.title}
+                        </h3>
+                        <p className="mt-2 text-sm text-slate-500">{project.subtitle}</p>
 
-                      <div className="mt-6 flex flex-col gap-3 text-sm leading-[1.6] text-slate-400">
-                        {project.desc.map((detail) => (
-                          <p key={detail.label}>
-                            <strong className="font-semibold text-slate-200">
-                              {detail.label}:
-                            </strong>{" "}
-                            {detail.text}
-                          </p>
-                        ))}
+                        <p className="mt-4 text-[0.68rem] font-mono uppercase tracking-[0.22em] text-slate-500 lg:block">
+                          Scroll inside card to read more
+                        </p>
+
+                        <div className="mt-6 flex flex-col gap-3 text-sm leading-[1.6] text-slate-400">
+                          {project.desc.map((detail) => (
+                            <p key={detail.label}>
+                              <strong className="font-semibold text-slate-200">
+                                {detail.label}:
+                              </strong>{" "}
+                              {detail.text}
+                            </p>
+                          ))}
+                        </div>
+
+                        <ul className="mt-6 flex flex-col gap-3">
+                          {project.highlights.map((highlight) => (
+                            <li key={highlight} className="flex gap-3 text-sm text-slate-400">
+                              <span className="mt-2 h-1.5 w-1.5 shrink-0 rotate-45 rounded-[1px] bg-cyan-400/50" />
+                              {highlight}
+                            </li>
+                          ))}
+                        </ul>
                       </div>
-
-                      <ul className="mt-6 flex flex-col gap-3">
-                        {project.highlights.map((highlight) => (
-                          <li key={highlight} className="flex gap-3 text-sm text-slate-400">
-                            <span className="mt-2 h-1.5 w-1.5 shrink-0 rotate-45 rounded-[1px] bg-cyan-400/50" />
-                            {highlight}
-                          </li>
-                        ))}
-                      </ul>
                     </div>
 
                     {project.featured ? (

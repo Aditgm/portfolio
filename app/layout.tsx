@@ -48,8 +48,8 @@ export const metadata: Metadata = {
 };
 
 import { TransitionProvider } from "@/components/TransitionContext";
-import { LiquidOverlay } from "@/components/LiquidOverlay";
 import { SmoothScrollProvider } from "@/components/SmoothScroll";
+import AppShellEffects from "@/components/AppShellEffects";
 
 export default function RootLayout({
   children,
@@ -59,12 +59,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
+        data-cursor-theme="dark"
         className={`${outfit.variable} ${firaCode.variable} antialiased noise-bg`}
       >
         <SmoothScrollProvider>
           <TransitionProvider>
             {children}
-            <LiquidOverlay />
+            <AppShellEffects />
           </TransitionProvider>
         </SmoothScrollProvider>
       </body>
