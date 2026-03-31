@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowUpRight, ExternalLink, Github, Hammer, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ArrowUpRight, ExternalLink, Github, X } from "lucide-react";
 import Image from "next/image";
-import { TransitionLink } from "./TransitionLink";
+import { Flip } from "gsap/Flip";
 import { useGSAP } from "@/hooks/useGSAP";
 
 type ProjectItem = {
@@ -20,7 +20,6 @@ type ProjectItem = {
   accentGradient: string;
   accentGlow: string;
   slug: string;
-  featured: boolean;
 };
 
 const projects: ProjectItem[] = [
@@ -56,7 +55,6 @@ const projects: ProjectItem[] = [
     accentGradient: "from-red-500/20 to-orange-500/5",
     accentGlow: "rgba(249, 115, 22, 0.18)",
     slug: "dengue-spot",
-    featured: true,
   },
   {
     title: "Legal Lens",
@@ -90,7 +88,6 @@ const projects: ProjectItem[] = [
     accentGradient: "from-purple-500/20 to-blue-500/5",
     accentGlow: "rgba(124, 58, 237, 0.2)",
     slug: "legal-lens",
-    featured: false,
   },
   {
     title: "YouTubey",
@@ -124,7 +121,6 @@ const projects: ProjectItem[] = [
     accentGradient: "from-blue-500/20 to-cyan-500/5",
     accentGlow: "rgba(45, 212, 191, 0.18)",
     slug: "youtubey",
-    featured: false,
   },
   {
     title: "Indian Economic Dashboard",
@@ -158,7 +154,6 @@ const projects: ProjectItem[] = [
     accentGradient: "from-emerald-500/20 to-teal-500/5",
     accentGlow: "rgba(16, 185, 129, 0.2)",
     slug: "indian-economic-dashboard",
-    featured: false,
   },
 ];
 
@@ -168,76 +163,63 @@ export default function Projects() {
   const gridRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const modalCardRef = useRef<HTMLDivElement>(null);
-  const modalBodyRef = useRef<HTMLDivElement>(null);
+  const modalContentRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const cardRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const openFlipStateRef = useRef<{ state: Flip.FlipState; slug: string } | null>(null);
   const overflowRef = useRef("");
   const [activeProject, setActiveProject] = useState<ProjectItem | null>(null);
-  const [isClosing, setIsClosing] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const { createRevealAnimation, gsap, prefersReducedMotion, withContext } = useGSAP(sectionRef);
 
   const openProject = useCallback(
     (project: ProjectItem) => {
-      if (activeProject || isClosing) {
+      if (activeProject || isAnimating) {
         return;
+      }
+
+      const sourceCard = cardRefs.current[project.slug];
+
+      if (!prefersReducedMotion && sourceCard) {
+        gsap.registerPlugin(Flip);
+        openFlipStateRef.current = {
+          state: Flip.getState(sourceCard, {
+            props: "borderRadius,boxShadow,transform,opacity",
+          }),
+          slug: project.slug,
+        };
+        setIsAnimating(true);
       }
 
       setActiveProject(project);
     },
-    [activeProject, isClosing]
+    [activeProject, gsap, isAnimating, prefersReducedMotion]
   );
 
-  const finishClose = useCallback(() => {
-    document.body.style.overflow = overflowRef.current;
-    setIsClosing(false);
-    setActiveProject(null);
-  }, []);
-
   const closeProject = useCallback(() => {
-    if (!activeProject || isClosing) {
+    if (!activeProject || isAnimating) {
       return;
     }
 
-    const modalCard = modalCardRef.current;
-    const modalBody = modalBodyRef.current;
-    const overlay = overlayRef.current;
     const sourceCard = cardRefs.current[activeProject.slug];
+    const overlay = overlayRef.current;
+    const modalCard = modalCardRef.current;
+    const modalContent = modalContentRef.current;
 
-    setIsClosing(true);
-
-    if (prefersReducedMotion || !modalCard || !overlay || !sourceCard) {
-      const tween = gsap.timeline({
-        onComplete: finishClose,
-      });
-
-      if (modalBody) {
-        tween.to(
-          modalBody,
-          {
-            autoAlpha: 0,
-            y: 12,
-            duration: 0.16,
-            ease: "power2.in",
-          },
-          0
-        );
-      }
-
-      tween.to(
-        [overlay, modalCard],
-        {
-          autoAlpha: 0,
-          duration: 0.2,
-          ease: "power2.in",
-        },
-        0
-      );
-
+    if (prefersReducedMotion || !sourceCard || !modalCard) {
+      setActiveProject(null);
       return;
     }
 
-    if (modalBody) {
-      gsap.to(modalBody, {
+    gsap.registerPlugin(Flip);
+    setIsAnimating(true);
+
+    const state = Flip.getState(modalCard, {
+      props: "borderRadius,boxShadow,transform,opacity",
+    });
+
+    if (modalContent) {
+      gsap.to(modalContent, {
         autoAlpha: 0,
         y: 18,
         duration: 0.18,
@@ -245,26 +227,29 @@ export default function Projects() {
       });
     }
 
-    const modalRect = modalCard.getBoundingClientRect();
-    const sourceRect = sourceCard.getBoundingClientRect();
+    if (overlay) {
+      gsap.to(overlay, {
+        autoAlpha: 0,
+        duration: 0.2,
+        ease: "power2.in",
+        overwrite: "auto",
+      });
+    }
 
-    gsap.to(overlay, {
-      autoAlpha: 0,
-      duration: 0.22,
-      ease: "power2.in",
-    });
+    setActiveProject(null);
 
-    gsap.to(modalCard, {
-      x: sourceRect.left - modalRect.left,
-      y: sourceRect.top - modalRect.top,
-      scaleX: sourceRect.width / modalRect.width,
-      scaleY: sourceRect.height / modalRect.height,
-      transformOrigin: "top left",
-      duration: 0.56,
-      ease: "power2.inOut",
-      onComplete: finishClose,
+    requestAnimationFrame(() => {
+      Flip.from(state, {
+        targets: sourceCard,
+        absolute: true,
+        duration: 0.58,
+        ease: "power2.inOut",
+        onComplete: () => {
+          setIsAnimating(false);
+        },
+      });
     });
-  }, [activeProject, finishClose, gsap, isClosing, prefersReducedMotion]);
+  }, [activeProject, gsap, isAnimating, prefersReducedMotion]);
 
   useEffect(() => {
     createRevealAnimation(headerRef, {
@@ -462,142 +447,118 @@ export default function Projects() {
   }, [gsap, prefersReducedMotion, withContext]);
 
   useEffect(() => {
-    return () => {
-      document.body.style.overflow = overflowRef.current;
-    };
-  }, []);
-
-  useEffect(() => {
     if (!activeProject || !modalCardRef.current || !overlayRef.current) {
       return;
     }
 
+    gsap.registerPlugin(Flip);
+
     const modalCard = modalCardRef.current;
-    const modalBody = modalBodyRef.current;
+    const modalContent = modalContentRef.current;
     const overlay = overlayRef.current;
-    const sourceCard = cardRefs.current[activeProject.slug];
+    const openFlipState = openFlipStateRef.current;
 
     overflowRef.current = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-
-    const timeline = gsap.timeline();
 
     gsap.set(overlay, {
       autoAlpha: 0,
     });
 
-    if (prefersReducedMotion || !sourceCard) {
-      gsap.set(modalCard, {
-        autoAlpha: 0,
-        y: 28,
-        scale: 0.97,
+    if (modalContent) {
+      gsap.set(modalContent, { autoAlpha: 0, y: 20 });
+    }
+
+    const overlayTween = gsap.to(overlay, {
+      autoAlpha: 1,
+      duration: 0.2,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+
+    if (
+      !prefersReducedMotion &&
+      openFlipState &&
+      openFlipState.slug === activeProject.slug
+    ) {
+      const flipTween = Flip.from(openFlipState.state, {
+        targets: modalCard,
+        absolute: true,
+        duration: 0.66,
+        ease: "power3.inOut",
+        onComplete: () => {
+          setIsAnimating(false);
+          openFlipStateRef.current = null;
+          closeButtonRef.current?.focus();
+        },
       });
 
-      if (modalBody) {
-        gsap.set(modalBody, { autoAlpha: 0, y: 18 });
-      }
-
-      timeline
-        .to(overlay, {
-          autoAlpha: 1,
-          duration: 0.18,
-          ease: "power2.out",
-        })
-        .to(
-          modalCard,
-          {
+      const contentTween = modalContent
+        ? gsap.to(modalContent, {
             autoAlpha: 1,
             y: 0,
-            scale: 1,
-            duration: 0.32,
+            duration: 0.3,
+            delay: 0.22,
             ease: "power3.out",
-          },
-          0
-        );
-
-      if (modalBody) {
-        timeline.to(
-          modalBody,
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.24,
-            ease: "power2.out",
-          },
-          0.08
-        );
-      }
-
-      closeButtonRef.current?.focus();
+          })
+        : null;
 
       return () => {
-        timeline.kill();
+        overlayTween.kill();
+        flipTween.kill();
+        contentTween?.kill();
       };
     }
 
-    if (modalBody) {
-      gsap.set(modalBody, { autoAlpha: 0, y: 18 });
-    }
-
-    const modalRect = modalCard.getBoundingClientRect();
-    const sourceRect = sourceCard.getBoundingClientRect();
-    const deltaX = sourceRect.left - modalRect.left;
-    const deltaY = sourceRect.top - modalRect.top;
-    const scaleX = sourceRect.width / modalRect.width;
-    const scaleY = sourceRect.height / modalRect.height;
-
     gsap.set(modalCard, {
-      x: deltaX,
-      y: deltaY,
-      scaleX,
-      scaleY,
-      transformOrigin: "top left",
+      autoAlpha: 0,
+      y: 28,
+      scale: 0.97,
     });
 
-    timeline.to(
-      overlay,
-      {
-        autoAlpha: 1,
-        duration: 0.22,
-        ease: "power2.out",
+    const modalTween = gsap.to(modalCard, {
+      autoAlpha: 1,
+      y: 0,
+      scale: 1,
+      duration: 0.35,
+      ease: "power3.out",
+      overwrite: "auto",
+      onComplete: () => {
+        setIsAnimating(false);
+        closeButtonRef.current?.focus();
       },
-      0
-    );
+    });
 
-    timeline.to(
-      modalCard,
-      {
-        x: 0,
-        y: 0,
-        scaleX: 1,
-        scaleY: 1,
-        transformOrigin: "top left",
-        clearProps: "transform",
-        duration: 0.72,
-        ease: "power3.inOut",
-      },
-      0
-    );
-
-    if (modalBody) {
-      timeline.to(
-        modalBody,
-        {
+    const contentTween = modalContent
+      ? gsap.to(modalContent, {
           autoAlpha: 1,
           y: 0,
-          duration: 0.32,
-          ease: "power3.out",
-        },
-        0.2
-      );
-    }
-
-    closeButtonRef.current?.focus();
+          duration: 0.24,
+          delay: 0.1,
+          ease: "power2.out",
+        })
+      : null;
 
     return () => {
-      timeline.kill();
+      overlayTween.kill();
+      modalTween.kill();
+      contentTween?.kill();
     };
   }, [activeProject, gsap, prefersReducedMotion]);
+
+  useEffect(() => {
+    if (activeProject) {
+      return;
+    }
+
+    document.body.style.overflow = overflowRef.current;
+  }, [activeProject]);
+
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = overflowRef.current;
+    };
+  }, []);
 
   useEffect(() => {
     if (!activeProject) {
@@ -617,11 +578,6 @@ export default function Projects() {
     };
   }, [activeProject, closeProject]);
 
-  const featuredProject = useMemo(
-    () => projects.find((project) => project.featured)?.slug ?? null,
-    []
-  );
-
   return (
     <section
       id="projects"
@@ -639,18 +595,15 @@ export default function Projects() {
             Things I&apos;ve <span className="text-gradient-static">Built</span>
           </h2>
           <p className="measure-copy mt-5 text-sm leading-7 text-slate-400 md:text-base md:leading-8">
-            A tighter overview first. Open any card for the full story, deep dive, and build
-            context without fighting the layout.
+            A clean grid for scanning quickly. Click any project to open a full detail overlay.
           </p>
         </div>
 
         <div
           ref={gridRef}
-          className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-12"
+          className="grid grid-cols-1 gap-6 md:grid-cols-2"
         >
           {projects.map((project) => {
-            const isFeatured = project.slug === featuredProject;
-
             return (
               <button
                 key={project.slug}
@@ -660,15 +613,15 @@ export default function Projects() {
                 type="button"
                 data-cursor-hover="true"
                 onClick={() => openProject(project)}
-                className={`card border-trace card-geo-accent group relative overflow-hidden text-left transition-transform duration-300 hover:-translate-y-1 ${isFeatured ? "md:col-span-2 xl:col-span-7" : "xl:col-span-5"}`}
+                className="card border-trace card-geo-accent group relative overflow-hidden text-left transition-transform duration-300 hover:-translate-y-1"
               >
                 <div className={`h-px w-full bg-gradient-to-r ${project.accentGradient}`} />
 
-                <div className={`grid gap-0 ${isFeatured ? "lg:grid-cols-[1.2fr_0.95fr]" : ""}`}>
+                <div className="grid gap-0">
                   <div
                     data-cursor-label="View"
                     data-project-media
-                    className="relative aspect-[16/10] overflow-hidden border-b border-white/[0.05] lg:border-b-0"
+                    className="relative aspect-[16/10] overflow-hidden border-b border-white/[0.05]"
                   >
                     <div
                       data-project-parallax
@@ -680,11 +633,7 @@ export default function Projects() {
                         alt={project.title}
                         fill
                         className="object-cover object-top"
-                        sizes={
-                          isFeatured
-                            ? "(min-width: 1280px) 52vw, (min-width: 768px) 100vw, 100vw"
-                            : "(min-width: 1280px) 40vw, (min-width: 768px) 50vw, 100vw"
-                        }
+                        sizes="(min-width: 768px) 50vw, 100vw"
                       />
                     </div>
                     <div
@@ -696,7 +645,7 @@ export default function Projects() {
                         data-project-label
                         className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-[#081120]/76 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/90 backdrop-blur-md"
                       >
-                        View Case Study
+                        View
                         <ArrowUpRight size={14} />
                       </span>
                     </div>
@@ -710,7 +659,7 @@ export default function Projects() {
                           {project.tag}
                         </span>
                         <span className="rounded-full border border-white/[0.08] px-3 py-1 text-[0.68rem] font-mono uppercase tracking-[0.22em] text-slate-500">
-                          Open
+                          Project
                         </span>
                       </div>
 
@@ -723,7 +672,7 @@ export default function Projects() {
 
                     <div className="mt-8 flex items-center justify-between gap-4">
                       <div className="flex flex-wrap gap-2">
-                        {project.stack.slice(0, isFeatured ? 4 : 3).map((tech) => (
+                        {project.stack.slice(0, 3).map((tech) => (
                           <span
                             key={tech}
                             className="rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[0.72rem] font-medium tracking-wide text-slate-300"
@@ -734,7 +683,7 @@ export default function Projects() {
                       </div>
 
                       <span className="inline-flex items-center gap-2 text-sm font-semibold text-white/85">
-                        View Details <ArrowUpRight size={16} />
+                        View <ArrowUpRight size={16} />
                       </span>
                     </div>
                   </div>
@@ -748,151 +697,129 @@ export default function Projects() {
       {activeProject ? (
         <div
           ref={overlayRef}
-          className={`fixed inset-0 z-[120] flex items-center justify-center bg-[rgba(2,6,23,0.78)] px-4 py-6 backdrop-blur-xl md:px-8 ${isClosing ? "pointer-events-none" : ""}`}
-          onClick={closeProject}
+          data-lenis-prevent="true"
+          className={`fixed inset-0 z-[120] overflow-y-auto bg-[rgba(2,6,23,0.78)] px-4 py-6 backdrop-blur-xl md:px-8 ${isAnimating ? "pointer-events-none" : ""}`}
+          onClick={!isAnimating ? closeProject : undefined}
         >
-          <div
-            ref={modalCardRef}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="project-modal-title"
-            className="card relative flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-[1.8rem] border border-white/[0.1] shadow-[0_40px_120px_-40px_rgba(2,6,23,0.72)]"
-            onClick={(event) => event.stopPropagation()}
-            style={{
-              boxShadow: `0 40px 120px -40px ${activeProject.accentGlow}`,
-            }}
-          >
-            <div className={`h-px w-full bg-gradient-to-r ${activeProject.accentGradient}`} />
-
-            <button
-              ref={closeButtonRef}
-              type="button"
-              aria-label="Close project details"
-              data-cursor-hover="true"
-              onClick={closeProject}
-              className="absolute right-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.1] bg-[#081120]/82 text-slate-200 backdrop-blur-md transition-colors hover:text-white"
-            >
-              <X size={18} />
-            </button>
-
+          <div className="flex min-h-full items-center justify-center">
             <div
-              ref={modalBodyRef}
-              data-lenis-prevent
-              className="min-h-0 overflow-y-auto overscroll-contain"
+              ref={modalCardRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="project-modal-title"
+              className="card relative w-full max-w-5xl overflow-hidden rounded-[1.8rem] border border-white/[0.1] shadow-[0_40px_120px_-40px_rgba(2,6,23,0.72)]"
+              onClick={(event) => event.stopPropagation()}
+              style={{
+                boxShadow: `0 40px 120px -40px ${activeProject.accentGlow}`,
+              }}
             >
-              <div className="grid min-h-0 lg:grid-cols-[1.15fr_0.95fr]">
-                <div className="relative min-h-[20rem] border-b border-white/[0.06] lg:min-h-full lg:border-b-0 lg:border-r lg:border-r-white/[0.06]">
-                  <Image
-                    src={activeProject.image}
-                    alt={activeProject.title}
-                    fill
-                    className="object-cover object-top"
-                    sizes="(min-width: 1024px) 56vw, 100vw"
-                  />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,rgba(2,6,23,0.18)_56%,rgba(2,6,23,0.72)_100%)]" />
-                </div>
+              <div className={`h-px w-full bg-gradient-to-r ${activeProject.accentGradient}`} />
 
-                <div className="flex min-h-0 flex-col p-6 md:p-8 lg:p-10">
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div>
-                      <span className={`geo-tag ${activeProject.tagColor}`}>
-                        <span className="h-1 w-1 rounded-full bg-current opacity-60" />
-                        {activeProject.tag}
-                      </span>
-                      <h3
-                        id="project-modal-title"
-                        className="mt-6 text-3xl font-bold leading-tight text-white md:text-[2.35rem]"
-                      >
-                        {activeProject.title}
-                      </h3>
-                      <p className="mt-3 text-base text-slate-400">{activeProject.subtitle}</p>
-                    </div>
+              <div ref={modalContentRef} className="p-6 md:p-8 lg:p-10">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <button
+                    ref={closeButtonRef}
+                    type="button"
+                    aria-label="Close project details"
+                    data-cursor-hover="true"
+                    onClick={closeProject}
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.1] bg-[#081120]/82 text-slate-200 backdrop-blur-md transition-colors hover:text-white"
+                  >
+                    <X size={18} />
+                  </button>
 
-                    <div className="flex items-center gap-3">
-                      <a
-                        href={activeProject.github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        data-cursor-hover="true"
-                        className="signature-outline inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold"
-                      >
-                        <Github size={15} />
-                        GitHub
-                      </a>
-                      <a
-                        href={activeProject.live}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        data-cursor-hover="true"
-                        className="signature-button inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold text-white"
-                      >
-                        <ExternalLink size={15} />
-                        Live
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="mt-8 space-y-5 text-sm leading-7 text-slate-300">
-                    {activeProject.desc.map((detail) => (
-                      <div key={detail.label}>
-                        <p className="font-mono text-[0.68rem] uppercase tracking-[0.26em] text-slate-500">
-                          {detail.label}
-                        </p>
-                        <p className="mt-2 text-[0.98rem] leading-7 text-slate-300">
-                          {detail.text}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-8">
-                    <p className="font-mono text-[0.68rem] uppercase tracking-[0.26em] text-slate-500">
-                      Stack
-                    </p>
-                    <div className="mt-4 flex flex-wrap gap-2.5">
-                      {activeProject.stack.map((tech) => (
-                        <span
-                          key={tech}
-                          className="rounded-full border border-white/[0.08] bg-white/[0.04] px-3.5 py-2 text-[0.78rem] font-medium tracking-wide text-slate-200"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mt-8">
-                    <p className="font-mono text-[0.68rem] uppercase tracking-[0.26em] text-slate-500">
-                      Key Highlights
-                    </p>
-                    <ul className="mt-4 grid gap-3">
-                      {activeProject.highlights.map((highlight) => (
-                        <li key={highlight} className="flex gap-3 text-sm text-slate-300">
-                          <span
-                            className="mt-2 h-1.5 w-1.5 shrink-0 rotate-45 rounded-[1px]"
-                            style={{ backgroundColor: "rgba(45, 212, 191, 0.58)" }}
-                          />
-                          {highlight}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="mt-8 flex flex-wrap gap-3">
-                    <TransitionLink
-                      href={`/build/${activeProject.slug}`}
+                  <div className="flex items-center gap-3">
+                    <a
+                      href={activeProject.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-cursor-hover="true"
                       className="signature-outline inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold"
                     >
-                      <Hammer size={15} />
-                      Build Story
-                    </TransitionLink>
-                    <button
-                      type="button"
-                      onClick={closeProject}
-                      className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] px-4 py-2.5 text-sm font-semibold text-slate-300 transition-colors hover:text-white"
+                      <Github size={15} />
+                      GitHub
+                    </a>
+                    <a
+                      href={activeProject.live}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-cursor-hover="true"
+                      className="signature-button inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold text-white"
                     >
-                      Back to Grid
-                    </button>
+                      <ExternalLink size={15} />
+                      Live
+                    </a>
+                  </div>
+                </div>
+
+                <div className="mt-6 overflow-hidden rounded-2xl border border-white/[0.08]">
+                  <div className="relative aspect-[16/8.8] w-full">
+                    <Image
+                      src={activeProject.image}
+                      alt={activeProject.title}
+                      fill
+                      className="object-cover object-top"
+                      sizes="(min-width: 1024px) 1100px, 100vw"
+                    />
+                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,23,0.05),rgba(2,6,23,0.38))]" />
+                  </div>
+                </div>
+
+                <div className="mt-8">
+                  <span className={`geo-tag ${activeProject.tagColor}`}>
+                    <span className="h-1 w-1 rounded-full bg-current opacity-60" />
+                    {activeProject.tag}
+                  </span>
+                  <h3 id="project-modal-title" className="mt-5 text-3xl font-bold text-white md:text-[2.35rem]">
+                    {activeProject.title}
+                  </h3>
+                  <p className="mt-3 text-base text-slate-400">{activeProject.subtitle}</p>
+                </div>
+
+                <div className="mt-8 grid gap-4 md:grid-cols-3">
+                  {activeProject.desc.map((detail) => (
+                    <div
+                      key={detail.label}
+                      className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5"
+                    >
+                      <p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-500">
+                        {detail.label}
+                      </p>
+                      <p className="mt-3 text-sm leading-7 text-slate-300">{detail.text}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-8">
+                  <p className="font-mono text-[0.68rem] uppercase tracking-[0.26em] text-slate-500">
+                    Key Highlights
+                  </p>
+                  <ul className="mt-4 grid gap-3 md:grid-cols-2">
+                    {activeProject.highlights.map((highlight) => (
+                      <li key={highlight} className="flex gap-3 text-sm text-slate-300">
+                        <span
+                          className="mt-2 h-1.5 w-1.5 shrink-0 rotate-45 rounded-[1px]"
+                          style={{ backgroundColor: "rgba(45, 212, 191, 0.58)" }}
+                        />
+                        {highlight}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="mt-8">
+                  <p className="font-mono text-[0.68rem] uppercase tracking-[0.26em] text-slate-500">
+                    Stack
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2.5">
+                    {activeProject.stack.map((tech) => (
+                      <span
+                        key={tech}
+                        className="rounded-full border border-white/[0.08] bg-white/[0.04] px-3.5 py-2 text-[0.78rem] font-medium tracking-wide text-slate-200"
+                      >
+                        {tech}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
