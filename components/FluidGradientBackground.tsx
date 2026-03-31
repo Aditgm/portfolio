@@ -9,9 +9,9 @@ type Palette = {
 };
 
 const palettes: Palette[] = [
-  { id: 0, name: "Aurora", swatch: "linear-gradient(135deg,#6d7cff,#62d7d2,#b88cff)" },
-  { id: 1, name: "Ocean Glass", swatch: "linear-gradient(135deg,#4c7eff,#53b7ff,#4ff2d2)" },
-  { id: 2, name: "Sunset Mist", swatch: "linear-gradient(135deg,#ff7e8f,#ffb778,#7e86ff)" },
+  { id: 0, name: "Aurora", swatch: "linear-gradient(135deg,#3f52bf,#2f8f97,#7052a8)" },
+  { id: 1, name: "Ocean Glass", swatch: "linear-gradient(135deg,#2f57b2,#2f7aa8,#2aa08a)" },
+  { id: 2, name: "Sunset Mist", swatch: "linear-gradient(135deg,#8f4468,#93623d,#4d57a8)" },
 ];
 
 const vertexShaderSource = `
@@ -95,10 +95,10 @@ float fbm(vec2 p) {
 }
 
 vec3 paletteA(float t) {
-  vec3 c1 = vec3(0.12, 0.16, 0.34);
-  vec3 c2 = vec3(0.28, 0.44, 0.98);
-  vec3 c3 = vec3(0.24, 0.86, 0.82);
-  vec3 c4 = vec3(0.73, 0.52, 1.00);
+  vec3 c1 = vec3(0.05, 0.07, 0.18);
+  vec3 c2 = vec3(0.16, 0.28, 0.62);
+  vec3 c3 = vec3(0.14, 0.48, 0.50);
+  vec3 c4 = vec3(0.38, 0.30, 0.62);
 
   vec3 base = mix(c1, c2, smoothstep(0.0, 0.36, t));
   base = mix(base, c3, smoothstep(0.28, 0.7, t));
@@ -106,10 +106,10 @@ vec3 paletteA(float t) {
 }
 
 vec3 paletteB(float t) {
-  vec3 c1 = vec3(0.06, 0.12, 0.26);
-  vec3 c2 = vec3(0.16, 0.42, 0.95);
-  vec3 c3 = vec3(0.24, 0.70, 1.00);
-  vec3 c4 = vec3(0.30, 0.95, 0.84);
+  vec3 c1 = vec3(0.03, 0.08, 0.18);
+  vec3 c2 = vec3(0.12, 0.30, 0.62);
+  vec3 c3 = vec3(0.12, 0.45, 0.72);
+  vec3 c4 = vec3(0.14, 0.56, 0.52);
 
   vec3 base = mix(c1, c2, smoothstep(0.0, 0.34, t));
   base = mix(base, c3, smoothstep(0.22, 0.66, t));
@@ -117,10 +117,10 @@ vec3 paletteB(float t) {
 }
 
 vec3 paletteC(float t) {
-  vec3 c1 = vec3(0.16, 0.10, 0.24);
-  vec3 c2 = vec3(0.44, 0.30, 0.98);
-  vec3 c3 = vec3(0.98, 0.50, 0.62);
-  vec3 c4 = vec3(1.00, 0.73, 0.42);
+  vec3 c1 = vec3(0.10, 0.06, 0.16);
+  vec3 c2 = vec3(0.26, 0.18, 0.56);
+  vec3 c3 = vec3(0.56, 0.26, 0.36);
+  vec3 c4 = vec3(0.60, 0.42, 0.26);
 
   vec3 base = mix(c1, c2, smoothstep(0.0, 0.36, t));
   base = mix(base, c3, smoothstep(0.3, 0.7, t));
@@ -166,13 +166,13 @@ void main() {
   vec3 color = mix(c1, c2, 0.45 + 0.25 * n1);
 
   float heroGlow = smoothstep(0.9, 0.1, distance(uv, vec2(0.5, 0.2)));
-  color += samplePalette(u_palette, 0.72) * heroGlow * 0.12;
+  color += samplePalette(u_palette, 0.72) * heroGlow * 0.08;
 
   float vignette = smoothstep(1.32, 0.18, length(centered));
-  color *= 0.72 + 0.28 * vignette;
+  color *= 0.62 + 0.24 * vignette;
 
   // Slightly deepens the base so content remains readable.
-  color = mix(color, vec3(0.03, 0.05, 0.1), 0.22);
+  color = mix(color, vec3(0.015, 0.03, 0.07), 0.4);
 
   gl_FragColor = vec4(color, 1.0);
 }

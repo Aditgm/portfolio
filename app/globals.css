@@ -796,9 +796,9 @@ html.lenis, html.lenis body {
   --fg-halo-x: 50%;
   --fg-halo-y: 26%;
   background:
-    radial-gradient(circle at var(--fg-halo-x) var(--fg-halo-y), rgba(133, 183, 255, 0.42), transparent 38%),
-    radial-gradient(circle at calc(100% - var(--fg-halo-x)) calc(100% - var(--fg-halo-y)), rgba(80, 245, 216, 0.3), transparent 44%),
-    linear-gradient(var(--fg-angle), #0a1430 0%, #111f43 var(--fg-shift), #1f2049 70%, #1b0f2c 100%);
+    radial-gradient(circle at var(--fg-halo-x) var(--fg-halo-y), rgba(86, 122, 196, 0.3), transparent 38%),
+    radial-gradient(circle at calc(100% - var(--fg-halo-x)) calc(100% - var(--fg-halo-y)), rgba(48, 158, 149, 0.22), transparent 44%),
+    linear-gradient(var(--fg-angle), #060d22 0%, #0a1532 var(--fg-shift), #131d38 70%, #130b1f 100%);
   opacity: 0.96;
   animation: fluid-fallback-shift 24s ease-in-out infinite alternate;
 }
@@ -813,17 +813,17 @@ html.lenis, html.lenis body {
 
 .fluid-gradient-hero-emphasis {
   background:
-    radial-gradient(circle at 50% 16%, rgba(150, 190, 255, 0.34), transparent 42%),
-    radial-gradient(circle at 18% 24%, rgba(99, 102, 241, 0.2), transparent 36%),
-    radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.16), transparent 32%);
+    radial-gradient(circle at 50% 16%, rgba(108, 148, 208, 0.22), transparent 42%),
+    radial-gradient(circle at 18% 24%, rgba(77, 80, 176, 0.14), transparent 36%),
+    radial-gradient(circle at 80% 20%, rgba(35, 151, 136, 0.12), transparent 32%);
   mix-blend-mode: screen;
-  opacity: 0.58;
+  opacity: 0.42;
 }
 
 .fluid-gradient-legibility {
   background:
-    linear-gradient(180deg, rgba(2, 6, 23, 0.38), rgba(2, 6, 23, 0.18) 32%, rgba(2, 6, 23, 0.42) 100%),
-    radial-gradient(circle at 50% 82%, rgba(2, 6, 23, 0.5), transparent 45%);
+    linear-gradient(180deg, rgba(2, 6, 23, 0.48), rgba(2, 6, 23, 0.28) 32%, rgba(2, 6, 23, 0.54) 100%),
+    radial-gradient(circle at 50% 82%, rgba(2, 6, 23, 0.6), transparent 45%);
 }
 
 .fluid-gradient-switcher {
