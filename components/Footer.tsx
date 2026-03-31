@@ -143,8 +143,8 @@ export default function Footer() {
   }, [gsap, prefersReducedMotion, showBackToTop]);
 
   const scrollToTop = () => {
-    if (prefersReducedMotion) {
-      window.scrollTo({ top: 0, behavior: "auto" });
+    if (prefersReducedMotion || !lenis) {
+      window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
       return;
     }
 

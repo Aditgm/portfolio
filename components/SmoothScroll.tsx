@@ -9,7 +9,7 @@ const SmoothScrollContext = createContext<RefObject<Lenis | null> | null>(null);
 
 export const useSmoothScroll = () => {
   const context = useContext(SmoothScrollContext);
-  if (!context?.current) {
+  if (!context) {
     throw new Error('useSmoothScroll must be used within a SmoothScrollProvider');
   }
   return context.current;
