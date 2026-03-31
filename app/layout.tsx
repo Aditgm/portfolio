@@ -65,11 +65,11 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body
         data-cursor-theme="dark"
-        className={`${outfit.variable} ${firaCode.variable} ${syne.variable} antialiased noise-bg`}
+        className={`${outfit.variable} ${firaCode.variable} ${syne.variable} antialiased noise-bg site-shell`}
       >
         <SmoothScrollProvider>
           <TransitionProvider>
-            {children}
+            <div className="relative z-10">{children}</div>
             <AppShellEffects />
           </TransitionProvider>
         </SmoothScrollProvider>

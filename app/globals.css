@@ -60,10 +60,7 @@ html {
 }
 
 body {
-  background:
-    radial-gradient(circle at top, rgba(99, 102, 241, 0.14), transparent 34%),
-    radial-gradient(circle at 78% 18%, rgba(45, 212, 191, 0.09), transparent 28%),
-    linear-gradient(180deg, var(--bg-primary) 0%, #081224 40%, var(--bg-secondary) 100%);
+  background: linear-gradient(180deg, var(--bg-primary) 0%, #071427 45%, var(--bg-secondary) 100%);
   color: var(--text-primary);
   font-family: var(--font-sans), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -73,6 +70,10 @@ body {
   line-height: 1.7;
   margin: 0;
   padding: 0;
+}
+
+.site-shell {
+  isolation: isolate;
 }
 
 html.lenis, html.lenis body {
@@ -741,6 +742,148 @@ html.lenis, html.lenis body {
   user-select: none;
 }
 
+/* Fluid gradient fallback animators (graceful WebGL fallback). */
+@property --fg-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 130deg;
+}
+
+@property --fg-shift {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 42%;
+}
+
+@property --fg-halo-x {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 50%;
+}
+
+@property --fg-halo-y {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 26%;
+}
+
+.fluid-gradient-root {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.fluid-gradient-canvas,
+.fluid-gradient-fallback,
+.fluid-gradient-hero-emphasis,
+.fluid-gradient-legibility {
+  position: absolute;
+  inset: 0;
+}
+
+.fluid-gradient-canvas {
+  width: 100%;
+  height: 100%;
+  opacity: 0.98;
+  will-change: transform;
+}
+
+.fluid-gradient-fallback {
+  --fg-angle: 130deg;
+  --fg-shift: 42%;
+  --fg-halo-x: 50%;
+  --fg-halo-y: 26%;
+  background:
+    radial-gradient(circle at var(--fg-halo-x) var(--fg-halo-y), rgba(133, 183, 255, 0.42), transparent 38%),
+    radial-gradient(circle at calc(100% - var(--fg-halo-x)) calc(100% - var(--fg-halo-y)), rgba(80, 245, 216, 0.3), transparent 44%),
+    linear-gradient(var(--fg-angle), #0a1430 0%, #111f43 var(--fg-shift), #1f2049 70%, #1b0f2c 100%);
+  opacity: 0.96;
+  animation: fluid-fallback-shift 24s ease-in-out infinite alternate;
+}
+
+.fluid-gradient-fallback-hidden {
+  opacity: 0;
+}
+
+.fluid-gradient-fallback-static {
+  animation: none;
+}
+
+.fluid-gradient-hero-emphasis {
+  background:
+    radial-gradient(circle at 50% 16%, rgba(150, 190, 255, 0.34), transparent 42%),
+    radial-gradient(circle at 18% 24%, rgba(99, 102, 241, 0.2), transparent 36%),
+    radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.16), transparent 32%);
+  mix-blend-mode: screen;
+  opacity: 0.58;
+}
+
+.fluid-gradient-legibility {
+  background:
+    linear-gradient(180deg, rgba(2, 6, 23, 0.38), rgba(2, 6, 23, 0.18) 32%, rgba(2, 6, 23, 0.42) 100%),
+    radial-gradient(circle at 50% 82%, rgba(2, 6, 23, 0.5), transparent 45%);
+}
+
+.fluid-gradient-switcher {
+  pointer-events: auto;
+  position: fixed;
+  top: 5.8rem;
+  right: 1rem;
+  display: inline-flex;
+  gap: 0.5rem;
+  padding: 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(6, 10, 24, 0.62);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 16px 38px -22px rgba(15, 23, 42, 0.72);
+  z-index: 35;
+}
+
+.fluid-gradient-swatch {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 0 0 1px rgba(2, 6, 23, 0.24) inset;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.fluid-gradient-swatch:hover {
+  transform: scale(1.08);
+  border-color: rgba(255, 255, 255, 0.48);
+}
+
+.fluid-gradient-swatch.is-active {
+  transform: scale(1.15);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+@keyframes fluid-fallback-shift {
+  0% {
+    --fg-angle: 118deg;
+    --fg-shift: 38%;
+    --fg-halo-x: 46%;
+    --fg-halo-y: 22%;
+  }
+
+  50% {
+    --fg-angle: 148deg;
+    --fg-shift: 51%;
+    --fg-halo-x: 55%;
+    --fg-halo-y: 32%;
+  }
+
+  100% {
+    --fg-angle: 124deg;
+    --fg-shift: 44%;
+    --fg-halo-x: 49%;
+    --fg-halo-y: 27%;
+  }
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -753,5 +896,13 @@ html.lenis, html.lenis body {
 
   .text-gradient {
     animation: none;
+  }
+
+  .fluid-gradient-fallback {
+    animation: none;
+  }
+
+  .fluid-gradient-switcher {
+    display: none;
   }
 }
