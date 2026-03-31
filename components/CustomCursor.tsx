@@ -27,7 +27,7 @@ type CustomCursorProps = {
 export default function CustomCursor({
   enabled = true,
   smoothing = 0.16,
-  hoverScale = 1.28,
+  hoverScale = 1.08,
 }: CustomCursorProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const outerRef = useRef<HTMLDivElement>(null);
@@ -95,21 +95,21 @@ export default function CustomCursor({
 
     const applyHoverState = (isMagnetic: boolean) => {
       gsap.to(outer, {
-        width: isMagnetic ? "calc(var(--cursor-size) * 1.9)" : "calc(var(--cursor-size) * 1.45)",
-        height: isMagnetic ? "calc(var(--cursor-size) * 1.9)" : "calc(var(--cursor-size) * 1.45)",
+        width: isMagnetic ? "calc(var(--cursor-size) * 1.34)" : "calc(var(--cursor-size) * 1.16)",
+        height: isMagnetic ? "calc(var(--cursor-size) * 1.34)" : "calc(var(--cursor-size) * 1.16)",
         borderRadius: isMagnetic
-          ? "var(--cursor-shape-radius)"
+          ? "calc(var(--cursor-shape-radius) + 4px)"
           : "calc(var(--cursor-shape-radius) + 10px)",
-        scale: isMagnetic ? hoverScale + 0.16 : hoverScale,
+        scale: isMagnetic ? hoverScale + 0.06 : hoverScale,
         opacity: 1,
-        duration: 0.22,
+        duration: 0.18,
         ease: "power2.out",
         overwrite: "auto",
       });
       gsap.to(dot, {
-        scale: isMagnetic ? 1.35 : 1.18,
-        opacity: isMagnetic ? 0.85 : 1,
-        duration: 0.18,
+        scale: isMagnetic ? 1.08 : 1.03,
+        opacity: isMagnetic ? 0.92 : 0.98,
+        duration: 0.16,
         ease: "power2.out",
         overwrite: "auto",
       });
@@ -118,7 +118,7 @@ export default function CustomCursor({
     const updateTargetState = (event: PointerEvent) => {
       const hovered = document
         .elementFromPoint(event.clientX, event.clientY)
-        ?.closest<HTMLElement>("[data-cursor-hover], [data-magnetic], a, button");
+        ?.closest<HTMLElement>("[data-cursor-hover], [data-magnetic]");
 
       const themeNode = document
         .elementFromPoint(event.clientX, event.clientY)
