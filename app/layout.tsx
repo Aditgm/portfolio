@@ -49,6 +49,7 @@ export const metadata: Metadata = {
 
 import { TransitionProvider } from "@/components/TransitionContext";
 import { LiquidOverlay } from "@/components/LiquidOverlay";
+import { SmoothScrollProvider } from "@/components/SmoothScroll";
 
 export default function RootLayout({
   children,
@@ -60,10 +61,12 @@ export default function RootLayout({
       <body
         className={`${outfit.variable} ${firaCode.variable} antialiased noise-bg`}
       >
-        <TransitionProvider>
-          {children}
-          <LiquidOverlay />
-        </TransitionProvider>
+        <SmoothScrollProvider>
+          <TransitionProvider>
+            {children}
+            <LiquidOverlay />
+          </TransitionProvider>
+        </SmoothScrollProvider>
       </body>
     </html>
   );
