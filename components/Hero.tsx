@@ -1,19 +1,14 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useEffect, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowDown, ArrowUpRight, Binary, Github, Mail, Trophy } from "lucide-react";
+import HeroLiquidDistortion from "./HeroLiquidDistortion";
 import MagneticButton from "./MagneticButton";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
-
-const Hero3DBackground = dynamic(() => import("./Hero3DBackground"), {
-  ssr: false,
-  loading: () => null,
-});
 
 const nameParts = [
   { word: "Aditya", accent: false },
@@ -246,8 +241,8 @@ export default function Hero() {
       className="relative isolate flex min-h-[100dvh] items-center justify-center overflow-hidden px-6 pb-24 pt-24 md:px-10 lg:px-12"
     >
       <div ref={backgroundLayerRef} className="absolute inset-0">
-        <Hero3DBackground containerRef={sectionRef} />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(125,152,184,0.14),transparent_42%),radial-gradient(circle_at_78%_62%,rgba(94,133,154,0.1),transparent_24%),linear-gradient(180deg,rgba(2,6,23,0.26),rgba(2,6,23,0.74)_62%,rgba(2,6,23,0.92))]" />
+        <HeroLiquidDistortion containerRef={sectionRef} />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,23,0.28),rgba(2,6,23,0.74)_58%,rgba(2,6,23,0.92))]" />
       </div>
 
       <div className="pointer-events-none absolute inset-0">
