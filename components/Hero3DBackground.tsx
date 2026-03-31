@@ -1,180 +1,292 @@
 "use client";
 
-import React, { useRef, useMemo } from "react";
+import { RefObject, useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Environment, Float, Stars } from "@react-three/drei";
 import * as THREE from "three";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 
-const vertexShader = `
-uniform float uTime;
-uniform vec2 uMouse;
-varying vec2 vUv;
-varying float vElevation;
-varying float vEdgeFade;
+type Hero3DBackgroundProps = {
+  containerRef?: RefObject<HTMLElement | null>;
+};
 
-// Standard simplex noise
-vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+type ParticleConfig = {
+  position: [number, number, number];
+  rotation: [number, number, number];
+  scale: number;
+  color: string;
+  emissive: string;
+  shape: "icosahedron" | "torus";
+  speed: number;
+  floatIntensity: number;
+};
 
-float snoise(vec2 v) {
-  const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
-  vec2 i  = floor(v + dot(v, C.yy) );
-  vec2 x0 = v -   i + dot(i, C.xx);
+const PALETTE = [
+  { color: "#60a5fa", emissive: "#1d4ed8" },
+  { color: "#22d3ee", emissive: "#0891b2" },
+  { color: "#c084fc", emissive: "#7c3aed" },
+  { color: "#f472b6", emissive: "#db2777" },
+];
 
-  vec2 i1;
-  i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-  vec4 x12 = x0.xyxy + C.xxzz;
-  x12.xy -= i1;
-
-  i = mod289(i); 
-  vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
-
-  vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
-  m = m*m ;
-  m = m*m ;
-
-  vec3 x = 2.0 * fract(p * C.www) - 1.0;
-  vec3 h = abs(x) - 0.5;
-  vec3 ox = floor(x + 0.5);
-  vec3 a0 = x - ox;
-
-  m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
-
-  vec3 g;
-  g.x  = a0.x  * x0.x  + h.x  * x0.y;
-  g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-  return 130.0 * dot(m, g);
+function seededValue(seed: number) {
+  const x = Math.sin(seed * 127.1) * 43758.5453123;
+  return x - Math.floor(x);
 }
 
-void main() {
-  vUv = uv;
-  vec3 pos = position;
+function GlowComposer() {
+  const { gl, scene, camera, size } = useThree();
+  const composerRef = useRef<EffectComposer | null>(null);
 
-  // Animate the plane surface moving towards camera
-  float noiseFreq = 2.0;
-  float noiseAmp = 0.6;
-  vec2 noisePos = vec2(pos.x * noiseFreq, pos.y * noiseFreq + uTime * 0.8);
-  float elevation = snoise(noisePos) * noiseAmp;
+  useEffect(() => {
+    const composer = new EffectComposer(gl);
+    const renderPass = new RenderPass(scene, camera);
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(size.width, size.height),
+      1.15,
+      0.8,
+      0.18
+    );
 
-  // Mouse interaction: push terrain up sharply where mouse is
-  float d = distance(vUv, uMouse);
-  float mouseEffect = smoothstep(0.3, 0.0, d) * 1.5;
-  
-  pos.z += elevation + mouseEffect;
-  vElevation = elevation + mouseEffect;
+    bloomPass.threshold = 0.08;
+    bloomPass.strength = 1.1;
+    bloomPass.radius = 0.75;
 
-  // Precalculate edge fade in vertex shader to save fragment shader compute
-  float edgeX = smoothstep(0.0, 0.3, vUv.x) * smoothstep(1.0, 0.7, vUv.x);
-  float edgeY = smoothstep(0.0, 0.3, vUv.y) * smoothstep(1.0, 0.7, vUv.y);
-  vEdgeFade = edgeX * edgeY;
+    composer.addPass(renderPass);
+    composer.addPass(bloomPass);
+    composerRef.current = composer;
 
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+    return () => {
+      composer.dispose();
+      composerRef.current = null;
+    };
+  }, [camera, gl, scene, size.height, size.width]);
+
+  useEffect(() => {
+    composerRef.current?.setSize(size.width, size.height);
+  }, [size.height, size.width]);
+
+  useFrame(() => {
+    composerRef.current?.render();
+  }, 1);
+
+  return null;
 }
-`;
 
-const fragmentShader = `
-uniform float uTime;
-varying vec2 vUv;
-varying float vElevation;
-varying float vEdgeFade;
+function FloatingParticles({ sceneRef }: { sceneRef: RefObject<THREE.Group | null> }) {
+  const particles = useMemo<ParticleConfig[]>(() => {
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    const count = isMobile ? 14 : 24;
 
-void main() {
-  // Base grid color - much darker so it doesn't compete with text
-  vec3 colorBase = vec3(0.02, 0.05, 0.15); 
-  
-  // Neon highlight color - bright cyan/blue
-  vec3 colorHigh = vec3(0.0, 0.7, 1.0); 
-  
-  // Mix color based heavily on how high the terrain is (elevation)
-  float mixStrength = clamp(vElevation * 0.8, 0.0, 1.0);
-  vec3 finalColor = mix(colorBase, colorHigh, mixStrength);
-  
-  // Lower baseline opacity significantly, boost when glowing (hovered)
-  float alpha = clamp(vEdgeFade * (0.15 + mixStrength * 0.85), 0.0, 1.0);
+    return Array.from({ length: count }, (_, index) => {
+      const palette = PALETTE[index % PALETTE.length];
+      const radius = 2.2 + seededValue(index + 1) * 4.6;
+      const angle = (index / count) * Math.PI * 2;
+      const vertical = (seededValue(index + 11) - 0.5) * 4.6;
+      const offset = (seededValue(index + 21) - 0.5) * 1.5;
 
-  gl_FragColor = vec4(finalColor, alpha);
-}
-`;
-
-function TerrainGrid() {
-    const meshRef = useRef<THREE.Mesh>(null);
-    const materialRef = useRef<THREE.ShaderMaterial>(null);
-    const { viewport, mouse } = useThree();
-
-    useFrame((state, delta) => {
-        if (!materialRef.current || !meshRef.current) return;
-
-        materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
-
-        // Smoothly lerp the mouse position into the uniform so it trails beautifully
-        // In ThreeJS, mouse is -1 to 1. In standard UV, it's 0 to 1.
-        const targetX = mouse.x * 0.5 + 0.5;
-        const targetY = mouse.y * 0.5 + 0.5;
-
-        materialRef.current.uniforms.uMouse.value.x += (targetX - materialRef.current.uniforms.uMouse.value.x) * delta * 5.0;
-        materialRef.current.uniforms.uMouse.value.y += (targetY - materialRef.current.uniforms.uMouse.value.y) * delta * 5.0;
-
-        // Add a gentle floating rotation
-        meshRef.current.rotation.x = -Math.PI * 0.25 + Math.sin(state.clock.elapsedTime * 0.1) * 0.05;
+      return {
+        position: [
+          Math.cos(angle) * radius + offset,
+          vertical,
+          -3.5 + Math.sin(angle * 1.3) * 3.2,
+        ],
+        rotation: [
+          seededValue(index + 31) * Math.PI,
+          seededValue(index + 41) * Math.PI,
+          seededValue(index + 51) * Math.PI,
+        ],
+        scale: 0.18 + seededValue(index + 61) * (isMobile ? 0.32 : 0.48),
+        color: palette.color,
+        emissive: palette.emissive,
+        shape: seededValue(index + 71) > 0.45 ? "icosahedron" : "torus",
+        speed: 0.45 + seededValue(index + 81) * 1.15,
+        floatIntensity: 0.35 + seededValue(index + 91) * 1.1,
+      };
     });
+  }, []);
 
-    const uniforms = useMemo(
-        () => ({
-            uTime: { value: 0 },
-            uMouse: { value: new THREE.Vector2(0.5, 0.5) },
-        }),
-        []
-    );
+  return (
+    <group ref={sceneRef}>
+      <Stars
+        radius={90}
+        depth={40}
+        count={2600}
+        factor={3.5}
+        saturation={0}
+        fade
+        speed={0.45}
+      />
 
-    // Plane geometry with dynamic segments based on device performance
-    const geometry = useMemo(() => {
-        // Extreme optimization for mobile: drop to bare minimum wireframe density
-        const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-        const segments = isMobile ? 25 : 60; // Drastically reduced for guaranteed 60FPS
+      <mesh position={[0, -1.6, -6.5]} rotation={[Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[4.8, 6.8, 96]} />
+        <meshBasicMaterial
+          color="#60a5fa"
+          transparent
+          opacity={0.08}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
 
-        return new THREE.PlaneGeometry(
-            viewport.width * 1.5,
-            viewport.height * 1.5,
-            segments,
-            segments
-        );
-    }, [viewport.width, viewport.height]);
-
-    return (
-        <mesh ref={meshRef} position={[0, -1, -2]}>
-            <primitive object={geometry} attach="geometry" />
-            <shaderMaterial
-                ref={materialRef}
-                vertexShader={vertexShader}
-                fragmentShader={fragmentShader}
-                uniforms={uniforms}
-                transparent={true}
-                depthWrite={false}
-                wireframe={true} // THE KEY: this makes it a glowing Tron-like grid!
-                blending={THREE.AdditiveBlending}
+      {particles.map((particle, index) => (
+        <Float
+          key={`${particle.shape}-${index}`}
+          speed={particle.speed}
+          rotationIntensity={1.2}
+          floatIntensity={particle.floatIntensity}
+          floatingRange={[-0.45, 0.45]}
+        >
+          <mesh
+            position={particle.position}
+            rotation={particle.rotation}
+            scale={particle.scale}
+          >
+            {particle.shape === "icosahedron" ? (
+              <icosahedronGeometry args={[1, 0]} />
+            ) : (
+              <torusKnotGeometry args={[0.55, 0.18, 96, 14]} />
+            )}
+            <meshStandardMaterial
+              color={particle.color}
+              emissive={particle.emissive}
+              emissiveIntensity={1.4}
+              metalness={0.7}
+              roughness={0.18}
             />
-        </mesh>
-    );
+          </mesh>
+        </Float>
+      ))}
+    </group>
+  );
 }
 
-export default function Hero3DBackground() {
-    return (
-        <div className="absolute inset-0 z-0 pointer-events-auto" style={{ width: "100%", height: "100%" }}>
-            <Canvas
-                camera={{ position: [0, 0, 5], fov: 75 }}
-                gl={{
-                    alpha: true,
-                    antialias: false,
-                    powerPreference: "high-performance",
-                    preserveDrawingBuffer: false,
-                    logarithmicDepthBuffer: false
-                }}
-                dpr={[1, typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : 1.5]} // Strict 1x DPR on mobile
-                performance={{ min: 0.1 }} // Let R3F aggressively downscale if needed
-                frameloop="always"
-            >
-                <TerrainGrid />
-            </Canvas>
-        </div>
+function CameraRig({
+  containerRef,
+  sceneRef,
+}: {
+  containerRef?: RefObject<HTMLElement | null>;
+  sceneRef: RefObject<THREE.Group | null>;
+}) {
+  const { camera, clock } = useThree();
+  const mouseRef = useRef({ x: 0, y: 0 });
+  const scrollRef = useRef(0);
+
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      mouseRef.current.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouseRef.current.y = (event.clientY / window.innerHeight) * 2 - 1;
+    };
+
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
+
+  useFrame(() => {
+    const targetScroll = (() => {
+      if (!containerRef?.current || typeof window === "undefined") {
+        return 0;
+      }
+
+      const rect = containerRef.current.getBoundingClientRect();
+      const distance = Math.max(rect.height, window.innerHeight);
+      return THREE.MathUtils.clamp(-rect.top / distance, 0, 1.15);
+    })();
+
+    scrollRef.current = THREE.MathUtils.lerp(scrollRef.current, targetScroll, 0.06);
+
+    const mouseX = mouseRef.current.x;
+    const mouseY = mouseRef.current.y;
+    const t = clock.elapsedTime;
+
+    camera.position.lerp(
+      new THREE.Vector3(
+        mouseX * 0.85,
+        mouseY * 0.4 + scrollRef.current * 0.55,
+        7 + scrollRef.current * 3.4
+      ),
+      0.045
     );
+    camera.rotation.set(
+      camera.rotation.x,
+      camera.rotation.y,
+      THREE.MathUtils.lerp(
+        camera.rotation.z,
+        -mouseX * 0.045 - scrollRef.current * 0.055,
+        0.035
+      )
+    );
+    camera.lookAt(0, 0, 0);
+
+    if (!sceneRef.current) {
+      return;
+    }
+
+    sceneRef.current.rotation.x = THREE.MathUtils.lerp(
+      sceneRef.current.rotation.x,
+      -0.2 + mouseY * 0.14 + scrollRef.current * 0.18,
+      0.04
+    );
+    sceneRef.current.rotation.y = THREE.MathUtils.lerp(
+      sceneRef.current.rotation.y,
+      t * 0.04 + mouseX * 0.22 + scrollRef.current * 0.36,
+      0.035
+    );
+    sceneRef.current.position.y = THREE.MathUtils.lerp(
+      sceneRef.current.position.y,
+      -scrollRef.current * 0.85,
+      0.04
+    );
+  });
+
+  return null;
+}
+
+function Scene({ containerRef }: Hero3DBackgroundProps) {
+  const sceneRef = useRef<THREE.Group>(null);
+
+  return (
+    <>
+      <color attach="background" args={["#020617"]} />
+      <fog attach="fog" args={["#020617", 8, 18]} />
+      <ambientLight intensity={0.6} color="#dbeafe" />
+      <pointLight position={[4, 2, 4]} intensity={22} color="#60a5fa" distance={18} />
+      <pointLight position={[-5, -2, 2]} intensity={14} color="#c084fc" distance={16} />
+      <spotLight
+        position={[0, 6, 8]}
+        intensity={18}
+        angle={0.4}
+        penumbra={0.7}
+        color="#67e8f9"
+      />
+      <Environment preset="night" />
+      <FloatingParticles sceneRef={sceneRef} />
+      <CameraRig containerRef={containerRef} sceneRef={sceneRef} />
+      <GlowComposer />
+    </>
+  );
+}
+
+export default function Hero3DBackground({ containerRef }: Hero3DBackgroundProps) {
+  return (
+    <div className="pointer-events-none absolute inset-0 z-0">
+      <Canvas
+        camera={{ position: [0, 0.15, 7], fov: 48 }}
+        dpr={[1, 1.5]}
+        gl={{
+          alpha: true,
+          antialias: true,
+          powerPreference: "high-performance",
+        }}
+        onCreated={({ gl }) => {
+          gl.setClearColor(0x000000, 0);
+        }}
+      >
+        <Scene containerRef={containerRef} />
+      </Canvas>
+    </div>
+  );
 }

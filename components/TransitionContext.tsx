@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import React, { createContext, useContext, useState, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
 interface TransitionContextType {
@@ -28,11 +28,6 @@ export function TransitionProvider({ children }: { children: React.ReactNode }) 
             setTimeout(() => setIsTransitioning(false), 500);
         }, 400);
     }, [pathname, router]);
-
-    // Only retract the transition when the pathname ACTUALLY changes
-    useEffect(() => {
-        setIsTransitioning(false);
-    }, [pathname]);
 
     return (
         <TransitionContext.Provider value={{ isTransitioning, triggerTransition }}>

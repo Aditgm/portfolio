@@ -1,24 +1,18 @@
 'use client';
 
-import { createContext, useContext, useEffect, useRef, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, type ReactNode, type RefObject } from 'react';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-interface SmoothScrollContextValue {
-  lenis: Lenis | null;
-}
-
-const SmoothScrollContext = createContext<SmoothScrollContextValue>({
-  lenis: null,
-});
+const SmoothScrollContext = createContext<RefObject<Lenis | null> | null>(null);
 
 export const useSmoothScroll = () => {
   const context = useContext(SmoothScrollContext);
-  if (!context.lenis) {
+  if (!context?.current) {
     throw new Error('useSmoothScroll must be used within a SmoothScrollProvider');
   }
-  return context.lenis;
+  return context.current;
 };
 
 interface SmoothScrollProviderProps {
@@ -27,8 +21,6 @@ interface SmoothScrollProviderProps {
 
 export const SmoothScrollProvider = ({ children }: SmoothScrollProviderProps) => {
   const lenisRef = useRef<Lenis | null>(null);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -46,43 +38,26 @@ export const SmoothScrollProvider = ({ children }: SmoothScrollProviderProps) =>
 
     lenis.on('scroll', ScrollTrigger.update);
 
-    gsap.ticker.add((time) => {
+    const tick = (time: number) => {
       lenis.raf(time * 1000);
-    });
+    };
+
+    gsap.ticker.add(tick);
 
     gsap.ticker.lagSmoothing(0);
+    ScrollTrigger.refresh();
 
     return () => {
-      lenis.destroy();
-      gsap.ticker.remove((time) => {
-        lenis.raf(time * 1000);
-      });
       lenis.off('scroll', ScrollTrigger.update);
+      gsap.ticker.remove(tick);
+      lenis.destroy();
+      lenisRef.current = null;
     };
   }, []);
 
   return (
-    <SmoothScrollContext.Provider value={{ lenis: lenisRef.current }}>
-      <div
-        ref={wrapperRef}
-        style={{
-          position: 'relative',
-          width: '100%',
-          height: '100vh',
-          overflow: 'hidden',
-        }}
-      >
-        <div
-          ref={contentRef}
-          style={{
-            width: '100%',
-            height: '100%',
-            overflow: 'visible',
-          }}
-        >
-          {children}
-        </div>
-      </div>
+    <SmoothScrollContext.Provider value={lenisRef}>
+      {children}
     </SmoothScrollContext.Provider>
   );
 };
