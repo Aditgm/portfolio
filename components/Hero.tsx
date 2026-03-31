@@ -282,12 +282,12 @@ export default function Hero() {
           <div className="flex flex-col items-center gap-6">
             <div ref={nameRef} className="group relative">
               <div className="pointer-events-none absolute inset-x-[10%] bottom-[10%] h-12 rounded-full bg-[rgba(99,102,241,0.18)] blur-[44px] transition-opacity duration-500 group-hover:opacity-100" />
-              <h1 className="display-title relative text-[clamp(4.8rem,13vw,9.4rem)] font-black uppercase leading-[0.84] text-white">
+              <h1 className="display-title relative select-none text-[clamp(4.8rem,13vw,9.4rem)] font-black uppercase leading-[0.84] text-white">
                 <span className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
                   {nameParts.map((part, partIndex) => (
                     <span
                       key={part.word}
-                      className={`inline-flex overflow-hidden ${part.accent ? "text-gradient" : ""}`}
+                      className={`inline-flex overflow-hidden ${part.accent ? "text-gradient opacity-0 transition-opacity duration-300 group-hover:opacity-100" : ""}`}
                     >
                       {Array.from(part.word).map((letter, index) => {
                         const letterIndex =
