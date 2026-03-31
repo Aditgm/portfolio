@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type TouchEvent, type WheelEvent } from "react";
 import { Bot, MessageCircle, Send, X } from "lucide-react";
 
 type SourceRef = {
@@ -37,6 +37,7 @@ export default function ChatbotRAG() {
     },
   ]);
   const endRef = useRef<HTMLDivElement>(null);
+  const messagesRef = useRef<HTMLDivElement>(null);
 
   const canSend = input.trim().length > 0 && !loading;
 
@@ -50,6 +51,28 @@ export default function ChatbotRAG() {
     requestAnimationFrame(() => {
       endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
     });
+  };
+
+  const handleMessagesWheel = (event: WheelEvent<HTMLDivElement>) => {
+    const container = messagesRef.current;
+    if (!container) {
+      return;
+    }
+
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const isDown = event.deltaY > 0;
+    const isAtTop = scrollTop <= 0;
+    const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+
+    if (scrollHeight <= clientHeight || (isDown && isAtBottom) || (!isDown && isAtTop)) {
+      event.preventDefault();
+    }
+
+    event.stopPropagation();
+  };
+
+  const handleMessagesTouchMove = (event: TouchEvent<HTMLDivElement>) => {
+    event.stopPropagation();
   };
 
   const sendMessage = async (text: string) => {
@@ -125,7 +148,10 @@ export default function ChatbotRAG() {
       </button>
 
       {open ? (
-        <div className="fixed bottom-24 right-6 z-[94] flex h-[min(72vh,540px)] w-[min(92vw,380px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#060b18]/95 shadow-[0_24px_60px_-24px_rgba(15,23,42,0.9)] backdrop-blur-xl">
+        <div
+          data-lenis-prevent="true"
+          className="fixed bottom-24 right-6 z-[94] flex h-[min(72vh,540px)] w-[min(92vw,380px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#060b18]/95 shadow-[0_24px_60px_-24px_rgba(15,23,42,0.9)] backdrop-blur-xl"
+        >
           <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
             <div className="flex items-center gap-2">
               <div className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-cyan-200">
@@ -133,12 +159,18 @@ export default function ChatbotRAG() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-white">Portfolio Assistant</p>
-                <p className="text-[11px] text-slate-400">RAG on portfolio knowledge</p>
+                <p className="text-[11px] text-slate-400">Ask anything about Aditya</p>
               </div>
             </div>
           </div>
 
-          <div className="flex-1 space-y-3 overflow-y-auto px-3 py-3">
+          <div
+            ref={messagesRef}
+            data-lenis-prevent="true"
+            onWheel={handleMessagesWheel}
+            onTouchMove={handleMessagesTouchMove}
+            className="flex-1 space-y-3 overflow-y-auto overscroll-contain px-3 py-3"
+          >
             {messages.map((message) => (
               <div
                 key={message.id}

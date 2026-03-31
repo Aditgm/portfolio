@@ -124,7 +124,7 @@ function buildContextAnswer(message: string, chunks: KnowledgeChunk[]): string {
     .map((chunk) => chunk.content)
     .join(" ");
 
-  return `Based on the portfolio knowledge base: ${summary}`;
+  return summary;
 }
 
 export async function POST(request: Request) {
