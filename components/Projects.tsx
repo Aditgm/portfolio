@@ -330,8 +330,8 @@ export default function Projects() {
       className="section-container geo-divider-top relative"
     >
       <div className="pointer-events-none absolute inset-0 geo-grid opacity-40" />
-      <div className="pointer-events-none absolute bottom-0 right-0 h-[400px] w-[400px] rounded-full bg-blue-600/[0.03] blur-[120px]" />
-      <div className="pointer-events-none absolute left-0 top-1/4 h-[300px] w-[300px] rounded-full bg-purple-600/[0.03] blur-[100px]" />
+      <div className="pointer-events-none absolute bottom-0 right-0 h-[400px] w-[400px] rounded-full bg-[rgba(99,102,241,0.06)] blur-[120px]" />
+      <div className="pointer-events-none absolute left-0 top-1/4 h-[300px] w-[300px] rounded-full bg-[rgba(124,58,237,0.06)] blur-[100px]" />
 
       <div className="section-inner">
         <div ref={headerRef} className="mb-14 max-w-2xl md:mb-16">
@@ -410,10 +410,16 @@ export default function Projects() {
                           </a>
                           <TransitionLink
                             href={`/build/${project.slug}`}
-                            className="group/build relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg border border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200 shadow-[0_0_20px_rgba(56,189,248,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-300/70 hover:bg-cyan-400/[0.16] hover:text-white hover:shadow-[0_0_30px_rgba(34,211,238,0.36)]"
+                            className="signature-outline group/build relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg transition-all duration-300 hover:-translate-y-0.5 hover:text-white"
                             aria-label={`Build details for ${project.title}`}
                           >
-                            <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,rgba(103,232,249,0.34),transparent_68%)] opacity-80 transition-opacity duration-300 group-hover/build:opacity-100" />
+                            <span
+                              className="pointer-events-none absolute inset-0 opacity-80 transition-opacity duration-300 group-hover/build:opacity-100"
+                              style={{
+                                background:
+                                  "radial-gradient(circle, rgba(129, 140, 248, 0.34), transparent 68%)",
+                              }}
+                            />
                             <Hammer size={14} />
                           </TransitionLink>
                         </div>
@@ -423,7 +429,7 @@ export default function Projects() {
                         data-lenis-prevent
                         className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 [scrollbar-color:rgba(148,163,184,0.4)_transparent] [scrollbar-width:thin]"
                       >
-                        <h3 className="text-xl font-bold text-white transition-colors duration-300 group-hover:text-blue-300">
+                        <h3 className="text-xl font-bold text-white transition-colors duration-300">
                           {project.title}
                         </h3>
                         <p className="mt-2 text-sm text-slate-500">{project.subtitle}</p>
@@ -446,7 +452,10 @@ export default function Projects() {
                         <ul className="mt-6 flex flex-col gap-3">
                           {project.highlights.map((highlight) => (
                             <li key={highlight} className="flex gap-3 text-sm text-slate-400">
-                              <span className="mt-2 h-1.5 w-1.5 shrink-0 rotate-45 rounded-[1px] bg-cyan-400/50" />
+                              <span
+                                className="mt-2 h-1.5 w-1.5 shrink-0 rotate-45 rounded-[1px]"
+                                style={{ backgroundColor: "rgba(45, 212, 191, 0.58)" }}
+                              />
                               {highlight}
                             </li>
                           ))}

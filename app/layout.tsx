@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit, Fira_Code } from "next/font/google";
+import { Outfit, Fira_Code, Syne } from "next/font/google";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -9,6 +9,11 @@ const outfit = Outfit({
 
 const firaCode = Fira_Code({
   variable: "--font-mono",
+  subsets: ["latin"],
+});
+
+const syne = Syne({
+  variable: "--font-display",
   subsets: ["latin"],
 });
 
@@ -60,7 +65,7 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body
         data-cursor-theme="dark"
-        className={`${outfit.variable} ${firaCode.variable} antialiased noise-bg`}
+        className={`${outfit.variable} ${firaCode.variable} ${syne.variable} antialiased noise-bg`}
       >
         <SmoothScrollProvider>
           <TransitionProvider>

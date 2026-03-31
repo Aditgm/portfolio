@@ -31,12 +31,18 @@ export default function Navbar() {
       className="fixed inset-x-0 top-0 z-50 flex justify-center pt-4 transition-all duration-500"
     >
       {/* Gradient line at very top */}
-      <div className="pointer-events-none absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
+      <div
+        className="pointer-events-none absolute left-0 right-0 top-0 h-px"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.32), transparent)",
+        }}
+      />
 
       <div
         className={`w-[90%] max-w-[1200px] transition-all duration-500 rounded-2xl ${
           scrolled
-            ? "border border-white/[0.08] bg-gradient-to-br from-[#0a0e1a]/90 via-[#030711]/85 to-[#0a0e1a]/90 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_60px_rgba(59,130,246,0.08)]"
+            ? "border border-white/[0.08] bg-gradient-to-br from-[#11182d]/90 via-[#040816]/86 to-[#10182d]/90 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_60px_rgba(99,102,241,0.12)]"
             : "border border-white/[0.03] bg-gradient-to-br from-[#0a0e1a]/40 via-[#030711]/30 to-[#0a0e1a]/40 backdrop-blur-md"
         }`}
       >
@@ -47,7 +53,7 @@ export default function Navbar() {
           aria-label="Aditya Raj portfolio home"
           className="group relative flex shrink-0 items-center gap-2"
         >
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-blue-500/18 bg-gradient-to-br from-[#0b1325]/70 via-[#07101e]/60 to-[#0b1325]/75 transition-colors group-hover:border-blue-400/35">
+          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-[rgba(99,102,241,0.24)] bg-gradient-to-br from-[#141a32]/76 via-[#081020]/62 to-[#141a32]/76 transition-colors group-hover:border-[rgba(99,102,241,0.42)]">
             <NavbarLogo3D color="#8ea8c4" label="AR" />
             <span className="sr-only">Aditya Raj</span>
           </div>
@@ -66,7 +72,13 @@ export default function Navbar() {
               >
                 {l.label}
                 {/* Hover underline */}
-                <span className="absolute bottom-1.5 left-1/2 h-0.5 w-0 -translate-x-1/2 bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-300 group-hover:w-3/4 rounded-full" />
+                <span
+                  className="absolute bottom-1.5 left-1/2 h-0.5 w-0 -translate-x-1/2 rounded-full transition-all duration-300 group-hover:w-3/4"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, var(--signature), var(--secondary-accent))",
+                  }}
+                />
               </a>
             </li>
           ))}
@@ -81,7 +93,7 @@ export default function Navbar() {
               rel="noopener noreferrer"
               whileHover={{ y: -2, scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="hidden items-center gap-2 rounded-2xl border border-blue-500/30 bg-gradient-to-r from-blue-500/[0.08] to-blue-500/[0.04] px-6 py-2.5 text-[0.85rem] font-semibold text-blue-300 transition-all duration-300 hover:border-blue-400/60 hover:bg-gradient-to-r hover:from-blue-500/[0.14] hover:to-blue-500/[0.08] hover:shadow-[0_0_32px_rgba(59,130,246,0.25),0_0_60px_rgba(59,130,246,0.1)] md:inline-flex group"
+              className="signature-outline hidden items-center gap-2 rounded-2xl px-6 py-2.5 text-[0.85rem] font-semibold transition-all duration-300 md:inline-flex group"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -136,7 +148,10 @@ export default function Navbar() {
                       onClick={() => setOpen(false)}
                       className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-slate-400 transition-all hover:bg-white/[0.06] hover:text-white"
                     >
-                      <span className="h-1 w-1 rounded-full bg-blue-500/40" />
+                      <span
+                        className="h-1 w-1 rounded-full"
+                        style={{ backgroundColor: "rgba(99, 102, 241, 0.56)" }}
+                      />
                       {l.label}
                     </a>
                   </motion.li>
@@ -145,7 +160,8 @@ export default function Navbar() {
                   <a
                     href="/resume.pdf"
                     target="_blank"
-                    className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-blue-300 transition-all hover:bg-blue-500/[0.08]"
+                    className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-all hover:bg-white/[0.06]"
+                    style={{ color: "var(--signature)" }}
                   >
                     Resume ↗
                   </a>

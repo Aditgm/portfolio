@@ -178,9 +178,9 @@ export default function Hero() {
       </div>
 
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-[14%] top-[14%] h-64 w-64 rounded-full bg-sky-400/8 blur-[120px]" />
-        <div className="absolute right-[10%] top-[22%] h-80 w-80 rounded-full bg-slate-400/10 blur-[140px]" />
-        <div className="absolute bottom-[8%] left-1/2 h-56 w-[36rem] -translate-x-1/2 rounded-full bg-cyan-400/6 blur-[110px]" />
+        <div className="absolute left-[14%] top-[14%] h-64 w-64 rounded-full bg-[rgba(99,102,241,0.12)] blur-[120px]" />
+        <div className="absolute right-[10%] top-[22%] h-80 w-80 rounded-full bg-[rgba(124,58,237,0.12)] blur-[140px]" />
+        <div className="absolute bottom-[8%] left-1/2 h-56 w-[36rem] -translate-x-1/2 rounded-full bg-[rgba(45,212,191,0.08)] blur-[110px]" />
       </div>
 
       <div ref={contentRef} className="relative z-10 mx-auto max-w-5xl text-center">
@@ -188,20 +188,26 @@ export default function Hero() {
           <a
             data-hero-badge
             href="mailto:arajsinha4@gmail.com"
-            className="inline-flex items-center gap-3 rounded-full border border-blue-400/20 bg-blue-400/8 px-6 py-3 text-sm font-semibold tracking-wide text-blue-200 backdrop-blur-md transition-colors duration-300 hover:bg-blue-400/12"
+            className="signature-pill inline-flex items-center gap-3 rounded-full px-6 py-3 text-sm font-semibold tracking-[0.18em] uppercase backdrop-blur-xl transition-transform duration-300 hover:-translate-y-0.5"
           >
             <span className="relative flex h-2.5 w-2.5">
               <span
-                className="absolute inline-flex h-full w-full rounded-full bg-blue-300 opacity-75"
-                style={{ animation: "pulse-ring 1.5s ease-out infinite" }}
+                className="absolute inline-flex h-full w-full rounded-full opacity-75"
+                style={{
+                  backgroundColor: "rgba(99, 102, 241, 0.72)",
+                  animation: "pulse-ring 1.5s ease-out infinite",
+                }}
               />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-blue-300" />
+              <span
+                className="relative inline-flex h-2.5 w-2.5 rounded-full"
+                style={{ backgroundColor: "var(--signature)" }}
+              />
             </span>
             Open to SDE Internships &amp; New Grad Roles
           </a>
 
           <div className="flex flex-col items-center gap-6">
-            <h1 className="text-[4rem] font-extrabold leading-[0.98] tracking-tight text-white sm:text-7xl md:text-8xl lg:text-[6.75rem]">
+            <h1 className="display-title text-[4rem] font-extrabold leading-[0.92] text-white sm:text-7xl md:text-8xl lg:text-[6.9rem]">
               <span className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
                 {nameParts.map((part) => (
                   <span
@@ -234,11 +240,24 @@ export default function Hero() {
                 <div
                   ref={achievementRef}
                   data-hero-achievement
-                  className="flex flex-wrap items-center justify-center gap-2 text-center text-sm font-medium text-cyan-300 sm:gap-3 sm:text-base"
+                  className="flex flex-wrap items-center justify-center gap-2 text-center text-sm font-medium sm:gap-3 sm:text-base"
+                  style={{ color: "var(--secondary-accent)" }}
                 >
-                  <span className="hidden h-px w-8 bg-gradient-to-r from-transparent to-cyan-500 sm:block" />
+                  <span
+                    className="hidden h-px w-8 sm:block"
+                    style={{
+                      background:
+                        "linear-gradient(90deg, transparent, var(--secondary-accent))",
+                    }}
+                  />
                   <span>{achievements[achievementIdx]}</span>
-                  <span className="hidden h-px w-8 bg-gradient-to-l from-transparent to-cyan-500 sm:block" />
+                  <span
+                    className="hidden h-px w-8 sm:block"
+                    style={{
+                      background:
+                        "linear-gradient(270deg, transparent, var(--secondary-accent))",
+                    }}
+                  />
                 </div>
               </div>
 
@@ -256,9 +275,15 @@ export default function Hero() {
               data-hero-card
               className="card card-geo-accent group relative flex flex-col justify-center rounded-2xl border border-white/8 bg-slate-900/40 p-6 backdrop-blur-md transition-all hover:bg-slate-800/60 sm:col-span-2 md:col-span-2 md:p-8"
             >
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              <div
+                className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                style={{
+                  background:
+                    "linear-gradient(145deg, rgba(99, 102, 241, 0.12), rgba(124, 58, 237, 0.06))",
+                }}
+              />
               <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
-                <Brain className="text-blue-400" size={24} /> Product &amp; AI
+                <Brain size={24} style={{ color: "var(--signature)" }} /> Product &amp; AI
               </h3>
               <p className="text-base leading-[1.8] text-slate-400">
                 Top <strong className="font-medium text-slate-200">0.4% competitive programmer</strong> on LeetCode who builds AI products that solve real problems. I&apos;m drawn to challenges at the intersection of <strong className="font-medium text-slate-200">LLMs and RAG systems</strong> in healthcare, law, and finance.
@@ -269,9 +294,15 @@ export default function Hero() {
               data-hero-card
               className="card card-geo-accent group relative flex flex-col justify-center rounded-2xl border border-white/8 bg-slate-900/40 p-6 backdrop-blur-md transition-all hover:bg-slate-800/60 md:p-8"
             >
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-blue-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              <div
+                className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                style={{
+                  background:
+                    "linear-gradient(145deg, rgba(45, 212, 191, 0.12), rgba(99, 102, 241, 0.06))",
+                }}
+              />
               <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
-                <Zap className="text-cyan-400" size={24} /> Philosophy
+                <Zap size={24} style={{ color: "var(--secondary-accent)" }} /> Philosophy
               </h3>
               <p className="text-base leading-[1.8] text-slate-400">
                 I approach every project the way I approach competitive programming: find the <strong className="font-medium text-slate-200">most elegant solution</strong>, then make it fast.
@@ -282,9 +313,15 @@ export default function Hero() {
               data-hero-card
               className="card card-geo-accent group relative flex flex-col justify-center rounded-2xl border border-white/8 bg-slate-900/40 p-6 backdrop-blur-md transition-all hover:bg-slate-800/60 sm:col-span-2 md:col-span-3 md:p-8"
             >
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              <div
+                className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                style={{
+                  background:
+                    "linear-gradient(145deg, rgba(124, 58, 237, 0.12), rgba(99, 102, 241, 0.06))",
+                }}
+              />
               <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
-                <Code2 className="text-purple-400" size={24} /> Current Focus
+                <Code2 size={24} style={{ color: "var(--accent-ultraviolet)" }} /> Current Focus
               </h3>
               <p className="text-base leading-[1.8] text-slate-400">
                 Currently exploring <strong className="font-medium text-slate-200">LangChain and Azure</strong>, contributing to open source, and building something new with production-ready AI workflows.
@@ -301,7 +338,7 @@ export default function Hero() {
                 href="https://github.com/Aditgm"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative inline-flex items-center gap-3 overflow-hidden whitespace-nowrap rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-10 py-5 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-xl hover:shadow-blue-600/40"
+                className="signature-button group relative inline-flex items-center gap-3 overflow-hidden whitespace-nowrap rounded-xl px-10 py-5 text-base font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:scale-105"
               >
                 <span
                   className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -316,7 +353,7 @@ export default function Hero() {
             <MagneticButton intensity={0.3} range={140}>
               <a
                 href="#contact"
-                className="group relative inline-flex items-center gap-3 overflow-hidden whitespace-nowrap rounded-xl border border-white/12 bg-white/6 px-10 py-5 text-base font-bold text-slate-200 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:border-white/25 hover:bg-white/10 hover:text-white hover:shadow-lg hover:shadow-white/5"
+                className="signature-outline group relative inline-flex items-center gap-3 overflow-hidden whitespace-nowrap rounded-xl px-10 py-5 text-base font-bold backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:text-white"
               >
                 <span className="relative flex items-center gap-3">
                   Get in Touch
@@ -368,7 +405,7 @@ export default function Hero() {
       >
         <span>Scroll</span>
         <span className="flex h-12 w-8 items-start justify-center rounded-full border border-white/12 bg-white/5 p-1.5">
-          <ArrowDown size={14} className="text-cyan-300" />
+          <ArrowDown size={14} style={{ color: "var(--secondary-accent)" }} />
         </span>
       </button>
     </section>

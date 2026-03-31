@@ -161,19 +161,19 @@ export default function Footer() {
       className="section-container geo-divider-top relative"
     >
       <div className="pointer-events-none absolute inset-0 geo-grid opacity-40" />
-      <div className="pointer-events-none absolute bottom-0 left-1/2 h-[500px] w-[600px] -translate-x-1/2 rounded-full bg-blue-600/[0.04] blur-[140px]" />
+      <div className="pointer-events-none absolute bottom-0 left-1/2 h-[500px] w-[600px] -translate-x-1/2 rounded-full bg-[rgba(99,102,241,0.07)] blur-[140px]" />
 
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
-          className="absolute left-[5%] top-[20%] h-8 w-8 rotate-45 rounded-sm border border-blue-500/10 opacity-40"
+          className="absolute left-[5%] top-[20%] h-8 w-8 rotate-45 rounded-sm border border-[rgba(99,102,241,0.16)] opacity-40"
           style={{ animation: "float-slow 12s ease-in-out infinite" }}
         />
         <div
-          className="absolute right-[10%] top-[30%] h-6 w-6 rotate-45 rounded-sm border border-purple-500/10 opacity-30"
+          className="absolute right-[10%] top-[30%] h-6 w-6 rotate-45 rounded-sm border border-[rgba(124,58,237,0.16)] opacity-30"
           style={{ animation: "float-slow 10s ease-in-out infinite 2s" }}
         />
         <div
-          className="absolute bottom-[30%] left-[15%] h-4 w-4 rounded-full border border-cyan-500/10 opacity-30"
+          className="absolute bottom-[30%] left-[15%] h-4 w-4 rounded-full border border-[rgba(45,212,191,0.16)] opacity-30"
           style={{ animation: "float 8s ease-in-out infinite 1s" }}
         />
       </div>
@@ -183,7 +183,7 @@ export default function Footer() {
           ref={headerRef}
           className="mb-12 flex w-full flex-col items-center text-center md:mb-14"
         >
-          <p className="section-label mb-4 justify-center after:block after:h-px after:w-8 after:bg-gradient-to-l after:from-blue-500 after:to-cyan-500">
+          <p className="section-label mb-4 justify-center after:block after:h-px after:w-8 after:bg-gradient-to-l after:from-[var(--signature)] after:to-[var(--secondary-accent)]">
             Contact
           </p>
           <h2 className="section-title text-center">
@@ -200,7 +200,13 @@ export default function Footer() {
           ref={contactCardRef}
           className="card border-trace mx-auto flex w-full max-w-2xl flex-col items-center gap-8 overflow-hidden"
         >
-          <div className="h-px w-full bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
+          <div
+            className="h-px w-full"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.34), transparent)",
+            }}
+          />
 
           <div className="flex w-full flex-col items-center gap-10 px-10 pb-10 pt-8 text-center md:px-12 md:pb-12 md:pt-10">
             <div className="flex w-full max-w-sm flex-col gap-4">
@@ -221,10 +227,10 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-cursor-hover="true"
-                className="group relative inline-flex w-full items-center justify-center gap-3 rounded-xl border border-blue-500/30 bg-blue-500/10 px-8 py-4 text-sm font-semibold text-blue-100 shadow-lg shadow-blue-500/5 transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-500/50 hover:bg-blue-500/20 hover:shadow-blue-500/20"
+                className="group signature-outline relative inline-flex w-full items-center justify-center gap-3 rounded-xl px-8 py-4 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5"
               >
                 <span className="relative flex items-center justify-center gap-3">
-                  Compose in Outlook <Mail size={16} className="text-blue-300" />
+                  Compose in Outlook <Mail size={16} style={{ color: "var(--signature)" }} />
                 </span>
               </a>
 
@@ -282,11 +288,11 @@ export default function Footer() {
           <p className="flex items-center gap-2 text-xs text-slate-600">
             <span className="font-mono">Built with</span>
             <span className="h-3 w-px bg-slate-800" />
-            <span className="text-blue-400/60">Next.js</span>
+            <span style={{ color: "rgba(129, 140, 248, 0.78)" }}>Next.js</span>
             <span className="h-1 w-1 rotate-45 rounded-[1px] bg-slate-700" />
-            <span className="text-cyan-400/60">Tailwind CSS</span>
+            <span style={{ color: "rgba(45, 212, 191, 0.78)" }}>Tailwind CSS</span>
             <span className="h-1 w-1 rotate-45 rounded-[1px] bg-slate-700" />
-            <span className="text-purple-400/60">GSAP</span>
+            <span style={{ color: "rgba(124, 58, 237, 0.78)" }}>GSAP</span>
           </p>
         </div>
       </div>
@@ -321,7 +327,7 @@ export default function Footer() {
             ease: "power2.out",
           });
         }}
-        className="fixed bottom-8 right-8 z-[60] inline-flex h-12 w-12 items-center justify-center rounded-full border border-blue-400/25 bg-[#081120]/88 text-cyan-200 shadow-[0_0_30px_rgba(56,189,248,0.16)] backdrop-blur-md transition-colors hover:border-blue-300/45 hover:text-white"
+        className="signature-outline fixed bottom-8 right-8 z-[60] inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#081120]/88 text-white backdrop-blur-md transition-colors hover:text-white"
       >
         <ArrowUp size={18} />
       </button>
