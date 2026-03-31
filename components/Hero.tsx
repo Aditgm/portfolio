@@ -1,11 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowDown, ArrowUpRight, Brain, Code2, Github, Mail, Zap } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Binary, Github, Mail, Trophy } from "lucide-react";
 import MagneticButton from "./MagneticButton";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
@@ -14,12 +14,6 @@ const Hero3DBackground = dynamic(() => import("./Hero3DBackground"), {
   ssr: false,
   loading: () => null,
 });
-
-const achievements = [
-  "Top 0.4% on LeetCode · Guardian",
-  "Codeforces Master · Ranked 56 in India",
-  "CodeChef · Ranked 379 in India",
-];
 
 const nameParts = [
   { word: "Aditya", accent: false },
@@ -34,39 +28,99 @@ const heroQuoteWords = [
   "ship.",
 ];
 
+const socialLinks = [
+  {
+    label: "GitHub",
+    href: "https://github.com/Aditgm",
+    icon: Github,
+    glow: "rgba(99, 102, 241, 0.18)",
+  },
+  {
+    label: "LeetCode",
+    href: "https://leetcode.com/u/adityagm/",
+    icon: Binary,
+    glow: "rgba(45, 212, 191, 0.18)",
+  },
+  {
+    label: "Codeforces",
+    href: "https://codeforces.com/profile/aditya2005",
+    icon: Trophy,
+    glow: "rgba(124, 58, 237, 0.18)",
+  },
+];
+
 export default function Hero() {
-  const [achievementIdx, setAchievementIdx] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const backgroundLayerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const achievementRef = useRef<HTMLDivElement>(null);
   const indicatorRef = useRef<HTMLButtonElement>(null);
+  const nameRef = useRef<HTMLDivElement>(null);
+  const letterRefs = useRef<Array<HTMLSpanElement | null>>([]);
 
   useEffect(() => {
-    const id = window.setInterval(() => {
-      setAchievementIdx((index) => (index + 1) % achievements.length);
-    }, 3000);
-
-    return () => window.clearInterval(id);
-  }, []);
-
-  useEffect(() => {
-    if (!achievementRef.current) {
+    if (!nameRef.current) {
       return;
     }
 
-    gsap.fromTo(
-      achievementRef.current,
-      { autoAlpha: 0, y: 14, filter: "blur(6px)" },
-      {
-        autoAlpha: 1,
-        y: 0,
-        filter: "blur(0px)",
-        duration: 0.5,
-        ease: "power3.out",
-      }
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isTouchDevice =
+      window.matchMedia("(hover: none), (pointer: coarse)").matches ||
+      navigator.maxTouchPoints > 0;
+
+    if (prefersReducedMotion || isTouchDevice) {
+      return;
+    }
+
+    const nameNode = nameRef.current;
+    const letters = letterRefs.current.filter(
+      (letter): letter is HTMLSpanElement => Boolean(letter)
     );
-  }, [achievementIdx]);
+
+    if (letters.length === 0) {
+      return;
+    }
+
+    const handleMove = (event: PointerEvent) => {
+      letters.forEach((letter) => {
+        const rect = letter.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const deltaX = event.clientX - centerX;
+        const deltaY = event.clientY - centerY;
+        const distance = Math.hypot(deltaX, deltaY);
+        const strength = Math.max(0, 1 - distance / 180);
+
+        gsap.to(letter, {
+          x: deltaX * 0.12 * strength,
+          y: deltaY * 0.1 * strength,
+          rotationZ: deltaX * 0.015 * strength,
+          duration: 0.32,
+          ease: "power3.out",
+          overwrite: "auto",
+        });
+      });
+    };
+
+    const handleLeave = () => {
+      gsap.to(letters, {
+        x: 0,
+        y: 0,
+        rotationZ: 0,
+        duration: 0.6,
+        ease: "elastic.out(1, 0.45)",
+        stagger: 0.01,
+        overwrite: "auto",
+      });
+    };
+
+    nameNode.addEventListener("pointermove", handleMove);
+    nameNode.addEventListener("pointerleave", handleLeave);
+
+    return () => {
+      nameNode.removeEventListener("pointermove", handleMove);
+      nameNode.removeEventListener("pointerleave", handleLeave);
+    };
+  }, []);
 
   useGSAP(
     () => {
@@ -84,9 +138,7 @@ export default function Hero() {
         filter: "blur(10px)",
       });
       gsap.set(
-        q(
-          "[data-hero-badge], [data-hero-subtitle], [data-hero-achievement], [data-hero-quote], [data-hero-card], [data-hero-cta], [data-hero-social]"
-        ),
+        q("[data-hero-badge], [data-hero-subtitle], [data-hero-quote], [data-hero-cta], [data-hero-social]"),
         { autoAlpha: 0, y: 24 }
       );
       gsap.set(q("[data-hero-quote-word]"), {
@@ -110,10 +162,10 @@ export default function Hero() {
             duration: 1.1,
             stagger: 0.045,
           },
-          "-=0.1"
+          "-=0.08"
         )
         .to(
-          q("[data-hero-subtitle], [data-hero-achievement], [data-hero-quote]"),
+          q("[data-hero-subtitle], [data-hero-quote]"),
           {
             autoAlpha: 1,
             y: 0,
@@ -123,16 +175,6 @@ export default function Hero() {
           "-=0.7"
         )
         .to(
-          q("[data-hero-card]"),
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.75,
-            stagger: 0.08,
-          },
-          "-=0.45"
-        )
-        .to(
           q("[data-hero-cta], [data-hero-social]"),
           {
             autoAlpha: 1,
@@ -140,7 +182,7 @@ export default function Hero() {
             duration: 0.55,
             stagger: 0.08,
           },
-          "-=0.3"
+          "-=0.35"
         );
 
       gsap.to(contentRef.current, {
@@ -219,7 +261,7 @@ export default function Hero() {
           <a
             data-hero-badge
             href="mailto:arajsinha4@gmail.com"
-            className="signature-pill inline-flex items-center gap-3 rounded-full px-6 py-3 text-sm font-semibold tracking-[0.18em] uppercase backdrop-blur-xl transition-transform duration-300 hover:-translate-y-0.5"
+            className="signature-pill inline-flex items-center gap-3 rounded-full px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] backdrop-blur-xl transition-transform duration-300 hover:-translate-y-0.5"
           >
             <span className="relative flex h-2.5 w-2.5">
               <span
@@ -238,26 +280,39 @@ export default function Hero() {
           </a>
 
           <div className="flex flex-col items-center gap-6">
-            <h1 className="display-title text-[clamp(4.35rem,11vw,8rem)] font-black leading-[0.88] text-white">
-              <span className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-                {nameParts.map((part) => (
-                  <span
-                    key={part.word}
-                    className={`inline-flex overflow-hidden ${part.accent ? "text-gradient" : ""}`}
-                  >
-                    {Array.from(part.word).map((letter, index) => (
-                      <span
-                        key={`${part.word}-${index}`}
-                        data-hero-letter
-                        className="inline-block will-change-transform"
-                      >
-                        {letter}
-                      </span>
-                    ))}
-                  </span>
-                ))}
-              </span>
-            </h1>
+            <div ref={nameRef} className="group relative">
+              <div className="pointer-events-none absolute inset-x-[10%] bottom-[10%] h-12 rounded-full bg-[rgba(99,102,241,0.18)] blur-[44px] transition-opacity duration-500 group-hover:opacity-100" />
+              <h1 className="display-title relative text-[clamp(4.8rem,13vw,9.4rem)] font-black uppercase leading-[0.84] text-white">
+                <span className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+                  {nameParts.map((part, partIndex) => (
+                    <span
+                      key={part.word}
+                      className={`inline-flex overflow-hidden ${part.accent ? "text-gradient" : ""}`}
+                    >
+                      {Array.from(part.word).map((letter, index) => {
+                        const letterIndex =
+                          nameParts
+                            .slice(0, partIndex)
+                            .reduce((total, item) => total + item.word.length, 0) + index;
+
+                        return (
+                          <span
+                            key={`${part.word}-${index}`}
+                            ref={(element) => {
+                              letterRefs.current[letterIndex] = element;
+                            }}
+                            data-hero-letter
+                            className="inline-block will-change-transform"
+                          >
+                            {letter}
+                          </span>
+                        );
+                      })}
+                    </span>
+                  ))}
+                </span>
+              </h1>
+            </div>
 
             <div className="flex flex-col items-center gap-3">
               <h2
@@ -266,31 +321,6 @@ export default function Hero() {
               >
                 Full-Stack Developer &amp; AI Engineer
               </h2>
-
-              <div className="mt-1 h-8 overflow-hidden">
-                <div
-                  ref={achievementRef}
-                  data-hero-achievement
-                  className="flex flex-wrap items-center justify-center gap-2 text-center text-sm font-medium sm:gap-3 sm:text-base"
-                  style={{ color: "var(--secondary-accent)" }}
-                >
-                  <span
-                    className="hidden h-px w-8 sm:block"
-                    style={{
-                      background:
-                        "linear-gradient(90deg, transparent, var(--secondary-accent))",
-                    }}
-                  />
-                  <span>{achievements[achievementIdx]}</span>
-                  <span
-                    className="hidden h-px w-8 sm:block"
-                    style={{
-                      background:
-                        "linear-gradient(270deg, transparent, var(--secondary-accent))",
-                    }}
-                  />
-                </div>
-              </div>
 
               <p
                 data-hero-quote
@@ -311,74 +341,10 @@ export default function Hero() {
             </div>
           </div>
 
-          <div className="mx-auto mt-6 grid max-w-[58rem] gap-4 text-left sm:grid-cols-2 md:grid-cols-3 md:gap-5">
-            <div
-              data-hero-card
-              className="card card-geo-accent group relative flex flex-col justify-center rounded-2xl border border-white/8 bg-slate-900/40 p-6 backdrop-blur-md transition-all hover:bg-slate-800/60 sm:col-span-2 md:col-span-2 md:p-8"
-            >
-              <div
-                className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                style={{
-                  background:
-                    "linear-gradient(145deg, rgba(99, 102, 241, 0.12), rgba(124, 58, 237, 0.06))",
-                }}
-              />
-              <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
-                <Brain size={24} style={{ color: "var(--signature)" }} /> Product &amp; AI
-              </h3>
-              <p className="measure-copy text-base leading-[1.8] text-slate-400">
-                Top <strong className="font-medium text-slate-200">0.4% competitive programmer</strong> on LeetCode who builds AI products that solve real problems. I&apos;m drawn to challenges at the intersection of <strong className="font-medium text-slate-200">LLMs and RAG systems</strong> in healthcare, law, and finance.
-              </p>
-            </div>
-
-            <div
-              data-hero-card
-              className="card card-geo-accent group relative flex flex-col justify-center rounded-2xl border border-white/8 bg-slate-900/40 p-6 backdrop-blur-md transition-all hover:bg-slate-800/60 md:p-8"
-            >
-              <div
-                className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                style={{
-                  background:
-                    "linear-gradient(145deg, rgba(45, 212, 191, 0.12), rgba(99, 102, 241, 0.06))",
-                }}
-              />
-              <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
-                <Zap size={24} style={{ color: "var(--secondary-accent)" }} /> Philosophy
-              </h3>
-              <p className="measure-copy text-base leading-[1.8] text-slate-400">
-                I approach every project the way I approach competitive programming: find the <strong className="font-medium text-slate-200">most elegant solution</strong>, then make it fast.
-              </p>
-            </div>
-
-            <div
-              data-hero-card
-              className="card card-geo-accent group relative flex flex-col justify-center rounded-2xl border border-white/8 bg-slate-900/40 p-6 backdrop-blur-md transition-all hover:bg-slate-800/60 sm:col-span-2 md:col-span-3 md:p-8"
-            >
-              <div
-                className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                style={{
-                  background:
-                    "linear-gradient(145deg, rgba(124, 58, 237, 0.12), rgba(99, 102, 241, 0.06))",
-                }}
-              />
-              <h3 className="mb-4 flex items-center gap-3 text-xl font-semibold text-white">
-                <Code2 size={24} style={{ color: "var(--accent-ultraviolet)" }} /> Current Focus
-              </h3>
-              <p className="measure-copy text-base leading-[1.8] text-slate-400">
-                Currently exploring <strong className="font-medium text-slate-200">LangChain and Azure</strong>, contributing to open source, and building something new with production-ready AI workflows.
-              </p>
-            </div>
-          </div>
-
-          <div
-            data-hero-cta
-            className="mt-6 flex flex-wrap items-center justify-center gap-7"
-          >
+          <div data-hero-cta className="mt-2 flex flex-wrap items-center justify-center gap-7">
             <MagneticButton intensity={0.34} range={150}>
               <a
-                href="https://github.com/Aditgm"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#projects"
                 className="signature-button group relative inline-flex items-center gap-3 overflow-hidden whitespace-nowrap rounded-xl px-10 py-5 text-base font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:scale-105"
               >
                 <span
@@ -387,10 +353,14 @@ export default function Hero() {
                 />
                 <span className="relative flex items-center gap-3">
                   View Projects
-                  <ArrowUpRight size={18} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <ArrowUpRight
+                    size={18}
+                    className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  />
                 </span>
               </a>
             </MagneticButton>
+
             <MagneticButton intensity={0.3} range={140}>
               <a
                 href="#contact"
@@ -404,36 +374,36 @@ export default function Hero() {
             </MagneticButton>
           </div>
 
-          <div
-            data-hero-social
-            className="mt-2 flex flex-wrap items-center justify-center gap-8 text-[0.9rem] font-medium text-slate-500"
-          >
-            <a
-              href="https://github.com/Aditgm"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 transition-all duration-300 hover:text-white"
-            >
-              <Github size={18} /> GitHub
-            </a>
-            <span className="hidden h-4 w-px bg-slate-700 sm:block" />
-            <a
-              href="https://leetcode.com/u/adityagm/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-all duration-300 hover:text-amber-300"
-            >
-              LeetCode
-            </a>
-            <span className="hidden h-4 w-px bg-slate-700 sm:block" />
-            <a
-              href="https://codeforces.com/profile/aditya2005"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-all duration-300 hover:text-orange-300"
-            >
-              Codeforces
-            </a>
+          <div data-hero-social className="mt-2 flex flex-wrap items-center justify-center gap-4">
+            {socialLinks.map((link) => {
+              const Icon = link.icon;
+
+              return (
+                <MagneticButton key={link.label} intensity={0.22} range={110}>
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={link.label}
+                    className="group relative inline-flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white/[0.06] text-slate-200 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:text-white"
+                    style={{
+                      boxShadow: `0 18px 36px -24px ${link.glow}`,
+                    }}
+                  >
+                    <span
+                      className="absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                      style={{
+                        background: `radial-gradient(circle, ${link.glow} 0%, transparent 68%)`,
+                      }}
+                    />
+                    <Icon
+                      size={18}
+                      className="relative z-10 transition-transform duration-300 group-hover:scale-110"
+                    />
+                  </a>
+                </MagneticButton>
+              );
+            })}
           </div>
         </div>
       </div>

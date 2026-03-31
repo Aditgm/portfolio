@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { Brain, Code2, Sparkles } from "lucide-react";
 import { useGSAP } from "@/hooks/useGSAP";
 
 interface Stat {
@@ -77,6 +78,30 @@ const contestHighlights = [
     bg: "from-orange-500/15 to-orange-500/5",
     borderAccent: "border-orange-500/10 hover:border-orange-500/30",
     glow: "group-hover:shadow-[0_0_40px_rgba(249,115,22,0.08)]",
+  },
+];
+
+const aboutCards = [
+  {
+    title: "Product + AI",
+    copy:
+      "Top 0.4% competitive programmer on LeetCode building AI products that solve real problems. Most of my work sits at the intersection of LLMs, retrieval, and interfaces people can actually use.",
+    icon: Brain,
+    accent: "rgba(99, 102, 241, 0.16)",
+  },
+  {
+    title: "Engineering Philosophy",
+    copy:
+      "I approach products the way I approach contests: reduce the problem, find the elegant path, then make the system fast enough to feel obvious.",
+    icon: Sparkles,
+    accent: "rgba(45, 212, 191, 0.16)",
+  },
+  {
+    title: "Current Focus",
+    copy:
+      "Right now that means production-minded AI workflows, stronger frontend motion, and building systems that feel polished without becoming fragile.",
+    icon: Code2,
+    accent: "rgba(124, 58, 237, 0.16)",
   },
 ];
 
@@ -300,15 +325,50 @@ export default function Stats() {
       <div className="pointer-events-none absolute right-0 top-0 h-[300px] w-[300px] rounded-full bg-blue-600/[0.04] blur-[100px]" />
 
       <div className="section-inner">
-        <div ref={headerRef} className="mb-14 max-w-2xl">
-          <p className="section-label mb-4">By the Numbers</p>
+        <div ref={headerRef} className="mb-14 max-w-3xl">
+          <p className="section-label mb-4">About</p>
           <h2 className="section-title">
-            Competitive <span className="text-gradient-static">Programming</span>
+            Building products with <span className="text-gradient-static">speed and taste</span>
           </h2>
           <p className="measure-copy mt-6 text-sm leading-7 text-slate-400 md:text-base md:leading-8">
-            Consistently ranked among the top competitive programmers globally across
-            all major platforms.
+            I build full-stack products with an AI-first lens, using competitive-programming
+            rigor to keep the systems clean, fast, and worth shipping.
           </p>
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-3">
+          {aboutCards.map((card) => {
+            const Icon = card.icon;
+
+            return (
+              <div
+                key={card.title}
+                className="card card-geo-accent border-trace group relative overflow-hidden p-8"
+              >
+                <div
+                  className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  style={{
+                    background: `linear-gradient(145deg, ${card.accent}, transparent 72%)`,
+                  }}
+                />
+                <div className="relative z-10">
+                  <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.04]">
+                    <Icon size={20} style={{ color: "var(--signature)" }} />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white">{card.title}</h3>
+                  <p className="mt-4 text-sm leading-7 text-slate-400">{card.copy}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mb-10 mt-16 flex items-center gap-5">
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+          <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-5 py-1.5 font-mono text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-slate-500">
+            By the Numbers
+          </span>
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
         </div>
 
         <div ref={gridRef} className="grid grid-cols-2 gap-6 lg:grid-cols-4 lg:gap-8">
