@@ -1,13 +1,18 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowDown, ArrowUpRight, Brain, Code2, Github, Mail, Zap } from "lucide-react";
-import Hero3DBackground from "./Hero3DBackground";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
+
+const Hero3DBackground = dynamic(() => import("./Hero3DBackground"), {
+  ssr: false,
+  loading: () => null,
+});
 
 const achievements = [
   "Top 0.4% on LeetCode · Guardian",
@@ -168,13 +173,13 @@ export default function Hero() {
     >
       <div ref={backgroundLayerRef} className="absolute inset-0">
         <Hero3DBackground containerRef={sectionRef} />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(96,165,250,0.16),transparent_42%),radial-gradient(circle_at_78%_62%,rgba(192,132,252,0.14),transparent_24%),linear-gradient(180deg,rgba(2,6,23,0.22),rgba(2,6,23,0.72)_62%,rgba(2,6,23,0.92))]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(125,152,184,0.14),transparent_42%),radial-gradient(circle_at_78%_62%,rgba(94,133,154,0.1),transparent_24%),linear-gradient(180deg,rgba(2,6,23,0.26),rgba(2,6,23,0.74)_62%,rgba(2,6,23,0.92))]" />
       </div>
 
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-[14%] top-[14%] h-64 w-64 rounded-full bg-cyan-500/10 blur-[120px]" />
-        <div className="absolute right-[10%] top-[22%] h-80 w-80 rounded-full bg-violet-500/12 blur-[140px]" />
-        <div className="absolute bottom-[8%] left-1/2 h-56 w-[36rem] -translate-x-1/2 rounded-full bg-blue-500/8 blur-[110px]" />
+        <div className="absolute left-[14%] top-[14%] h-64 w-64 rounded-full bg-sky-400/8 blur-[120px]" />
+        <div className="absolute right-[10%] top-[22%] h-80 w-80 rounded-full bg-slate-400/10 blur-[140px]" />
+        <div className="absolute bottom-[8%] left-1/2 h-56 w-[36rem] -translate-x-1/2 rounded-full bg-cyan-400/6 blur-[110px]" />
       </div>
 
       <div ref={contentRef} className="relative z-10 mx-auto max-w-5xl text-center">

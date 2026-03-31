@@ -1,6 +1,6 @@
 "use client";
 
-import { RefObject, useEffect, useMemo, useRef } from "react";
+import { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Float, Stars } from "@react-three/drei";
 import * as THREE from "three";
@@ -10,6 +10,26 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 
 type Hero3DBackgroundProps = {
   containerRef?: RefObject<HTMLElement | null>;
+};
+
+type QualityTier = "low" | "medium" | "high";
+
+type SceneQuality = {
+  tier: QualityTier;
+  particleCount: number;
+  starCount: number;
+  dpr: [number, number];
+  antialias: boolean;
+  enableBloom: boolean;
+  enableEnvironment: boolean;
+  enableMouseTracking: boolean;
+  ringSegments: number;
+  torusSegments: [number, number];
+  bloom: {
+    strength: number;
+    radius: number;
+    threshold: number;
+  };
 };
 
 type ParticleConfig = {
@@ -23,35 +43,141 @@ type ParticleConfig = {
   floatIntensity: number;
 };
 
+type NavigatorWithDeviceMemory = Navigator & {
+  deviceMemory?: number;
+};
+
 const PALETTE = [
-  { color: "#60a5fa", emissive: "#1d4ed8" },
-  { color: "#22d3ee", emissive: "#0891b2" },
-  { color: "#c084fc", emissive: "#7c3aed" },
-  { color: "#f472b6", emissive: "#db2777" },
+  { color: "#8ea8c4", emissive: "#4a6179" },
+  { color: "#7ba7ad", emissive: "#41656c" },
+  { color: "#9b9ec4", emissive: "#555a80" },
+  { color: "#90b8c9", emissive: "#4f6f7d" },
 ];
+
+const QUALITY_PRESETS: Record<QualityTier, SceneQuality> = {
+  low: {
+    tier: "low",
+    particleCount: 8,
+    starCount: 700,
+    dpr: [0.75, 1],
+    antialias: false,
+    enableBloom: false,
+    enableEnvironment: false,
+    enableMouseTracking: false,
+    ringSegments: 48,
+    torusSegments: [42, 8],
+    bloom: {
+      strength: 0,
+      radius: 0,
+      threshold: 1,
+    },
+  },
+  medium: {
+    tier: "medium",
+    particleCount: 12,
+    starCount: 1100,
+    dpr: [1, 1.15],
+    antialias: false,
+    enableBloom: true,
+    enableEnvironment: false,
+    enableMouseTracking: true,
+    ringSegments: 64,
+    torusSegments: [56, 10],
+    bloom: {
+      strength: 0.42,
+      radius: 0.5,
+      threshold: 0.28,
+    },
+  },
+  high: {
+    tier: "high",
+    particleCount: 18,
+    starCount: 1600,
+    dpr: [1, 1.35],
+    antialias: true,
+    enableBloom: true,
+    enableEnvironment: true,
+    enableMouseTracking: true,
+    ringSegments: 80,
+    torusSegments: [72, 12],
+    bloom: {
+      strength: 0.58,
+      radius: 0.58,
+      threshold: 0.24,
+    },
+  },
+};
 
 function seededValue(seed: number) {
   const x = Math.sin(seed * 127.1) * 43758.5453123;
   return x - Math.floor(x);
 }
 
-function GlowComposer() {
+function resolveSceneQuality(): SceneQuality {
+  if (typeof window === "undefined") {
+    return QUALITY_PRESETS.medium;
+  }
+
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isMobile = window.matchMedia("(max-width: 767px)").matches;
+  const navigatorWithMemory = navigator as NavigatorWithDeviceMemory;
+  const deviceMemory = navigatorWithMemory.deviceMemory ?? 4;
+  const hardwareConcurrency = navigator.hardwareConcurrency ?? 4;
+
+  if (prefersReducedMotion || isMobile || deviceMemory <= 4 || hardwareConcurrency <= 4) {
+    return QUALITY_PRESETS.low;
+  }
+
+  if (window.innerWidth < 1280 || deviceMemory <= 8 || hardwareConcurrency <= 8) {
+    return QUALITY_PRESETS.medium;
+  }
+
+  return QUALITY_PRESETS.high;
+}
+
+function useSceneQuality() {
+  const [quality, setQuality] = useState<SceneQuality>(() => resolveSceneQuality());
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateQuality = () => setQuality(resolveSceneQuality());
+
+    updateQuality();
+    window.addEventListener("resize", updateQuality, { passive: true });
+    mediaQuery.addEventListener("change", updateQuality);
+
+    return () => {
+      window.removeEventListener("resize", updateQuality);
+      mediaQuery.removeEventListener("change", updateQuality);
+    };
+  }, []);
+
+  return quality;
+}
+
+function GlowComposer({ quality }: { quality: SceneQuality }) {
   const { gl, scene, camera, size } = useThree();
   const composerRef = useRef<EffectComposer | null>(null);
 
   useEffect(() => {
+    if (!quality.enableBloom) {
+      composerRef.current?.dispose();
+      composerRef.current = null;
+      return;
+    }
+
     const composer = new EffectComposer(gl);
     const renderPass = new RenderPass(scene, camera);
     const bloomPass = new UnrealBloomPass(
       new THREE.Vector2(size.width, size.height),
-      1.15,
-      0.8,
-      0.18
+      quality.bloom.strength,
+      quality.bloom.radius,
+      quality.bloom.threshold
     );
 
-    bloomPass.threshold = 0.08;
-    bloomPass.strength = 1.1;
-    bloomPass.radius = 0.75;
+    bloomPass.threshold = quality.bloom.threshold;
+    bloomPass.strength = quality.bloom.strength;
+    bloomPass.radius = quality.bloom.radius;
 
     composer.addPass(renderPass);
     composer.addPass(bloomPass);
@@ -61,28 +187,39 @@ function GlowComposer() {
       composer.dispose();
       composerRef.current = null;
     };
-  }, [camera, gl, scene, size.height, size.width]);
+  }, [camera, gl, quality, scene, size.height, size.width]);
 
   useEffect(() => {
+    if (!quality.enableBloom) {
+      return;
+    }
+
     composerRef.current?.setSize(size.width, size.height);
-  }, [size.height, size.width]);
+  }, [quality.enableBloom, size.height, size.width]);
 
   useFrame(() => {
+    if (!quality.enableBloom) {
+      return;
+    }
+
     composerRef.current?.render();
   }, 1);
 
   return null;
 }
 
-function FloatingParticles({ sceneRef }: { sceneRef: RefObject<THREE.Group | null> }) {
+function FloatingParticles({
+  quality,
+  sceneRef,
+}: {
+  quality: SceneQuality;
+  sceneRef: RefObject<THREE.Group | null>;
+}) {
   const particles = useMemo<ParticleConfig[]>(() => {
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-    const count = isMobile ? 14 : 24;
-
-    return Array.from({ length: count }, (_, index) => {
+    return Array.from({ length: quality.particleCount }, (_, index) => {
       const palette = PALETTE[index % PALETTE.length];
       const radius = 2.2 + seededValue(index + 1) * 4.6;
-      const angle = (index / count) * Math.PI * 2;
+      const angle = (index / quality.particleCount) * Math.PI * 2;
       const vertical = (seededValue(index + 11) - 0.5) * 4.6;
       const offset = (seededValue(index + 21) - 0.5) * 1.5;
 
@@ -97,34 +234,36 @@ function FloatingParticles({ sceneRef }: { sceneRef: RefObject<THREE.Group | nul
           seededValue(index + 41) * Math.PI,
           seededValue(index + 51) * Math.PI,
         ],
-        scale: 0.18 + seededValue(index + 61) * (isMobile ? 0.32 : 0.48),
+        scale:
+          0.18 +
+          seededValue(index + 61) * (quality.tier === "low" ? 0.22 : quality.tier === "medium" ? 0.32 : 0.42),
         color: palette.color,
         emissive: palette.emissive,
         shape: seededValue(index + 71) > 0.45 ? "icosahedron" : "torus",
-        speed: 0.45 + seededValue(index + 81) * 1.15,
-        floatIntensity: 0.35 + seededValue(index + 91) * 1.1,
+        speed: 0.32 + seededValue(index + 81) * 0.82,
+        floatIntensity: 0.22 + seededValue(index + 91) * 0.55,
       };
     });
-  }, []);
+  }, [quality]);
 
   return (
     <group ref={sceneRef}>
       <Stars
         radius={90}
         depth={40}
-        count={2600}
-        factor={3.5}
+        count={quality.starCount}
+        factor={3}
         saturation={0}
         fade
-        speed={0.45}
+        speed={quality.tier === "low" ? 0.18 : 0.28}
       />
 
       <mesh position={[0, -1.6, -6.5]} rotation={[Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[4.8, 6.8, 96]} />
+        <ringGeometry args={[4.8, 6.8, quality.ringSegments]} />
         <meshBasicMaterial
-          color="#60a5fa"
+          color="#7c97b6"
           transparent
-          opacity={0.08}
+          opacity={0.05}
           side={THREE.DoubleSide}
         />
       </mesh>
@@ -133,9 +272,9 @@ function FloatingParticles({ sceneRef }: { sceneRef: RefObject<THREE.Group | nul
         <Float
           key={`${particle.shape}-${index}`}
           speed={particle.speed}
-          rotationIntensity={1.2}
+          rotationIntensity={quality.tier === "high" ? 0.85 : 0.55}
           floatIntensity={particle.floatIntensity}
-          floatingRange={[-0.45, 0.45]}
+          floatingRange={quality.tier === "low" ? [-0.22, 0.22] : [-0.32, 0.32]}
         >
           <mesh
             position={particle.position}
@@ -145,14 +284,16 @@ function FloatingParticles({ sceneRef }: { sceneRef: RefObject<THREE.Group | nul
             {particle.shape === "icosahedron" ? (
               <icosahedronGeometry args={[1, 0]} />
             ) : (
-              <torusKnotGeometry args={[0.55, 0.18, 96, 14]} />
+              <torusKnotGeometry
+                args={[0.55, 0.18, quality.torusSegments[0], quality.torusSegments[1]]}
+              />
             )}
             <meshStandardMaterial
               color={particle.color}
               emissive={particle.emissive}
-              emissiveIntensity={1.4}
-              metalness={0.7}
-              roughness={0.18}
+              emissiveIntensity={0.62}
+              metalness={0.5}
+              roughness={0.42}
             />
           </mesh>
         </Float>
@@ -163,16 +304,24 @@ function FloatingParticles({ sceneRef }: { sceneRef: RefObject<THREE.Group | nul
 
 function CameraRig({
   containerRef,
+  quality,
   sceneRef,
 }: {
   containerRef?: RefObject<HTMLElement | null>;
+  quality: SceneQuality;
   sceneRef: RefObject<THREE.Group | null>;
 }) {
   const { camera, clock } = useThree();
   const mouseRef = useRef({ x: 0, y: 0 });
   const scrollRef = useRef(0);
+  const cameraTargetRef = useRef(new THREE.Vector3());
 
   useEffect(() => {
+    if (!quality.enableMouseTracking) {
+      mouseRef.current = { x: 0, y: 0 };
+      return;
+    }
+
     const handleMouseMove = (event: MouseEvent) => {
       mouseRef.current.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouseRef.current.y = (event.clientY / window.innerHeight) * 2 - 1;
@@ -183,7 +332,7 @@ function CameraRig({
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, []);
+  }, [quality.enableMouseTracking]);
 
   useFrame(() => {
     const targetScroll = (() => {
@@ -202,21 +351,19 @@ function CameraRig({
     const mouseY = mouseRef.current.y;
     const t = clock.elapsedTime;
 
-    camera.position.lerp(
-      new THREE.Vector3(
-        mouseX * 0.85,
-        mouseY * 0.4 + scrollRef.current * 0.55,
-        7 + scrollRef.current * 3.4
-      ),
-      0.045
+    cameraTargetRef.current.set(
+      mouseX * (quality.tier === "high" ? 0.7 : 0.48),
+      mouseY * (quality.tier === "high" ? 0.34 : 0.22) + scrollRef.current * 0.45,
+      7 + scrollRef.current * 3
     );
+    camera.position.lerp(cameraTargetRef.current, quality.tier === "high" ? 0.045 : 0.035);
     camera.rotation.set(
       camera.rotation.x,
       camera.rotation.y,
       THREE.MathUtils.lerp(
         camera.rotation.z,
-        -mouseX * 0.045 - scrollRef.current * 0.055,
-        0.035
+        -mouseX * 0.03 - scrollRef.current * 0.04,
+        quality.tier === "high" ? 0.035 : 0.028
       )
     );
     camera.lookAt(0, 0, 0);
@@ -227,65 +374,75 @@ function CameraRig({
 
     sceneRef.current.rotation.x = THREE.MathUtils.lerp(
       sceneRef.current.rotation.x,
-      -0.2 + mouseY * 0.14 + scrollRef.current * 0.18,
-      0.04
+      -0.16 + mouseY * 0.08 + scrollRef.current * 0.14,
+      quality.tier === "high" ? 0.04 : 0.03
     );
     sceneRef.current.rotation.y = THREE.MathUtils.lerp(
       sceneRef.current.rotation.y,
-      t * 0.04 + mouseX * 0.22 + scrollRef.current * 0.36,
-      0.035
+      t * 0.026 + mouseX * 0.14 + scrollRef.current * 0.24,
+      quality.tier === "high" ? 0.035 : 0.028
     );
     sceneRef.current.position.y = THREE.MathUtils.lerp(
       sceneRef.current.position.y,
-      -scrollRef.current * 0.85,
-      0.04
+      -scrollRef.current * 0.72,
+      quality.tier === "high" ? 0.04 : 0.03
     );
   });
 
   return null;
 }
 
-function Scene({ containerRef }: Hero3DBackgroundProps) {
+function Scene({
+  containerRef,
+  quality,
+}: Hero3DBackgroundProps & {
+  quality: SceneQuality;
+}) {
   const sceneRef = useRef<THREE.Group>(null);
 
   return (
     <>
       <color attach="background" args={["#020617"]} />
       <fog attach="fog" args={["#020617", 8, 18]} />
-      <ambientLight intensity={0.6} color="#dbeafe" />
-      <pointLight position={[4, 2, 4]} intensity={22} color="#60a5fa" distance={18} />
-      <pointLight position={[-5, -2, 2]} intensity={14} color="#c084fc" distance={16} />
+      <ambientLight intensity={0.48} color="#d9e5ef" />
+      <pointLight position={[4, 2, 4]} intensity={quality.tier === "high" ? 14 : 10} color="#8ea8c4" distance={16} />
+      <pointLight position={[-5, -2, 2]} intensity={quality.tier === "high" ? 8 : 6} color="#91a8ba" distance={14} />
       <spotLight
         position={[0, 6, 8]}
-        intensity={18}
+        intensity={quality.tier === "high" ? 10 : 7}
         angle={0.4}
         penumbra={0.7}
-        color="#67e8f9"
+        color="#87aeb7"
       />
-      <Environment preset="night" />
-      <FloatingParticles sceneRef={sceneRef} />
-      <CameraRig containerRef={containerRef} sceneRef={sceneRef} />
-      <GlowComposer />
+      {quality.enableEnvironment ? <Environment preset="night" /> : null}
+      <FloatingParticles quality={quality} sceneRef={sceneRef} />
+      <CameraRig containerRef={containerRef} quality={quality} sceneRef={sceneRef} />
+      <GlowComposer quality={quality} />
     </>
   );
 }
 
 export default function Hero3DBackground({ containerRef }: Hero3DBackgroundProps) {
+  const quality = useSceneQuality();
+
   return (
     <div className="pointer-events-none absolute inset-0 z-0">
       <Canvas
         camera={{ position: [0, 0.15, 7], fov: 48 }}
-        dpr={[1, 1.5]}
+        dpr={quality.dpr}
+        performance={{ min: 0.65 }}
         gl={{
           alpha: true,
-          antialias: true,
+          antialias: quality.antialias,
+          depth: true,
           powerPreference: "high-performance",
+          stencil: false,
         }}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
         }}
       >
-        <Scene containerRef={containerRef} />
+        <Scene containerRef={containerRef} quality={quality} />
       </Canvas>
     </div>
   );
