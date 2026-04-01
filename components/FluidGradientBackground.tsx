@@ -9,9 +9,9 @@ type Palette = {
 };
 
 const palettes: Palette[] = [
-  { id: 0, name: "Aurora", swatch: "linear-gradient(135deg,#3f52bf,#2f8f97,#7052a8)" },
-  { id: 1, name: "Ocean Glass", swatch: "linear-gradient(135deg,#2f57b2,#2f7aa8,#2aa08a)" },
-  { id: 2, name: "Sunset Mist", swatch: "linear-gradient(135deg,#8f4468,#93623d,#4d57a8)" },
+  { id: 0, name: "Midnight", swatch: "linear-gradient(135deg,#1a1a2e,#2d2d44,#3d3d5c)" },
+  { id: 1, name: "Slate", swatch: "linear-gradient(135deg,#0f172a,#1e293b,#334155)" },
+  { id: 2, name: "Graphite", swatch: "linear-gradient(135deg,#18181b,#27272a,#3f3f46)" },
 ];
 
 const vertexShaderSource = `
@@ -95,10 +95,11 @@ float fbm(vec2 p) {
 }
 
 vec3 paletteA(float t) {
-  vec3 c1 = vec3(0.05, 0.07, 0.18);
-  vec3 c2 = vec3(0.16, 0.28, 0.62);
-  vec3 c3 = vec3(0.14, 0.48, 0.50);
-  vec3 c4 = vec3(0.38, 0.30, 0.62);
+  // Midnight - dark greyish premium
+  vec3 c1 = vec3(0.02, 0.02, 0.05);
+  vec3 c2 = vec3(0.08, 0.08, 0.14);
+  vec3 c3 = vec3(0.12, 0.12, 0.20);
+  vec3 c4 = vec3(0.18, 0.18, 0.26);
 
   vec3 base = mix(c1, c2, smoothstep(0.0, 0.36, t));
   base = mix(base, c3, smoothstep(0.28, 0.7, t));
@@ -106,10 +107,11 @@ vec3 paletteA(float t) {
 }
 
 vec3 paletteB(float t) {
-  vec3 c1 = vec3(0.03, 0.08, 0.18);
-  vec3 c2 = vec3(0.12, 0.30, 0.62);
-  vec3 c3 = vec3(0.12, 0.45, 0.72);
-  vec3 c4 = vec3(0.14, 0.56, 0.52);
+  // Slate - cool dark grey
+  vec3 c1 = vec3(0.02, 0.04, 0.06);
+  vec3 c2 = vec3(0.05, 0.08, 0.12);
+  vec3 c3 = vec3(0.08, 0.12, 0.18);
+  vec3 c4 = vec3(0.10, 0.15, 0.22);
 
   vec3 base = mix(c1, c2, smoothstep(0.0, 0.34, t));
   base = mix(base, c3, smoothstep(0.22, 0.66, t));
@@ -117,10 +119,11 @@ vec3 paletteB(float t) {
 }
 
 vec3 paletteC(float t) {
-  vec3 c1 = vec3(0.10, 0.06, 0.16);
-  vec3 c2 = vec3(0.26, 0.18, 0.56);
-  vec3 c3 = vec3(0.56, 0.26, 0.36);
-  vec3 c4 = vec3(0.60, 0.42, 0.26);
+  // Graphite - warm dark grey
+  vec3 c1 = vec3(0.03, 0.03, 0.04);
+  vec3 c2 = vec3(0.08, 0.07, 0.08);
+  vec3 c3 = vec3(0.14, 0.12, 0.12);
+  vec3 c4 = vec3(0.18, 0.16, 0.15);
 
   vec3 base = mix(c1, c2, smoothstep(0.0, 0.36, t));
   base = mix(base, c3, smoothstep(0.3, 0.7, t));
