@@ -40,7 +40,7 @@ const projects: ProjectItem[] = [
       },
       {
         label: "Result",
-        text: "Empowered 2,000+ students with instant access to 5,000+ questions across 30+ subjects, improving exam readiness by 40%.",
+        text: "Empowered 15+ students with instant access to 5,000+ questions across 30+ subjects, improving exam readiness by 40%.",
       },
     ],
     highlights: [
