@@ -73,6 +73,8 @@ export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const indicatorRef = useRef<HTMLButtonElement>(null);
+  const isVisibleRef = useRef(true);
+  const rafIdRef = useRef<number | null>(null);
 
   const typewriterText = useTypewriter(rolePhrases);
 
@@ -138,6 +140,11 @@ export default function Hero() {
     };
 
     const drawRain = () => {
+      // Pause animation when hero is not visible to reduce CPU usage
+      if (!isVisibleRef.current) {
+        return;
+      }
+
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
 
@@ -160,7 +167,10 @@ export default function Hero() {
         drops[index] += 1;
       }
 
-      animationFrame = window.requestAnimationFrame(drawRain);
+      // Only schedule next frame if visible
+      if (isVisibleRef.current) {
+        animationFrame = window.requestAnimationFrame(drawRain);
+      }
     };
 
     setupCanvas();
@@ -168,8 +178,24 @@ export default function Hero() {
     if (prefersReducedMotion) {
       drawStatic();
     } else {
-      drawRain();
+      // Start animation loop - will be gated by isVisibleRef
+      animationFrame = window.requestAnimationFrame(drawRain);
     }
+
+    // IntersectionObserver to pause/resume animation based on hero visibility
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        isVisibleRef.current = entry.isIntersecting;
+
+        // Resume animation when hero comes back into view
+        if (entry.isIntersecting && !prefersReducedMotion && !rafIdRef.current) {
+          rafIdRef.current = window.requestAnimationFrame(drawRain);
+        }
+      },
+      { threshold: 0 }
+    );
+    observer.observe(canvas);
 
     const onResize = () => {
       setupCanvas();
@@ -185,6 +211,10 @@ export default function Hero() {
       if (animationFrame) {
         window.cancelAnimationFrame(animationFrame);
       }
+      if (rafIdRef.current) {
+        window.cancelAnimationFrame(rafIdRef.current);
+      }
+      observer.disconnect();
     };
   }, []);
 
@@ -194,7 +224,7 @@ export default function Hero() {
 
   return (
     <section
-      id="about"
+      id="hero"
       ref={sectionRef}
       className="terminal-hero-section relative isolate flex min-h-[100dvh] items-center justify-center overflow-hidden px-6 pb-24 pt-24 md:px-10"
     >

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#020617"/>
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3f52bf"/>
+      <stop offset="50%" style="stop-color:#2f8f97"/>
+      <stop offset="100%" style="stop-color:#7052a8"/>
+    </linearGradient>
+  </defs>
+  <circle cx="600" cy="315" r="180" fill="url(#grad)" opacity="0.3"/>
+  <text x="600" y="290" font-family="system-ui" font-size="72" font-weight="bold" fill="#defff8" text-anchor="middle">Aditya Raj</text>
+  <text x="600" y="360" font-family="system-ui" font-size="28" fill="#8ea8c4" text-anchor="middle">Full-Stack Developer &amp; AI Engineer</text>
+  <text x="600" y="400" font-family="system-ui" font-size="22" fill="#64748b" text-anchor="middle">LeetCode Guardian | Codeforces Master</text>
+</svg>

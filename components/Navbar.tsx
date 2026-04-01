@@ -6,7 +6,7 @@ import NavbarLogo from "./NavbarLogo";
 import { useGSAP } from "@/hooks/useGSAP";
 
 const links = [
-  { label: "About", href: "#about" },
+  { label: "About", href: "#hero" },
   { label: "Experience", href: "#experience" },
   { label: "Projects", href: "#projects" },
   { label: "Skills", href: "#skills" },
@@ -24,10 +24,33 @@ export default function Navbar() {
 
   const { gsap, prefersReducedMotion, withContext } = useGSAP(headerRef);
 
+  // Throttled scroll handler using requestAnimationFrame to prevent layout thrashing.
+  // Updates occur at most once per animation frame, with passive listener for scroll performance.
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 24);
-    window.addEventListener("scroll", fn, { passive: true });
-    return () => window.removeEventListener("scroll", fn);
+    if (typeof window === "undefined") return;
+
+    let ticking = false;
+    let rafId: number | null = null;
+
+    const updateState = () => {
+      setScrolled(window.scrollY > 24);
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        rafId = window.requestAnimationFrame(updateState);
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    updateState();
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (rafId) window.cancelAnimationFrame(rafId);
+    };
   }, []);
 
   useEffect(() => {

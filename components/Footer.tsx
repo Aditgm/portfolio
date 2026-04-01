@@ -47,22 +47,44 @@ export default function Footer() {
   const contactCardRef = useRef<HTMLDivElement>(null);
   const backToTopRef = useRef<HTMLButtonElement>(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [currentYear, setCurrentYear] = useState<number>(2026);
   const { createRevealAnimation, gsap, prefersReducedMotion, withContext } = useGSAP(sectionRef);
   const lenis = useSmoothScroll();
+
+  // Dynamic copyright year - ensures correct year renders without hydration mismatch
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
 
   const titleLetters = useMemo(() => splitText("Get In "), []);
   const accentLetters = useMemo(() => splitText("Touch"), []);
 
+  // Throttled scroll handler using requestAnimationFrame to prevent layout thrashing.
+  // Updates occur at most once per animation frame, with passive listener for scroll performance.
   useEffect(() => {
-    const toggleVisibility = () => {
+    if (typeof window === "undefined") return;
+
+    let ticking = false;
+    let rafId: number | null = null;
+
+    const updateState = () => {
       setShowBackToTop(window.scrollY > 520);
+      ticking = false;
     };
 
-    toggleVisibility();
-    window.addEventListener("scroll", toggleVisibility, { passive: true });
+    const onScroll = () => {
+      if (!ticking) {
+        rafId = window.requestAnimationFrame(updateState);
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    updateState();
 
     return () => {
-      window.removeEventListener("scroll", toggleVisibility);
+      window.removeEventListener("scroll", onScroll);
+      if (rafId) window.cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -283,7 +305,7 @@ export default function Footer() {
           />
 
           <p className="text-xs text-slate-600">
-            &copy; 2026 Aditya Raj. All rights reserved.
+            &copy; {currentYear} Aditya Raj. All rights reserved.
           </p>
           <p className="flex items-center gap-2 text-xs text-slate-600">
             <span className="font-mono">Built with</span>

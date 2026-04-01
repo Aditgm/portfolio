@@ -1,0 +1,14 @@
+# robots.txt for Aditya Raj Portfolio
+# https://adityaraj.dev
+
+User-agent: *
+Allow: /
+
+# Disallow API routes
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://adityaraj.dev/sitemap.xml
+
+# Crawl-delay (optional, for politeness)
+Crawl-delay: 1

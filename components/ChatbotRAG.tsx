@@ -33,7 +33,7 @@ export default function ChatbotRAG() {
     {
       id: "welcome",
       role: "assistant",
-      text: "Hi, I am Aditya's portfolio assistant. Ask about projects, skills, achievements, or contact details.",
+      text: "Hi, I'm Aditya's FAQ Assistant. I can answer questions about projects, skills, achievements, and contact info based on the portfolio content.",
     },
   ]);
   const endRef = useRef<HTMLDivElement>(null);
@@ -158,8 +158,8 @@ export default function ChatbotRAG() {
                 <Bot size={16} />
               </div>
               <div>
-                <p className="text-sm font-semibold text-white">Portfolio Assistant</p>
-                <p className="text-[11px] text-slate-400">Ask anything about Aditya</p>
+                <p className="text-sm font-semibold text-white">FAQ Assistant</p>
+                <p className="text-[11px] text-slate-400">Keyword-based answers from portfolio</p>
               </div>
             </div>
           </div>

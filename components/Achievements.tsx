@@ -522,7 +522,7 @@ export default function Achievements() {
 
   return (
     <section
-      id="about"
+      id="achievements"
       ref={sectionRef}
       className="section-container geo-divider-top relative"
     >

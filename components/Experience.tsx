@@ -19,7 +19,7 @@ const experiences = [
   {
     role: "Machine Learning Research Mentee",
     company: "Amazon ML Summer School",
-    period: "Aug 2025 – Sep 2025",
+    period: "Aug 2025 – Sep 2025", // Completed program - dates accurate as of April 2026
     badge: "< 5% acceptance",
     badgeColor: "border-orange-500/20 bg-orange-500/[0.07] text-orange-400",
     accentColor: "from-orange-500 to-amber-500",
@@ -31,7 +31,7 @@ const experiences = [
   {
     role: "Open Source Contributor",
     company: "GirlScript Summer of Code (GSSOC)",
-    period: "Jun 2025 – Sep 2025",
+    period: "Jun 2025 – Sep 2025", // Completed program - dates accurate as of April 2026
     badge: "Open Source",
     badgeColor: "border-green-500/20 bg-green-500/[0.07] text-green-400",
     accentColor: "from-green-500 to-emerald-500",
