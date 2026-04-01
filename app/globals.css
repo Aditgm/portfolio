@@ -4,6 +4,9 @@
    DESIGN TOKENS
    ═══════════════════════════════════════════════════ */
 :root {
+  --font-sans: "Aptos", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Cascadia Code", "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+  --font-display: "Aptos Display", "Trebuchet MS", "Segoe UI Variable Display", sans-serif;
   --bg-primary: #020617;
   --bg-secondary: #0f172a;
   --surface: rgba(255, 255, 255, 0.04);
@@ -386,6 +389,258 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .chatbot-fab {
     transition: none;
+  }
+}
+
+.project-showcase-surface {
+  background:
+    radial-gradient(circle at 18% 16%, rgba(129, 140, 248, 0.18), transparent 34%),
+    radial-gradient(circle at 82% 20%, rgba(45, 212, 191, 0.12), transparent 38%),
+    linear-gradient(180deg, rgba(4, 8, 20, 0.94), rgba(6, 12, 28, 0.96));
+}
+
+.project-showcase {
+  inset: 0;
+  padding: 1.15rem;
+}
+
+.project-showcase-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 4%, rgba(255, 255, 255, 0.14), transparent 44%),
+    linear-gradient(180deg, rgba(99, 102, 241, 0.08), transparent 46%);
+}
+
+.project-showcase-card {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 1.15rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(8, 17, 32, 0.8);
+  box-shadow:
+    0 30px 60px -36px rgba(2, 6, 23, 0.96),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  backdrop-filter: blur(12px);
+}
+
+.project-showcase-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 28%, rgba(3, 7, 18, 0.14));
+  pointer-events: none;
+}
+
+.project-showcase-card--1 {
+  inset: 1.15rem 3.2rem 4.8rem 3.2rem;
+  z-index: 3;
+}
+
+.project-showcase-card--2 {
+  left: 1.15rem;
+  bottom: 1.1rem;
+  width: 38%;
+  aspect-ratio: 4 / 3;
+  z-index: 2;
+}
+
+.project-showcase-card--3 {
+  right: 1rem;
+  bottom: 1.2rem;
+  width: 42%;
+  aspect-ratio: 16 / 10;
+  z-index: 1;
+}
+
+.project-showcase-frame {
+  position: absolute;
+  inset: 0;
+}
+
+.project-showcase-chip,
+.project-showcase-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(8, 17, 32, 0.76);
+  padding: 0.45rem 0.82rem;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(226, 232, 240, 0.84);
+  backdrop-filter: blur(14px);
+}
+
+.project-showcase-chip {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 2;
+}
+
+.project-showcase-count {
+  color: rgba(226, 232, 240, 0.75);
+}
+
+@media (max-width: 767px) {
+  .project-showcase {
+    padding: 0.85rem;
+  }
+
+  .project-showcase-card {
+    border-radius: 0.95rem;
+  }
+
+  .project-showcase-card--1 {
+    inset: 0.95rem 1.4rem 4.7rem 1.4rem;
+  }
+
+  .project-showcase-card--2 {
+    width: 41%;
+    left: 0.85rem;
+    bottom: 0.85rem;
+  }
+
+  .project-showcase-card--3 {
+    width: 45%;
+    right: 0.8rem;
+    bottom: 1rem;
+  }
+
+  .project-showcase-chip,
+  .project-showcase-count {
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+  }
+}
+
+@keyframes chatbot-ripple-expand {
+  0% {
+    transform: scale(0);
+    opacity: 0.72;
+  }
+  100% {
+    transform: scale(1.1);
+    opacity: 0;
+  }
+}
+
+@keyframes chatbot-glow-ring {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.62;
+  }
+  100% {
+    transform: scale(1.65);
+    opacity: 0;
+  }
+}
+
+.chatbot-fab-shell {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  width: 64px;
+  height: 64px;
+}
+
+.chatbot-fab-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(103, 232, 249, 0.42);
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.16), transparent 72%);
+  animation: chatbot-glow-ring 2.8s ease-out infinite;
+  pointer-events: none;
+}
+
+.chatbot-fab-ring--inner {
+  animation-delay: 0.45s;
+}
+
+.chatbot-fab-ring--outer {
+  animation-duration: 3.15s;
+}
+
+.chatbot-fab {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.32), transparent 38%),
+    linear-gradient(135deg, hsl(193 92% 64%) 0%, hsl(239 84% 67%) 48%, hsl(265 82% 63%) 100%);
+  box-shadow:
+    0 28px 60px -28px rgba(79, 70, 229, 0.92),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  overflow: hidden;
+  transition: transform 0.32s ease, box-shadow 0.32s ease;
+}
+
+.chatbot-fab:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow:
+    0 34px 70px -30px rgba(79, 70, 229, 0.96),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+}
+
+.chatbot-fab:focus-visible {
+  outline: 2px solid rgba(34, 211, 238, 0.8);
+  outline-offset: 3px;
+}
+
+.chatbot-fab[data-open="true"] {
+  transform: rotate(45deg);
+}
+
+.chatbot-fab[data-open="true"] .chatbot-fab-icon {
+  transform: rotate(-45deg);
+}
+
+.chatbot-fab-aura {
+  position: absolute;
+  inset: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.04) 58%, transparent 76%);
+  pointer-events: none;
+}
+
+.chatbot-fab-icon {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.32s ease;
+}
+
+.chatbot-ripple-container {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chatbot-fab,
+  .chatbot-fab-icon {
+    transition: none;
+  }
+
+  .chatbot-fab-ring {
+    animation: none;
+    opacity: 0.18;
   }
 }
 

@@ -10,8 +10,6 @@ export default function ScrollProgress() {
     if (typeof window === "undefined" || !containerRef.current || !barRef.current) {
       return;
     }
-
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     
     const handleScroll = () => {
       const scrollTop = window.scrollY;

@@ -200,20 +200,31 @@ export default function ChatbotRAG() {
 
   return (
     <>
-      <button
-        ref={fabRef}
-        type="button"
-        onClick={handleIconClick}
-        onKeyDown={handleKeyDown}
-        aria-label={open ? "Close chatbot" : "Open chatbot"}
-        aria-expanded={open}
-        className="chatbot-fab"
-      >
-        <div ref={ripplesRef} className="chatbot-ripple-container" />
-        <span className="chatbot-fab-icon">
-          {open ? <X size={20} /> : <MessageCircle size={20} />}
-        </span>
-      </button>
+      <div className="chatbot-fab-shell">
+        {!open ? (
+          <>
+            <span className="chatbot-fab-ring chatbot-fab-ring--outer" aria-hidden="true" />
+            <span className="chatbot-fab-ring chatbot-fab-ring--inner" aria-hidden="true" />
+          </>
+        ) : null}
+
+        <button
+          ref={fabRef}
+          type="button"
+          onClick={handleIconClick}
+          onKeyDown={handleKeyDown}
+          aria-label={open ? "Close chatbot" : "Open chatbot"}
+          aria-expanded={open}
+          data-open={open}
+          className="chatbot-fab"
+        >
+          <span className="chatbot-fab-aura" aria-hidden="true" />
+          <div ref={ripplesRef} className="chatbot-ripple-container" />
+          <span className="chatbot-fab-icon">
+            {open ? <X size={20} /> : <MessageCircle size={20} />}
+          </span>
+        </button>
+      </div>
 
       {open ? (
         <div

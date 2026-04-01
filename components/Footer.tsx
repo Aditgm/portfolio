@@ -47,14 +47,9 @@ export default function Footer() {
   const contactCardRef = useRef<HTMLDivElement>(null);
   const backToTopRef = useRef<HTMLButtonElement>(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [currentYear, setCurrentYear] = useState<number>(2026);
   const { createRevealAnimation, gsap, prefersReducedMotion, withContext } = useGSAP(sectionRef);
   const lenis = useSmoothScroll();
-
-  // Dynamic copyright year - ensures correct year renders without hydration mismatch
-  useEffect(() => {
-    setCurrentYear(new Date().getFullYear());
-  }, []);
+  const currentYear = new Date().getFullYear();
 
   const titleLetters = useMemo(() => splitText("Get In "), []);
   const accentLetters = useMemo(() => splitText("Touch"), []);

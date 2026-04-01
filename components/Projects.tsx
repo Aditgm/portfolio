@@ -7,6 +7,21 @@ import { Flip } from "gsap/Flip";
 import { useGSAP } from "@/hooks/useGSAP";
 import { projects, type ProjectItem } from "@/data/projects";
 
+const showcaseLabels = ["Overview", "Interface", "Flow"] as const;
+
+function getProjectShowcase(project: ProjectItem) {
+  const images = [project.image, ...(project.gallery ?? [])].filter(Boolean);
+
+  while (images.length < 3) {
+    images.push(project.image);
+  }
+
+  return images.slice(0, 3).map((src, index) => ({
+    src,
+    label: showcaseLabels[index],
+  }));
+}
+
 export default function Projects() {
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -64,6 +79,8 @@ export default function Projects() {
     const modalContent = modalContentRef.current;
 
     if (prefersReducedMotion || !sourceCard || !modalCard) {
+      openFlipStateRef.current = null;
+      setIsAnimating(false);
       setActiveProject(null);
       return;
     }
@@ -95,10 +112,6 @@ export default function Projects() {
 
     setActiveProject(null);
 
-    // Store scroll position before flip animation
-    const scrollY = window.scrollY;
-    const scrollX = window.scrollX;
-
     requestAnimationFrame(() => {
       Flip.from(state, {
         targets: sourceCard,
@@ -106,15 +119,10 @@ export default function Projects() {
         duration: 0.58,
         ease: "power2.inOut",
         onComplete: () => {
+          openFlipStateRef.current = null;
           setIsAnimating(false);
-          // Restore scroll position after animation completes
-          window.scrollTo(scrollX, scrollY);
+          window.scrollTo(scrollPositionRef.current.x, scrollPositionRef.current.y);
         },
-      });
-      
-      // Delay setting activeProject null until after flip animation
-      gsap.delayedCall(0.58, () => {
-        setActiveProject(null);
       });
     });
   }, [activeProject, gsap, isAnimating, prefersReducedMotion]);
@@ -190,12 +198,91 @@ export default function Projects() {
         const mediaParallax = card.querySelector<HTMLElement>("[data-project-parallax]");
         const mediaOverlay = card.querySelector<HTMLElement>("[data-project-overlay]");
         const mediaLabel = card.querySelector<HTMLElement>("[data-project-label]");
+        const showcaseCards = Array.from(
+          card.querySelectorAll<HTMLElement>("[data-showcase-card]")
+        );
 
-        if (!mediaSurface || !mediaParallax || !mediaOverlay || !mediaLabel) {
+        if (
+          !mediaSurface ||
+          !mediaParallax ||
+          !mediaOverlay ||
+          !mediaLabel ||
+          showcaseCards.length === 0
+        ) {
           return () => undefined;
         }
 
         gsap.set(mediaLabel, { autoAlpha: 0, y: 18 });
+        gsap.set(showcaseCards, {
+          transformPerspective: 1400,
+          transformOrigin: "center center",
+          willChange: "transform, opacity",
+        });
+
+        const baseShowcaseState = [
+          { x: 0, y: 0, rotate: -4, scale: 1 },
+          { x: -32, y: 74, rotate: -10, scale: 0.92 },
+          { x: 36, y: 64, rotate: 9, scale: 0.9 },
+        ];
+
+        const hoverShowcaseState = [
+          { x: 0, y: -8, rotate: -2, scale: 1.02 },
+          { x: -44, y: 94, rotate: -13, scale: 0.96 },
+          { x: 52, y: 82, rotate: 12, scale: 0.94 },
+        ];
+
+        const applyShowcaseState = (
+          state: typeof baseShowcaseState,
+          offsetX = 0,
+          offsetY = 0,
+          duration = 0.45
+        ) => {
+          showcaseCards.forEach((showcaseCard, index) => {
+            const layerState = state[index] ?? baseShowcaseState[0];
+
+            gsap.to(showcaseCard, {
+              x: layerState.x + offsetX * (6 + index * 4),
+              y: layerState.y + offsetY * (4 + index * 3),
+              rotate: layerState.rotate + offsetX * (index === 0 ? 3.5 : 2),
+              scale: layerState.scale,
+              duration,
+              ease: "power3.out",
+              overwrite: "auto",
+            });
+          });
+        };
+
+        const revealTimeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: card,
+            start: "top 86%",
+            once: prefersReducedMotion,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        revealTimeline.fromTo(
+          showcaseCards,
+          {
+            autoAlpha: 0,
+            y: (index: number) => 36 + index * 10,
+            scale: 0.88,
+            rotate: (index: number) => (index === 1 ? -14 : index === 2 ? 12 : -8),
+          },
+          {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            rotate: 0,
+            duration: prefersReducedMotion ? 0.3 : 0.78,
+            stagger: 0.08,
+            ease: "power3.out",
+          }
+        );
+
+        revealTimeline.add(() => {
+          applyShowcaseState(baseShowcaseState, 0, 0, 0.01);
+        });
 
         if (prefersReducedMotion) {
           const handleEnter = () => {
@@ -212,6 +299,7 @@ export default function Projects() {
               ease: "power2.out",
               overwrite: "auto",
             });
+            applyShowcaseState(hoverShowcaseState, 0, 0, 0.24);
           };
 
           const handleLeave = () => {
@@ -228,12 +316,14 @@ export default function Projects() {
               ease: "power2.out",
               overwrite: "auto",
             });
+            applyShowcaseState(baseShowcaseState, 0, 0, 0.2);
           };
 
           mediaSurface.addEventListener("pointerenter", handleEnter);
           mediaSurface.addEventListener("pointerleave", handleLeave);
 
           return () => {
+            revealTimeline.kill();
             mediaSurface.removeEventListener("pointerenter", handleEnter);
             mediaSurface.removeEventListener("pointerleave", handleLeave);
           };
@@ -262,6 +352,7 @@ export default function Projects() {
             ease: "power3.out",
             overwrite: "auto",
           });
+          applyShowcaseState(hoverShowcaseState);
         };
 
         const handleMove = (event: PointerEvent) => {
@@ -271,6 +362,7 @@ export default function Projects() {
 
           xTo(offsetX * 22);
           yTo(offsetY * 18);
+          applyShowcaseState(hoverShowcaseState, offsetX, offsetY, 0.35);
         };
 
         const handleLeave = () => {
@@ -295,6 +387,7 @@ export default function Projects() {
             ease: "power2.out",
             overwrite: "auto",
           });
+          applyShowcaseState(baseShowcaseState, 0, 0, 0.42);
         };
 
         mediaSurface.addEventListener("pointerenter", handleEnter);
@@ -302,6 +395,7 @@ export default function Projects() {
         mediaSurface.addEventListener("pointerleave", handleLeave);
 
         return () => {
+          revealTimeline.kill();
           mediaSurface.removeEventListener("pointerenter", handleEnter);
           mediaSurface.removeEventListener("pointermove", handleMove);
           mediaSurface.removeEventListener("pointerleave", handleLeave);
@@ -472,6 +566,8 @@ export default function Projects() {
           className="grid grid-cols-1 gap-6 md:grid-cols-2"
         >
           {projects.map((project, index) => {
+            const showcase = getProjectShowcase(project);
+
             return (
               <button
                 key={project.slug}
@@ -489,28 +585,47 @@ export default function Projects() {
                   <div
                     data-cursor-label="View"
                     data-project-media
-                    className="relative aspect-[16/10] overflow-hidden border-b border-white/[0.05]"
+                    className="project-showcase-surface relative aspect-[16/10] overflow-hidden border-b border-white/[0.05]"
                   >
                     <div
                       data-project-parallax
-                      className="absolute inset-0 will-change-transform"
+                      className="project-showcase absolute inset-0 will-change-transform"
                     >
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_50%)]" />
-                      <Image
-                        src={project.image}
-                        alt={project.title}
-                        fill
-                        className="object-cover object-top"
-                        sizes="(min-width: 768px) 50vw, 100vw"
-                        priority={index < 2}
-                        loading={index < 2 ? "eager" : "lazy"}
-                      />
+                      <div className="project-showcase-backdrop" />
+                      {showcase.map((item, showcaseIndex) => (
+                        <div
+                          key={`${project.slug}-${item.src}-${showcaseIndex}`}
+                          data-showcase-card
+                          className={`project-showcase-card project-showcase-card--${showcaseIndex + 1}`}
+                        >
+                          <div className="project-showcase-frame">
+                            <Image
+                              src={item.src}
+                              alt={
+                                showcaseIndex === 0
+                                  ? `${project.title} preview`
+                                  : `${project.title} ${item.label.toLowerCase()} preview`
+                              }
+                              fill
+                              className="object-cover object-top"
+                              sizes="(min-width: 768px) 50vw, 100vw"
+                              priority={index < 2 && showcaseIndex === 0}
+                              loading={index < 2 && showcaseIndex === 0 ? "eager" : "lazy"}
+                            />
+                          </div>
+                          <span className="project-showcase-chip">{item.label}</span>
+                        </div>
+                      ))}
                     </div>
                     <div
                       data-project-overlay
                       className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,10,24,0.08),rgba(5,10,24,0.32)_52%,rgba(5,10,24,0.62))] opacity-45"
                     />
-                      <div className="absolute inset-x-0 bottom-0 flex items-end p-5 md:p-6">
+                    <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 md:p-6">
+                      <span className="project-showcase-count">
+                        <span className="font-mono text-white/55">03</span>
+                        frames
+                      </span>
                       <span
                         data-project-label
                         className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-[#081120]/76 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/90 backdrop-blur-md"
@@ -520,30 +635,6 @@ export default function Projects() {
                       </span>
                     </div>
                   </div>
-
-                  {/* Project Gallery - Additional Images */}
-                  {project.gallery && project.gallery.length > 0 && (
-                    <div className="project-gallery mt-4">
-                      {project.gallery.map((galleryImage, galleryIndex) => (
-                        <button
-                          key={galleryIndex}
-                          className="project-gallery-item"
-                          aria-label={`${project.title} - Image ${galleryIndex + 2}`}
-                        >
-                          <Image
-                            src={galleryImage}
-                            alt=""
-                            fill
-                            className="object-cover"
-                            sizes="(min-width: 768px) 33vw, 50vw"
-                          />
-                          <span className="project-gallery-label">
-                            Image {galleryIndex + 2}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
 
                   <div className="flex flex-col justify-between p-6 md:p-7">
                     <div>

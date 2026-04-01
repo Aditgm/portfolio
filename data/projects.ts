@@ -120,7 +120,6 @@ export const projects: ProjectItem[] = [
     github: "https://github.com/Aditgm/dengue-spot",
     live: "https://dengue-spot-gi3p.onrender.com/",
     image: "/projects/denguespot.png",
-    gallery: ["/projects/denguespot-2.png", "/projects/denguespot-3.png"],
     tag: "Full-Stack + AI/CV",
     tagColor: "border-red-500/20 bg-red-500/[0.07] text-red-400",
     accentGradient: "from-red-500/20 to-orange-500/5",

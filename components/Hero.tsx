@@ -72,7 +72,6 @@ function useTypewriter(phrases: string[]) {
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const indicatorRef = useRef<HTMLButtonElement>(null);
   const isVisibleRef = useRef(true);
   const rafIdRef = useRef<number | null>(null);
   const isRunningRef = useRef(false);
@@ -141,7 +140,6 @@ export default function Hero() {
     };
 
     const drawRain = () => {
-      // Only continue if visibility check passes
       if (!isVisibleRef.current) {
         isRunningRef.current = false;
         rafIdRef.current = null;
@@ -170,12 +168,27 @@ export default function Hero() {
         drops[index] += 1;
       }
 
-      // Continue animation loop only if visible
-      // Use a post-frame callback to reset rafIdRef after the frame executes
       if (isVisibleRef.current) {
         isRunningRef.current = true;
         rafIdRef.current = window.requestAnimationFrame(drawRain);
       }
+    };
+
+    const stopRain = () => {
+      if (rafIdRef.current !== null) {
+        window.cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+      isRunningRef.current = false;
+    };
+
+    const startRain = () => {
+      if (prefersReducedMotion || !isVisibleRef.current || isRunningRef.current) {
+        return;
+      }
+
+      isRunningRef.current = true;
+      rafIdRef.current = window.requestAnimationFrame(drawRain);
     };
 
     setupCanvas();
@@ -184,47 +197,45 @@ export default function Hero() {
       drawStatic();
     }
 
-    // IntersectionObserver for robust visibility detection
     const observerCallback: IntersectionObserverCallback = (entries) => {
       const entry = entries[0];
       const wasVisible = isVisibleRef.current;
       isVisibleRef.current = entry.isIntersecting;
 
-      // Hero became invisible - stop animation cleanly
       if (wasVisible && !entry.isIntersecting) {
-        if (rafIdRef.current) {
-          window.cancelAnimationFrame(rafIdRef.current);
-          rafIdRef.current = null;
-        }
-        isRunningRef.current = false;
+        stopRain();
+        return;
       }
-      // Hero became visible - drawRain will auto-restart on next frame check
+
+      if (!wasVisible && entry.isIntersecting) {
+        startRain();
+      }
     };
 
     const observer = new IntersectionObserver(observerCallback, {
       threshold: 0,
-      rootMargin: "50px"
+      rootMargin: "50px",
     });
-    
-    // Observe the section element, not canvas (more reliable)
+
     if (sectionRef.current) {
       observer.observe(sectionRef.current);
     }
 
-    // Start initial animation if visible
     if (!prefersReducedMotion && sectionRef.current) {
       const rect = sectionRef.current.getBoundingClientRect();
-      const isOnScreen = rect.top < window.innerHeight && rect.bottom > 0;
-      if (isOnScreen) {
-        isRunningRef.current = true;
-        rafIdRef.current = window.requestAnimationFrame(drawRain);
-      }
+      isVisibleRef.current = rect.top < window.innerHeight && rect.bottom > 0;
+      startRain();
     }
 
     const onResize = () => {
       setupCanvas();
       if (prefersReducedMotion) {
         drawStatic();
+        return;
+      }
+
+      if (isVisibleRef.current) {
+        startRain();
       }
     };
 
@@ -232,11 +243,7 @@ export default function Hero() {
 
     return () => {
       window.removeEventListener("resize", onResize);
-      if (rafIdRef.current) {
-        window.cancelAnimationFrame(rafIdRef.current);
-        rafIdRef.current = null;
-      }
-      isRunningRef.current = false;
+      stopRain();
       observer.disconnect();
     };
   }, []);
@@ -322,7 +329,6 @@ export default function Hero() {
       </div>
 
       <button
-        ref={indicatorRef}
         type="button"
         onClick={scrollToProjects}
         className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#8ecbc3] transition-colors hover:text-[#d8fff8]"

@@ -1,29 +1,16 @@
 import type { Metadata } from "next";
-import { Outfit, Fira_Code, Syne } from "next/font/google";
+import AppShellEffects from "@/components/AppShellEffects";
+import Preloader from "@/components/Preloader";
+import ScrollProgress from "@/components/ScrollProgress";
+import { SmoothScrollProvider } from "@/components/SmoothScroll";
+import { TransitionProvider } from "@/components/TransitionContext";
 import "./globals.css";
 
-const outfit = Outfit({
-  variable: "--font-sans",
-  subsets: ["latin"],
-  display: "swap", // Prevents FOIT - text shows immediately using fallback font
-});
-
-const firaCode = Fira_Code({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  display: "swap", // Prevents FOIT - text shows immediately using fallback font
-});
-
-const syne = Syne({
-  variable: "--font-display",
-  subsets: ["latin"],
-  display: "swap", // Prevents FOIT - text shows immediately using fallback font
-});
-
 export const metadata: Metadata = {
-  title: "Aditya Raj — AI/ML Specialist & Full-Stack Developer",
+  title: "Aditya Raj | AI/ML Specialist & Full-Stack Developer",
+  metadataBase: new URL("https://adityaraj.dev"),
   description:
-    "Portfolio of Aditya Raj — Computer Science undergraduate specializing in AI/ML, Full-Stack Development, and Competitive Programming. Codeforces Master (2131), LeetCode Guardian (2360+, Top 0.4%), Amazon ML Summer School.",
+    "Portfolio of Aditya Raj, a computer science undergraduate specializing in AI/ML, full-stack development, and competitive programming.",
   keywords: [
     "Aditya Raj",
     "AI ML Developer",
@@ -37,18 +24,18 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Aditya Raj", url: "https://github.com/aditya-raj" }],
   openGraph: {
-    title: "Aditya Raj — AI/ML Specialist & Full-Stack Developer",
+    title: "Aditya Raj | AI/ML Specialist & Full-Stack Developer",
     description:
-      "Codeforces Master · LeetCode Guardian (Top 0.4%) · Amazon ML Summer School · MERN Stack · RAG/LLM",
+      "Codeforces Master, LeetCode Guardian, Amazon ML Summer School, MERN Stack, and RAG/LLM projects.",
     type: "website",
     locale: "en_US",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "Aditya Raj Portfolio" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Aditya Raj — AI/ML Specialist & Full-Stack Developer",
+    title: "Aditya Raj | AI/ML Specialist & Full-Stack Developer",
     description:
-      "Codeforces Master · LeetCode Guardian (Top 0.4%) · Amazon ML Summer School",
+      "Codeforces Master, LeetCode Guardian, and Amazon ML Summer School participant.",
   },
   robots: {
     index: true,
@@ -56,13 +43,6 @@ export const metadata: Metadata = {
   },
 };
 
-import { TransitionProvider } from "@/components/TransitionContext";
-import { SmoothScrollProvider } from "@/components/SmoothScroll";
-import AppShellEffects from "@/components/AppShellEffects";
-import Preloader from "@/components/Preloader";
-import ScrollProgress from "@/components/ScrollProgress";
-
-// Person schema for SEO
 const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
@@ -76,7 +56,8 @@ const personSchema = {
     "https://www.codechef.com/users/adityagm",
   ],
   jobTitle: "Full-Stack Developer & AI Engineer",
-  description: "Computer Science undergraduate specializing in AI/ML, Full-Stack Development, and Competitive Programming.",
+  description:
+    "Computer Science undergraduate specializing in AI/ML, Full-Stack Development, and Competitive Programming.",
 };
 
 export default function RootLayout({
@@ -92,21 +73,15 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
         />
       </head>
-      <body
-        data-cursor-theme="dark"
-        className={`${outfit.variable} ${firaCode.variable} ${syne.variable} antialiased noise-bg site-shell`}
-      >
-        {/* Skip to main content link for accessibility */}
+      <body data-cursor-theme="dark" className="antialiased noise-bg site-shell">
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
-        
-        {/* Scroll progress indicator */}
+
         <ScrollProgress />
-        
-        {/* AppShellEffects includes CustomCursor + FluidGradientBackground */}
         <AppShellEffects />
         <Preloader />
+
         <SmoothScrollProvider>
           <TransitionProvider>
             <main id="main-content" className="relative z-10">
