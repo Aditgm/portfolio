@@ -291,6 +291,21 @@ body {
 }
 
 /* Chatbot ripple animation */
+@keyframes ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
 .chatbot-ripple {
   position: absolute;
   inset: 0;
