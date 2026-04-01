@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, type TouchEvent, type WheelEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type TouchEvent, type WheelEvent } from "react";
 import { Bot, MessageCircle, Send, X } from "lucide-react";
 
 type SourceRef = {
@@ -38,6 +38,8 @@ export default function ChatbotRAG() {
   ]);
   const endRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
+  const fabRef = useRef<HTMLButtonElement>(null);
+  const ripplesRef = useRef<HTMLDivElement>(null);
 
   const canSend = input.trim().length > 0 && !loading;
 
@@ -53,25 +55,16 @@ export default function ChatbotRAG() {
     });
   };
 
-  const toggleChat = () => {
-    setOpen(!open);
-  };
-
   const handleMessagesWheel = (event: WheelEvent<HTMLDivElement>) => {
     const container = messagesRef.current;
-    if (!container) {
-      return;
-    }
-
+    if (!container) return;
     const { scrollTop, scrollHeight, clientHeight } = container;
     const isDown = event.deltaY > 0;
     const isAtTop = scrollTop <= 0;
     const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
-
     if (scrollHeight <= clientHeight || (isDown && isAtBottom) || (!isDown && isAtTop)) {
       event.preventDefault();
     }
-
     event.stopPropagation();
   };
 
@@ -79,18 +72,95 @@ export default function ChatbotRAG() {
     event.stopPropagation();
   };
 
+  // Compute point on circle boundary along line from center to click
+  const getBorderIntersection = useCallback(
+    (clickX: number, clickY: number) => {
+      const icon = fabRef.current;
+      if (!icon) return { x: 0, y: 0 };
+      const rect = icon.getBoundingClientRect();
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+      const r = Math.min(cx, cy);
+      const dx = clickX - cx;
+      const dy = clickY - cy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist === 0) return { x: cx, y: cy - r }; // default top
+      const originX = cx + (dx / dist) * r;
+      const originY = cy + (dy / dist) * r;
+      return { x: originX, y: originY };
+    },
+    []
+  );
+
+  // Create a ripple element at the computed intersection point
+  const createRipple = useCallback(
+    (clickX: number, clickY: number) => {
+      const container = ripplesRef.current;
+      const icon = fabRef.current;
+      if (!container || !icon) return;
+
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reducedMotion) return;
+
+      const origin = getBorderIntersection(clickX, clickY);
+      const iconSize = icon.getBoundingClientRect().width;
+      const size = iconSize * 3;
+
+      const ripple = document.createElement("span");
+      ripple.className = "chatbot-ripple-particle";
+      ripple.style.cssText = `
+        position: absolute;
+        width: ${size}px;
+        height: ${size}px;
+        left: ${origin.x - size / 2}px;
+        top: ${origin.y - size / 2}px;
+        border-radius: 50%;
+        pointer-events: none;
+        background: radial-gradient(circle, var(--chatbot-ripple-color, rgba(34, 211, 238, 0.5)) 0%, transparent 70%);
+        animation: chatbot-ripple-expand var(--chatbot-ripple-duration, 0.6s) ease-out forwards;
+      `;
+
+      container.appendChild(ripple);
+
+      ripple.addEventListener("animationend", () => ripple.remove(), { once: true });
+      setTimeout(() => {
+        if (ripple.parentElement) ripple.remove();
+      }, 700);
+    },
+    [getBorderIntersection]
+  );
+
+  const handleIconClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      const rect = fabRef.current!.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+      createRipple(clickX, clickY);
+      setOpen((prev) => !prev);
+    },
+    [createRipple]
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLButtonElement>) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        const icon = fabRef.current;
+        if (icon) {
+          const rect = icon.getBoundingClientRect();
+          createRipple(rect.width / 2, 0);
+        }
+        setOpen((prev) => !prev);
+      }
+    },
+    [createRipple]
+  );
+
   const sendMessage = async (text: string) => {
     const trimmed = text.trim();
-    if (!trimmed || loading) {
-      return;
-    }
+    if (!trimmed || loading) return;
 
-    const userMessage: Message = {
-      id: createId(),
-      role: "user",
-      text: trimmed,
-    };
-
+    const userMessage: Message = { id: createId(), role: "user", text: trimmed };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setLoading(true);
@@ -99,23 +169,11 @@ export default function ChatbotRAG() {
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: trimmed,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: trimmed }),
       });
-
-      if (!response.ok) {
-        throw new Error("chat_request_failed");
-      }
-
-      const data = (await response.json()) as {
-        answer?: string;
-        sources?: SourceRef[];
-      };
-
+      if (!response.ok) throw new Error("chat_request_failed");
+      const data = (await response.json()) as { answer?: string; sources?: SourceRef[] };
       setMessages((prev) => [
         ...prev,
         {
@@ -142,28 +200,27 @@ export default function ChatbotRAG() {
 
   return (
     <>
-      <div className="chatbot-fab-wrapper">
-        {!open && (
-          <>
-            <span className="chatbot-ripple-outer" />
-            <span className="chatbot-ripple-outer" />
-            <span className="chatbot-ripple-outer" />
-          </>
-        )}
-        <button
-          type="button"
-          onClick={toggleChat}
-          aria-label={open ? "Close assistant" : "Open assistant"}
-          className="chatbot-fab"
-        >
+      <button
+        ref={fabRef}
+        type="button"
+        onClick={handleIconClick}
+        onKeyDown={handleKeyDown}
+        aria-label={open ? "Close chatbot" : "Open chatbot"}
+        aria-expanded={open}
+        className="chatbot-fab"
+      >
+        <div ref={ripplesRef} className="chatbot-ripple-container" />
+        <span className="chatbot-fab-icon">
           {open ? <X size={20} /> : <MessageCircle size={20} />}
-        </button>
-      </div>
+        </span>
+      </button>
 
       {open ? (
         <div
           data-lenis-prevent="true"
-          className="fixed bottom-24 right-6 z-[94] flex h-[min(72vh,540px)] w-[min(92vw,380px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#060b18]/95 shadow-[0_24px_60px_-24px_rgba(15,23,42,0.9)] backdrop-blur-xl"
+          className="chatbot-panel"
+          role="dialog"
+          aria-label="Chatbot conversation"
         >
           <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
             <div className="flex items-center gap-2">
@@ -175,6 +232,14 @@ export default function ChatbotRAG() {
                 <p className="text-[11px] text-slate-400">Keyword-based answers from portfolio</p>
               </div>
             </div>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Close chatbot"
+              className="chatbot-close-btn"
+            >
+              <X size={16} />
+            </button>
           </div>
 
           <div
@@ -196,14 +261,12 @@ export default function ChatbotRAG() {
                 {message.text}
               </div>
             ))}
-
             {loading ? (
               <div className="mr-auto inline-flex items-center gap-2 rounded-xl bg-white/[0.06] px-3 py-2 text-xs text-slate-300">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-cyan-300" />
                 Thinking...
               </div>
             ) : null}
-
             <div ref={endRef} />
           </div>
 
@@ -213,16 +276,13 @@ export default function ChatbotRAG() {
                 <button
                   key={prompt}
                   type="button"
-                  onClick={() => {
-                    void sendMessage(prompt);
-                  }}
+                  onClick={() => void sendMessage(prompt)}
                   className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] text-slate-300 transition-colors hover:border-white/20 hover:text-white"
                 >
                   {prompt}
                 </button>
               ))}
             </div>
-
             {visibleSources.length > 0 ? (
               <div className="mb-2 flex flex-wrap gap-1.5">
                 {visibleSources.slice(0, 3).map((source) => (
@@ -235,7 +295,6 @@ export default function ChatbotRAG() {
                 ))}
               </div>
             ) : null}
-
             <form
               onSubmit={(event) => {
                 event.preventDefault();

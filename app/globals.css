@@ -262,56 +262,42 @@ body {
   }
 }
 
-/* Chatbot FAB wrapper for outer ripple */
-.chatbot-fab-wrapper {
+/* ═══════════════════════════════════════════════════
+   CHATBOT COMPONENT
+   ═══════════════════════════════════════════════════ */
+
+/* Ripple expand animation - starts from border and expands outward */
+@keyframes chatbot-ripple-expand {
+  0% {
+    transform: scale(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* Outer glow rings that pulse continuously when closed */
+@keyframes chatbot-glow-ring {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+    border-color: rgba(34, 211, 238, 0.6);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
+    border-color: rgba(34, 211, 238, 0);
+  }
+}
+
+/* The FAB button - circular clickable icon */
+.chatbot-fab {
   position: fixed;
   bottom: 24px;
   right: 24px;
   z-index: 9999;
-  pointer-events: none;
-}
-
-.chatbot-fab-wrapper > button {
-  pointer-events: auto;
-}
-
-/* Chatbot ripple - starts outside the icon */
-@keyframes ripple-outer {
-  0% {
-    transform: scale(1);
-    opacity: 0.8;
-    border: 3px solid rgba(34, 211, 238, 0.8);
-  }
-  100% {
-    transform: scale(3);
-    opacity: 0;
-    border: 1px solid rgba(34, 211, 238, 0);
-  }
-}
-
-.chatbot-ripple-outer {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: 3px solid rgba(34, 211, 238, 0.8);
-  animation: ripple-outer 2s ease-out infinite;
-  pointer-events: none;
-}
-
-.chatbot-ripple-outer:nth-child(2) {
-  animation-delay: 0.6s;
-}
-
-.chatbot-ripple-outer:nth-child(3) {
-  animation-delay: 1.2s;
-}
-
-/* Chatbot FAB button */
-.chatbot-fab {
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -323,13 +309,84 @@ body {
   align-items: center;
   justify-content: center;
   color: white;
+  overflow: hidden;
   position: relative;
-  z-index: 2;
   transition: transform 0.3s ease;
 }
 
 .chatbot-fab:hover {
   transform: translateY(-4px);
+}
+
+.chatbot-fab:focus-visible {
+  outline: 2px solid rgba(34, 211, 238, 0.8);
+  outline-offset: 3px;
+}
+
+.chatbot-fab-icon {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Container for click-originated ripples - clipped by button overflow: hidden */
+.chatbot-ripple-container {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Chatbot panel */
+.chatbot-panel {
+  position: fixed;
+  bottom: 96px;
+  right: 24px;
+  z-index: 9998;
+  display: flex;
+  flex-direction: column;
+  width: min(92vw, 380px);
+  height: min(72vh, 540px);
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(6, 11, 24, 0.95);
+  box-shadow: 0 24px 60px -24px rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(16px);
+}
+
+/* Close button in panel header */
+.chatbot-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chatbot-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.chatbot-close-btn:focus-visible {
+  outline: 2px solid rgba(34, 211, 238, 0.6);
+  outline-offset: 2px;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .chatbot-fab {
+    transition: none;
+  }
 }
 
 html.lenis, html.lenis body {
