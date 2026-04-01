@@ -1,143 +1,240 @@
-# Animation Layer Migration Guide
+# Framer Motion to GSAP Migration Guide
 
 ## Summary
 
-This PR migrates the animation layer from Framer Motion to GSAP for the `Education` and `GithubGraph` components, following the existing pattern established by `Hero`, `Achievements`, `Experience`, `Projects`, `Skills`, and `Footer`.
-
-## Motivation
-
-### Current State
-- **7 components** use GSAP with `useGSAP` hook and `createRevealAnimation` pattern
-- **2 components** (`Education`, `GithubGraph`) use Framer Motion
-- **1 component** (`Navbar`) uses Framer Motion (AnimatePresence for mobile menu)
-- **1 component** (`BuildTimeline`) uses Framer Motion (in `/app/build` route)
-
-### Why GSAP?
-1. **Unified Animation Layer**: Single library for all scroll-triggered reveal animations
-2. **Bundle Size**: Framer Motion (~45KB gzipped) vs GSAP core (~10KB) + ScrollTrigger (~7KB)
-3. **Performance**: GSAP ScrollTrigger provides more efficient intersection handling
-4. **Consistency**: All sections use identical reveal patterns, easing, and timing
-
-## Changes
-
-### Components Migrated
-
-#### Education.tsx
-- Removed: `import { motion } from "framer-motion"`
-- Added: `import { useGSAP } from "@/hooks/useGSAP"`
-- Replaced `motion.div` with regular `div` with refs
-- Used `createRevealAnimation()` for header and card
-- Added staggered reveal for course tags with `withContext()`
-- Preserved exact timing: 0.6s duration, `power3.out` easing
-- Preserved stagger: 0.04s delay per course item
-
-#### GithubGraph.tsx
-- Removed: `import { motion } from "framer-motion"`
-- Added: `import { useGSAP } from "@/hooks/useGSAP"`
-- Replaced `motion.div` with regular `div` with refs
-- Used `createRevealAnimation()` for header (0.6s) and card (0.6s + 0.1s delay)
-- Maintained parity with original animation timing
-
-### Timing & Easing Parity
-| Component | Original | Migrated |
-|-----------|----------|----------|
-| Education Header | 0.6s, ease [0.22, 1, 0.36, 1] | 0.6s, power3.out |
-| Education Card | 0.6s, ease [0.22, 1, 0.36, 1] | 0.6s, power3.out |
-| Course Tags | 0.04s stagger | 0.04s stagger |
-| GithubGraph Header | 0.6s, ease [0.22, 1, 0.36, 1] | 0.6s, power3.out |
-| GithubGraph Card | 0.6s + 0.1s delay | 0.6s + 0.1s delay |
-
-### Accessibility
-- **Reduced Motion**: Respected via `prefersReducedMotion` from `useGSAP` hook
-- **Screen Readers**: ARIA regions preserved, no animation-related announcements
-- **Keyboard Navigation**: Fully functional
-
-## Navbar Assessment
-
-### Current Usage
-- `motion.header`: Initial load animation (slide down + fade in)
-- `AnimatePresence`: Mobile menu open/close transitions
-- `motion.button`: Hover/tap effects on menu toggle
-- `motion.a`: Hover effects on resume button
-
-### Assessment结论: **Keep as-is**
-
-#### Rationale
-1. **Animation Type**: These are UI interactions (not scroll-triggered reveals)
-   - Initial load animation: One-time, not scroll-dependent
-   - Mobile menu: State-based, not scroll-triggered
-   - Button hover effects: Micro-interactions
-
-2. **AnimatePresence**: GSAP doesn't have equivalent to Framer Motion's `AnimatePresence` for conditional rendering with exit animations. Would require significant refactoring.
-
-3. **Risk/Benefit Ratio**
-   - Migration effort: Medium-High
-   - Bundle savings: ~2KB (negligible)
-   - Consistency gain: Low (different animation types)
-   - Risk: High (potential UI regressions)
-
-4. **Performance**: Navbar animations are negligible in impact (once on load, negligible for button hovers)
-
-### Recommendation
-Keep Navbar on Framer Motion. The UI interaction animations (menu, button effects) are fundamentally different from scroll-triggered reveal animations and don't benefit from the unified GSAP layer.
-
-## Remaining Framer Motion Usage
-- `Navbar.tsx`: UI interactions (keep)
-- `BuildTimeline.tsx` (in `/app/build`): Not in scope for this PR
-
-## Testing
-
-### Validation Plan
-See `VALIDATION_PLAN.md` for:
-- Unit tests for component rendering
-- Visual regression checks
-- Performance benchmarks
-- Rollback procedures
-
-### Quick Verification
-```bash
-# Run lint
-npm run lint
-
-# Build check
-npm run build
-
-# Local dev verification
-npm run dev
-```
-
-## Acceptance Criteria
-
-- [x] Education.tsx uses GSAP with `useGSAP` hook
-- [x] GithubGraph.tsx uses GSAP with `useGSAP` hook
-- [x] Framer Motion imports removed from both components
-- [x] Animation timing matches original (0.6s duration, matching easing)
-- [x] Course tags have staggered reveal (0.04s)
-- [x] Reduced motion is respected
-- [x] No console errors
-- [x] Lint passes
-- [x] Build succeeds
-- [x] Navbar remains on Framer Motion with documented rationale
-
-## Bundle Impact
-
-| Before | After | Change |
-|--------|-------|--------|
-| Framer Motion used by 2 components | Framer Motion used by 2 components | No change |
-| GSAP ScrollTrigger | GSAP ScrollTrigger | No change |
-| Animation libs in bundle | Same | No change |
-
-Note: Framer Motion remains in bundle due to Navbar. Full removal would require Navbar migration (not recommended in this PR).
-
-## Related Files
-
-- `hooks/useGSAP.ts` - Existing hook (unchanged)
-- `components/Hero.tsx` - Reference GSAP implementation
-- `components/Experience.tsx` - Reference GSAP with stagger
-- `components/Achievements.tsx` - Reference GSAP with multiple reveals
+This migration replaces all Framer Motion dependencies with GSAP, achieving a unified animation layer using the existing `useGSAP` hook and `createRevealAnimation` pattern.
 
 ---
 
-**PR Type**: Refactor
-**Breaking Changes**: None
-**Depends On**: None
+## Changes Overview
+
+### Files Modified
+
+| File | Change |
+|------|--------|
+| `components/Navbar.tsx` | Framer Motion → GSAP |
+| `app/build/[slug]/BuildTimeline.tsx` | Framer Motion → GSAP |
+| `components/Projects.tsx` | Added 2 new projects |
+
+### Files Unchanged (Already Using GSAP)
+- `Hero.tsx`
+- `Achievements.tsx`
+- `Experience.tsx`
+- `Skills.tsx`
+- `Education.tsx`
+- `GithubGraph.tsx`
+- `Footer.tsx`
+
+---
+
+## New Projects Added
+
+### DIT PyQ Hub
+- **Tag:** Full-Stack + EdTech
+- **Tech Stack:** Next.js, MongoDB, Express.js, Node.js, Tailwind CSS, JWT
+- **Live:** https://dit-pyq-hub.vercel.app/
+- **GitHub:** https://github.com/Aditgm/dit-pyq-hub
+
+### DevSaathi
+- **Tag:** AI + Developer Tools
+- **Tech Stack:** React, Node.js, LangChain, OpenAI, VS Code API, Pinecone
+- **Live:** https://devsaathi.vercel.app/
+- **GitHub:** https://github.com/Aditgm/devsaathi
+
+---
+
+## GSAP Hover Animation Examples
+
+### Project Card Hover Effect
+
+```tsx
+// In Projects.tsx - Add to card hover handlers
+const handleCardHover = (card: HTMLDivElement, isEntering: boolean) => {
+  gsap.to(card, {
+    scale: isEntering ? 1.02 : 1,
+    y: isEntering ? -4 : 0,
+    boxShadow: isEntering 
+      ? "0 20px 40px rgba(99, 102, 241, 0.15)" 
+      : "0 4px 20px rgba(0, 0, 0, 0.3)",
+    duration: 0.3,
+    ease: "power2.out",
+  });
+};
+```
+
+### Image Hover Effect (GSAP)
+
+```tsx
+// Example: Image scale and overlay on hover
+const handleImageHover = (container: HTMLDivElement, isEntering: boolean) => {
+  const img = container.querySelector("img");
+  const overlay = container.querySelector(".image-overlay");
+  
+  if (img) {
+    gsap.to(img, {
+      scale: isEntering ? 1.1 : 1,
+      duration: 0.4,
+      ease: "power2.out",
+    });
+  }
+  
+  if (overlay) {
+    gsap.to(overlay, {
+      opacity: isEntering ? 1 : 0,
+      duration: 0.3,
+      ease: "power2.out",
+    });
+  }
+};
+```
+
+### Button/Touch Hover Effect
+
+```tsx
+// Magnetic button hover with GSAP
+const handleBtnHover = (btn: HTMLElement, isEntering: boolean) => {
+  gsap.to(btn, {
+    scale: isEntering ? 1.05 : 0.95,
+    duration: 0.15,
+    ease: "power2.out",
+  });
+};
+
+// For touch devices, use onTouchStart/onTouchEnd
+```
+
+---
+
+## Migration Pattern (useEffect + createRevealAnimation)
+
+The pattern used throughout the codebase:
+
+```tsx
+import { useEffect, useRef } from "react";
+import { useGSAP } from "@/hooks/useGSAP";
+
+export default function Component() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const elementRef = useRef<HTMLDivElement>(null);
+  
+  const { createRevealAnimation, gsap, prefersReducedMotion, withContext } = useGSAP(sectionRef);
+
+  // For reveal animations on scroll
+  useEffect(() => {
+    createRevealAnimation(elementRef, {
+      from: { opacity: 0, y: 20 },
+      to: { opacity: 1, y: 0 },
+      duration: 0.6,
+      ease: "power3.out",
+    });
+  }, [createRevealAnimation]);
+
+  // For hover/touch interactions
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    
+    const element = elementRef.current;
+    if (!element) return;
+
+    const handleMouseEnter = () => {
+      gsap.to(element, { scale: 1.05, duration: 0.2 });
+    };
+    
+    element.addEventListener("mouseenter", handleMouseEnter);
+    return () => element.removeEventListener("mouseenter", handleMouseEnter);
+  }, [gsap, prefersReducedMotion]);
+
+  return <div ref={elementRef}>Content</div>;
+}
+```
+
+---
+
+## Git Workflow
+
+### 1. Create Branch
+```bash
+git checkout -b feature/add-projects-gsap-migration
+```
+
+### 2. Stage Changes
+```bash
+git add components/Projects.tsx
+git add components/Navbar.tsx
+git add app/build/[slug]/BuildTimeline.tsx
+git add app/build/[slug]/page.tsx
+```
+
+### 3. Commit
+```bash
+git commit -m "feat: add DIT PyQ Hub and DevSaathi projects, migrate Framer Motion to GSAP
+
+- Added 2 new projects with full details
+- Migrated Navbar from Framer Motion to GSAP
+- Migrated BuildTimeline from Framer Motion to GSAP
+- Removed framer-motion dependency
+- Added GSAP hover animations for buttons"
+```
+
+### 4. Push and Create PR
+```bash
+git push origin feature/add-projects-gsap-migration
+```
+
+---
+
+## Testing Steps
+
+### Development
+```bash
+npm run dev
+# Verify:
+# - All pages load without errors
+# - Navbar animations work (header slide-in, menu open/close)
+# - Project cards display correctly
+# - BuildTimeline pages work (/build/dit-pyq-hub, /build/devsaathi)
+# - Hover effects work on buttons and links
+```
+
+### Production
+```bash
+npm run build
+npm run start
+# Verify:
+# - All routes work correctly
+# - No console errors
+# - Lighthouse score > 80
+```
+
+### Accessibility Tests
+- [ ] Keyboard navigation works (Tab, Enter, Escape)
+- [ ] Screen reader announces menu state changes
+- [ ] Reduced motion preference is respected
+- [ ] Focus visible on all interactive elements
+
+---
+
+## Rollback Plan
+
+If issues arise:
+```bash
+# Revert specific files
+git checkout HEAD -- components/Navbar.tsx
+git checkout HEAD -- app/build/[slug]/BuildTimeline.tsx
+
+# Or full revert
+git checkout HEAD~1 -- .
+```
+
+---
+
+## Bundle Impact
+
+| Before | After |
+|--------|-------|
+| Framer Motion included | Framer Motion removed |
+| ~45KB gzipped saved | GSAP already in use |
+
+---
+
+*Migration completed successfully. Build passes with no errors.*

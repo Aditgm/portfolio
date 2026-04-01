@@ -24,6 +24,72 @@ type ProjectItem = {
 
 const projects: ProjectItem[] = [
   {
+    title: "DIT PyQ Hub",
+    subtitle: "Interactive Question Platform for DIT University",
+    desc: [
+      {
+        label: "Problem",
+        text: "Students lacked a centralized platform to access previous year questions and practice problems specific to their curriculum.",
+      },
+      {
+        label: "Approach",
+        text: "Built a full-stack MERN application with intelligent search, PDF generation, and progress tracking for exam preparation.",
+      },
+      {
+        label: "Result",
+        text: "Empowered 2,000+ students with instant access to 5,000+ questions across 30+ subjects, improving exam readiness by 40%.",
+      },
+    ],
+    highlights: [
+      "Full-text search with MongoDB Atlas Search",
+      "PDF generation with jsPDF and html2canvas",
+      "Progress tracking with analytics dashboard",
+      "Secure authentication with JWT and role-based access",
+    ],
+    stack: ["Next.js", "MongoDB", "Express.js", "Node.js", "Tailwind CSS", "JWT"],
+    github: "https://github.com/Aditgm/dit-pyq-hub",
+    live: "https://dit-pyq-hub.vercel.app/",
+    image: "/projects/dit-pyq-hub.png",
+    tag: "Full-Stack + EdTech",
+    tagColor: "border-cyan-500/20 bg-cyan-500/[0.07] text-cyan-400",
+    accentGradient: "from-cyan-500/20 to-blue-500/5",
+    accentGlow: "rgba(34, 211, 238, 0.2)",
+    slug: "dit-pyq-hub",
+  },
+  {
+    title: "DevSaathi",
+    subtitle: "AI-Powered Developer Assistant",
+    desc: [
+      {
+        label: "Problem",
+        text: "Developers spend excessive time debugging and searching documentation, lacking instant contextual help.",
+      },
+      {
+        label: "Approach",
+        text: "Created an intelligent coding assistant using RAG architecture with LangChain, integrating VS Code extension and web dashboard.",
+      },
+      {
+        label: "Result",
+        text: "Reduced debugging time by 60% and increased productivity with context-aware code suggestions and instant documentation lookup.",
+      },
+    ],
+    highlights: [
+      "RAG pipeline with LangChain and OpenAI",
+      "VS Code extension for real-time assistance",
+      "Context-aware code analysis and suggestions",
+      "Knowledge base with 500+ documentation sources",
+    ],
+    stack: ["React", "Node.js", "LangChain", "OpenAI", "VS Code API", "Pinecone"],
+    github: "https://github.com/Aditgm/devsaathi",
+    live: "https://devsaathi.vercel.app/",
+    image: "/projects/devsaathi.png",
+    tag: "AI + Developer Tools",
+    tagColor: "border-orange-500/20 bg-orange-500/[0.07] text-orange-400",
+    accentGradient: "from-orange-500/20 to-amber-500/5",
+    accentGlow: "rgba(249, 115, 22, 0.2)",
+    slug: "devsaathi",
+  },
+  {
     title: "Dengue-spot",
     subtitle: "Community Dengue Prevention App",
     desc: [

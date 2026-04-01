@@ -1,7 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
 import Tilt from "react-parallax-tilt";
+import { useGSAP } from "@/hooks/useGSAP";
 
 interface Step {
     id: number;
@@ -14,9 +15,36 @@ interface Step {
 }
 
 export default function BuildTimeline({ steps }: { steps: Step[] }) {
+    const timelineRef = useRef<HTMLDivElement>(null);
+    const iconRefs = useRef<(HTMLDivElement | null)[]>([]);
+    const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+    const { createRevealAnimation } = useGSAP(timelineRef);
+
+    useEffect(() => {
+        steps.forEach((_, index) => {
+            if (iconRefs.current[index]) {
+                createRevealAnimation(iconRefs.current[index], {
+                    from: { scale: 0, rotate: -45, autoAlpha: 0 },
+                    to: { scale: 1, rotate: 0, autoAlpha: 1 },
+                    duration: 0.5,
+                    ease: "back.out(1.7)",
+                });
+            }
+
+            if (cardRefs.current[index]) {
+                createRevealAnimation(cardRefs.current[index], {
+                    from: { opacity: 0, y: 30, autoAlpha: 0 },
+                    to: { opacity: 1, y: 0, autoAlpha: 1 },
+                    duration: 0.7,
+                    ease: "power3.out",
+                });
+            }
+        });
+    }, [createRevealAnimation, steps]);
+
     return (
-        <div style={{ position: "relative", width: "100%", paddingTop: "2rem", paddingBottom: "4rem" }}>
-            {/* Central vertical line */}
+        <div ref={timelineRef} style={{ position: "relative", width: "100%", paddingTop: "2rem", paddingBottom: "4rem" }}>
             <div
                 style={{
                     position: "absolute",
@@ -29,16 +57,11 @@ export default function BuildTimeline({ steps }: { steps: Step[] }) {
                 }}
             />
 
-            {/* Cards container — block level, centered with margin auto */}
             <div style={{ position: "relative", zIndex: 10, maxWidth: "640px", margin: "0 auto", padding: "0 1rem" }}>
                 {steps.map((step, index) => (
                     <div key={step.id} style={{ marginBottom: index < steps.length - 1 ? "6rem" : "0", textAlign: "center" }}>
-                        {/* Icon / Node */}
-                        <motion.div
-                            initial={{ scale: 0, rotate: -45 }}
-                            whileInView={{ scale: 1, rotate: 0 }}
-                            viewport={{ once: true, margin: "-80px" }}
-                            transition={{ type: "spring", stiffness: 300, damping: 20, delay: index * 0.05 }}
+                        <div
+                            ref={(el) => { iconRefs.current[index] = el; }}
                             style={{ display: "inline-block", marginBottom: "1.5rem" }}
                         >
                             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#050510] border border-white/[0.1] shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-transform duration-500 hover:scale-110">
@@ -46,14 +69,10 @@ export default function BuildTimeline({ steps }: { steps: Step[] }) {
                                     {step.icon}
                                 </div>
                             </div>
-                        </motion.div>
+                        </div>
 
-                        {/* Content Card */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, margin: "-50px" }}
-                            transition={{ duration: 0.7, delay: 0.1 + index * 0.05, type: "spring", stiffness: 150, damping: 20 }}
+                        <div
+                            ref={(el) => { cardRefs.current[index] = el; }}
                         >
                             <Tilt
                                 tiltMaxAngleX={8}
@@ -80,9 +99,7 @@ export default function BuildTimeline({ steps }: { steps: Step[] }) {
                                         textAlign: "center",
                                     }}
                                 >
-                                    {/* Hover gradient overlay */}
                                     <div className="absolute inset-0 bg-gradient-to-br from-white/[0.06] to-transparent opacity-0 transition-opacity duration-500 hover:opacity-100" />
-                                    {/* Top accent line */}
                                     <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "3px", background: "linear-gradient(to right, transparent, rgba(59,130,246,0.4), transparent)", opacity: 0.6 }} />
 
                                     <div style={{ position: "relative", zIndex: 10 }}>
@@ -98,7 +115,7 @@ export default function BuildTimeline({ steps }: { steps: Step[] }) {
                                     </div>
                                 </div>
                             </Tilt>
-                        </motion.div>
+                        </div>
                     </div>
                 ))}
             </div>

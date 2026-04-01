@@ -198,6 +198,94 @@ const buildSteps = {
                 border: "border-orange-500/20"
             }
         ]
+    },
+    "dit-pyq-hub": {
+        title: "DIT PyQ Hub",
+        subtitle: "Interactive Question Platform for DIT University",
+        heroImage: "/projects/dit-pyq-hub.png",
+        overview: "Creating a comprehensive question bank platform for university students to access previous year questions and track their exam preparation progress.",
+        steps: [
+            {
+                id: 1,
+                title: "需求分析",
+                description: "Identified the need for a centralized platform where students can access 5,000+ questions across 30+ subjects specific to DIT University curriculum.",
+                icon: <Brain size={20} />,
+                color: "text-cyan-400",
+                bg: "bg-cyan-500/10",
+                border: "border-cyan-500/20"
+            },
+            {
+                id: 2,
+                title: "MongoDB Atlas Search",
+                description: "Implemented full-text search using MongoDB Atlas Search for instant query results and intelligent question retrieval.",
+                icon: <Database size={20} />,
+                color: "text-blue-400",
+                bg: "bg-blue-500/10",
+                border: "border-blue-500/20"
+            },
+            {
+                id: 3,
+                title: "PDF Generation",
+                description: "Built PDF export functionality using jsPDF and html2canvas, allowing students to download question papers for offline study.",
+                icon: <LayoutPanelLeft size={20} />,
+                color: "text-green-400",
+                bg: "bg-green-500/10",
+                border: "border-green-500/20"
+            },
+            {
+                id: 4,
+                title: "Analytics Dashboard",
+                description: "Created progress tracking with visual analytics showing completion rates, strong/weak areas, and study time metrics.",
+                icon: <Server size={20} />,
+                color: "text-purple-400",
+                bg: "bg-purple-500/10",
+                border: "border-purple-500/20"
+            }
+        ]
+    },
+    "devsaathi": {
+        title: "DevSaathi",
+        subtitle: "AI-Powered Developer Assistant",
+        heroImage: "/projects/devsaathi.png",
+        overview: "Building an intelligent coding assistant that helps developers debug faster and access documentation instantly through AI-powered context awareness.",
+        steps: [
+            {
+                id: 1,
+                title: "RAG Architecture",
+                description: "Designed a Retrieval-Augmented Generation pipeline using LangChain and Pinecone for context-aware code assistance.",
+                icon: <Brain size={20} />,
+                color: "text-orange-400",
+                bg: "bg-orange-500/10",
+                border: "border-orange-500/20"
+            },
+            {
+                id: 2,
+                title: "Knowledge Base",
+                description: "Indexed 500+ documentation sources including MDN, React docs, Node.js docs for comprehensive coverage.",
+                icon: <Database size={20} />,
+                color: "text-cyan-400",
+                bg: "bg-cyan-500/10",
+                border: "border-cyan-500/20"
+            },
+            {
+                id: 3,
+                title: "VS Code Extension",
+                description: "Developed a VS Code extension for real-time inline suggestions and context-aware debugging assistance.",
+                icon: <LayoutPanelLeft size={20} />,
+                color: "text-blue-400",
+                bg: "bg-blue-500/10",
+                border: "border-blue-500/20"
+            },
+            {
+                id: 4,
+                title: "Web Dashboard",
+                description: "Built a web interface for code analysis, documentation search, and conversation history with OpenAI integration.",
+                icon: <Server size={20} />,
+                color: "text-purple-400",
+                bg: "bg-purple-500/10",
+                border: "border-purple-500/20"
+            }
+        ]
     }
 };
 
