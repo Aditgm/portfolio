@@ -148,7 +148,10 @@ export default function ChatbotRAG() {
         aria-label={open ? "Close assistant" : "Open assistant"}
         className="signature-button fixed bottom-6 right-6 z-[95] inline-flex h-14 w-14 items-center justify-center rounded-full text-white shadow-[0_20px_42px_-20px_rgba(99,102,241,0.78)] transition-transform duration-300 hover:-translate-y-1"
       >
-        {open ? <X size={20} /> : <MessageCircle size={20} />}
+        <span className="relative flex items-center justify-center">
+          <span className={`absolute inset-0 rounded-full ${open ? '' : 'animate-ping-slow bg-cyan-400/30'}`} />
+          {open ? <X size={20} /> : <MessageCircle size={20} />}
+        </span>
       </button>
 
       {open ? (
