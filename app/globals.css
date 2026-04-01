@@ -292,18 +292,14 @@ body {
   transform: scale(0.95);
 }
 
-/* Chatbot ripple animation - outside the icon */
+/* Chatbot ripple animation - starts from button boundary */
 @keyframes ping {
   0% {
     transform: scale(1);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(2.5);
-    opacity: 0;
+    opacity: 0.7;
   }
   100% {
-    transform: scale(3);
+    transform: scale(2);
     opacity: 0;
   }
 }
@@ -313,17 +309,9 @@ body {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: transparent;
-  animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  border: 2px solid rgba(34, 211, 238, 0.6);
+  animation: ping 1.5s ease-out infinite;
   pointer-events: none;
-}
-
-.chatbot-ripple::before {
-  content: '';
-  position: absolute;
-  inset: -8px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(34, 211, 238, 0.4) 0%, rgba(34, 211, 238, 0.1) 50%, transparent 70%);
 }
 
 html.lenis, html.lenis body {
