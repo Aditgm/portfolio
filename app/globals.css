@@ -1096,3 +1096,42 @@ html.lenis, html.lenis body {
     display: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════
+   2D REPLACEMENT STYLES (Lightweight 3D Replacements)
+   ═══════════════════════════════════════════════════ */
+
+.static-geometry-blob {
+  position: absolute;
+  width: var(--blob-size, 80px);
+  height: var(--blob-size, 80px);
+  border-radius: 50%;
+  background: var(--blob-color, rgba(99, 102, 241, 0.15));
+  filter: blur(var(--blob-blur, 120px));
+  opacity: var(--blob-opacity, 0.15);
+  transform: translate(-50%, -50%);
+  will-change: transform;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(-50%, -50%) translateY(0) scale(1);
+  }
+  25% {
+    transform: translate(-50%, -50%) translateY(-8px) scale(1.02);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(0) scale(0.98);
+  }
+  75% {
+    transform: translate(-50%, -50%) translateY(8px) scale(1.01);
+  }
+}
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+.simple-bg-noise {
+  will-change: opacity;
+}

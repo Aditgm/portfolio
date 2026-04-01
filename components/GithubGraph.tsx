@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { ArrowUpRight, Flame, Github, Sparkles } from "lucide-react";
 import { GitHubCalendar } from "react-github-calendar";
 import { useGSAP } from "@/hooks/useGSAP";
@@ -25,7 +25,7 @@ export default function GithubGraph() {
 
     const { createRevealAnimation } = useGSAP(sectionRef);
 
-    useGSAP(() => {
+    useEffect(() => {
         createRevealAnimation(headerRef, {
             from: { autoAlpha: 0, y: 20, rotateX: 8 },
             to: { autoAlpha: 1, y: 0, rotateX: 0 },

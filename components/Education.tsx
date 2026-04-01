@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { GraduationCap } from "lucide-react";
 import { useGSAP } from "@/hooks/useGSAP";
 
@@ -14,7 +14,7 @@ export default function Education() {
 
   const { createRevealAnimation, gsap, prefersReducedMotion, withContext } = useGSAP(sectionRef);
 
-  useGSAP(() => {
+  useEffect(() => {
     createRevealAnimation(headerRef, {
       from: { autoAlpha: 0, y: 20, rotateX: 8 },
       to: { autoAlpha: 1, y: 0, rotateX: 0 },
@@ -28,7 +28,7 @@ export default function Education() {
     });
   }, [createRevealAnimation]);
 
-  useGSAP(() => {
+  useEffect(() => {
     withContext(() => {
       const courseElements = courseRefs.current.filter(
         (el): el is HTMLSpanElement => el !== null

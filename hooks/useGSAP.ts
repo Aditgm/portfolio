@@ -18,6 +18,7 @@ export type RevealAnimationOptions = {
   from?: gsap.TweenVars;
   to?: gsap.TweenVars;
   duration?: number;
+  delay?: number;
   ease?: string;
   scrub?: boolean | number;
   trigger?: gsap.DOMTarget;
@@ -149,6 +150,7 @@ export function useGSAP<T extends ScopeElement>(scope?: RefObject<T | null>) {
           rotateX: 0,
           scale: 1,
           duration: shouldScrub ? undefined : (options.duration ?? 0.85),
+          delay: options.delay,
           ease: options.ease ?? "power3.out",
           force3D: true,
           overwrite: "auto",

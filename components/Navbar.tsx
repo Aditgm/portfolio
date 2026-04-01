@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import MagneticButton from "./MagneticButton";
-import { NavbarLogo3D } from "./Scene3D";
+import NavbarLogo from "./NavbarLogo";
 
 const links = [
   { label: "About", href: "#about" },
@@ -54,7 +54,7 @@ export default function Navbar() {
           className="group relative flex shrink-0 items-center gap-2"
         >
           <div className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-[rgba(99,102,241,0.24)] bg-gradient-to-br from-[#141a32]/76 via-[#081020]/62 to-[#141a32]/76 transition-colors group-hover:border-[rgba(99,102,241,0.42)]">
-            <NavbarLogo3D color="#8ea8c4" label="AR" />
+            <NavbarLogo color="#8ea8c4" />
             <span className="sr-only">Aditya Raj</span>
           </div>
           <span className="hidden text-[0.7rem] font-medium text-slate-500 tracking-widest uppercase sm:block transition-colors group-hover:text-slate-400">
