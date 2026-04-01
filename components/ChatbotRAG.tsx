@@ -149,9 +149,7 @@ export default function ChatbotRAG() {
         className="chatbot-fab"
       >
         <span style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          {!open && (
-            <span className="chatbot-ripple" />
-          )}
+          {!open && <span className="chatbot-ripple" />}
           {open ? <X size={20} /> : <MessageCircle size={20} />}
         </span>
       </button>

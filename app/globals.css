@@ -290,28 +290,38 @@ body {
   transform: scale(0.95);
 }
 
-/* Chatbot ripple animation */
+/* Chatbot ripple animation - outside the icon */
 @keyframes ping {
   0% {
     transform: scale(1);
-    opacity: 0.6;
+    opacity: 0.8;
   }
   50% {
-    transform: scale(2);
+    transform: scale(2.5);
     opacity: 0;
   }
   100% {
-    transform: scale(2.5);
+    transform: scale(3);
     opacity: 0;
   }
 }
 
 .chatbot-ripple {
   position: absolute;
-  inset: 0;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  background: rgba(34, 211, 238, 0.3);
+  background: transparent;
   animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+.chatbot-ripple::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.4) 0%, rgba(34, 211, 238, 0.1) 50%, transparent 70%);
 }
 
 html.lenis, html.lenis body {
