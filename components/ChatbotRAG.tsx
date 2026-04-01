@@ -146,33 +146,11 @@ export default function ChatbotRAG() {
         type="button"
         onClick={toggleChat}
         aria-label={open ? "Close assistant" : "Open assistant"}
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          right: "24px",
-          zIndex: 9995,
-          width: "56px",
-          height: "56px",
-          borderRadius: "50%",
-          border: "none",
-          background: "linear-gradient(135deg, hsl(239 84% 67%) 0%, hsl(250 76% 58%) 100%)",
-          boxShadow: "0 20px 42px -20px rgba(99,102,241,0.78)",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "white",
-        }}
+        className="chatbot-fab"
       >
         <span style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
           {!open && (
-            <span style={{
-              position: "absolute",
-              inset: 0,
-              borderRadius: "50%",
-              background: "rgba(34, 211, 238, 0.3)",
-              animation: "ping 2s cubic-bezier(0, 0, 0.2, 1) infinite",
-            }} />
+            <span className="chatbot-ripple" />
           )}
           {open ? <X size={20} /> : <MessageCircle size={20} />}
         </span>
