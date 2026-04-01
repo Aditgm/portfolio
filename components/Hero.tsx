@@ -1,26 +1,22 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDown, ArrowUpRight, Binary, Github, Mail, Trophy } from "lucide-react";
-import HeroLiquidDistortion from "./HeroLiquidDistortion";
 import MagneticButton from "./MagneticButton";
 
-gsap.registerPlugin(useGSAP, ScrollTrigger);
-
-const nameParts = [
-  { word: "Aditya", accent: false },
-  { word: "Raj", accent: false },
+const asciiName = [
+  "      _    ____ ___ _______   ___    _   ____      _       ",
+  "     / \\  |  _ \\_ _|_   _\ \ / / \  | | |  _ \\    / \\      ",
+  "    / _ \\ | | | || |  | |  \\ V / _ \\ | | | |_) |  / _ \\     ",
+  "   / ___ \\| |_| || |  | |   | | / ___ \\| | |  _ <  / ___ \\    ",
+  "  /_/   \\_\\____/|___| |_|   |_|/_/   \\_\\_| |_| \\_\\/_/   \\_\\   ",
 ];
 
-const heroQuoteWords = [
-  "Building",
-  "AI-powered",
-  "products",
-  "that",
-  "ship.",
+const rolePhrases = [
+  "Full-Stack Developer",
+  "AI Engineer",
+  "Competitive Programmer",
+  "Building Products That Ship",
 ];
 
 const socialLinks = [
@@ -28,380 +24,253 @@ const socialLinks = [
     label: "GitHub",
     href: "https://github.com/Aditgm",
     icon: Github,
-    glow: "rgba(99, 102, 241, 0.18)",
   },
   {
     label: "LeetCode",
     href: "https://leetcode.com/u/adityagm/",
     icon: Binary,
-    glow: "rgba(45, 212, 191, 0.18)",
   },
   {
     label: "Codeforces",
     href: "https://codeforces.com/profile/aditya2005",
     icon: Trophy,
-    glow: "rgba(124, 58, 237, 0.18)",
   },
 ];
 
-export default function Hero() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const backgroundLayerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const indicatorRef = useRef<HTMLButtonElement>(null);
-  const nameRef = useRef<HTMLDivElement>(null);
-  const letterRefs = useRef<Array<HTMLSpanElement | null>>([]);
+function useTypewriter(phrases: string[]) {
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [text, setText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    if (!nameRef.current) {
+    if (phrases.length === 0) {
+      return;
+    }
+
+    const currentPhrase = phrases[phraseIndex % phrases.length];
+
+    const timeout = window.setTimeout(
+      () => {
+        if (!isDeleting) {
+          const next = currentPhrase.slice(0, text.length + 1);
+          setText(next);
+
+          if (next === currentPhrase) {
+            setIsDeleting(true);
+          }
+        } else {
+          const next = currentPhrase.slice(0, text.length - 1);
+          setText(next);
+
+          if (next.length === 0) {
+            setIsDeleting(false);
+            setPhraseIndex((value) => (value + 1) % phrases.length);
+          }
+        }
+      },
+      isDeleting ? 50 : text === currentPhrase ? 1250 : 95
+    );
+
+    return () => window.clearTimeout(timeout);
+  }, [isDeleting, phraseIndex, phrases, text]);
+
+  return text;
+}
+
+export default function Hero() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const indicatorRef = useRef<HTMLButtonElement>(null);
+
+  const typewriterText = useTypewriter(rolePhrases);
+
+  const heroQuote = useMemo(
+    () => "Designing reliable systems where algorithms, product, and execution converge.",
+    []
+  );
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      return;
+    }
+
+    const context = canvas.getContext("2d");
+    if (!context) {
       return;
     }
 
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const isTouchDevice =
-      window.matchMedia("(hover: none), (pointer: coarse)").matches ||
-      navigator.maxTouchPoints > 0;
+    const chars = "01<>[]{}()$#@%&*+=-:/\\\\";
+    const fontSize = 14;
 
-    if (prefersReducedMotion || isTouchDevice) {
-      return;
-    }
+    let animationFrame = 0;
+    let columns = 0;
+    let drops: number[] = [];
 
-    const nameNode = nameRef.current;
-    const letters = letterRefs.current.filter(
-      (letter): letter is HTMLSpanElement => Boolean(letter)
-    );
+    const setupCanvas = () => {
+      const devicePixelRatio = Math.max(1, window.devicePixelRatio || 1);
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
 
-    if (letters.length === 0) {
-      return;
-    }
+      canvas.width = Math.floor(width * devicePixelRatio);
+      canvas.height = Math.floor(height * devicePixelRatio);
 
-    const handleMove = (event: PointerEvent) => {
-      letters.forEach((letter) => {
-        const rect = letter.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const deltaX = event.clientX - centerX;
-        const deltaY = event.clientY - centerY;
-        const distance = Math.hypot(deltaX, deltaY);
-        const strength = Math.max(0, 1 - distance / 180);
+      context.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+      context.font = `${fontSize}px var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace`;
 
-        gsap.to(letter, {
-          x: deltaX * 0.12 * strength,
-          y: deltaY * 0.1 * strength,
-          rotationZ: deltaX * 0.015 * strength,
-          duration: 0.32,
-          ease: "power3.out",
-          overwrite: "auto",
-        });
-      });
+      columns = Math.max(1, Math.floor(width / fontSize));
+      drops = new Array(columns)
+        .fill(0)
+        .map(() => Math.floor((Math.random() * height) / fontSize));
+
+      context.fillStyle = "#020612";
+      context.fillRect(0, 0, width, height);
     };
 
-    const handleLeave = () => {
-      gsap.to(letters, {
-        x: 0,
-        y: 0,
-        rotationZ: 0,
-        duration: 0.6,
-        ease: "elastic.out(1, 0.45)",
-        stagger: 0.01,
-        overwrite: "auto",
-      });
+    const drawStatic = () => {
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+
+      context.clearRect(0, 0, width, height);
+      context.fillStyle = "rgba(2, 6, 18, 0.96)";
+      context.fillRect(0, 0, width, height);
+
+      context.fillStyle = "rgba(122, 227, 215, 0.25)";
+      for (let row = 0; row < 12; row += 1) {
+        for (let col = 0; col < columns; col += 2) {
+          const char = chars[(row + col) % chars.length];
+          context.fillText(char, col * fontSize, row * (fontSize + 6) + 24);
+        }
+      }
     };
 
-    nameNode.addEventListener("pointermove", handleMove);
-    nameNode.addEventListener("pointerleave", handleLeave);
+    const drawRain = () => {
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+
+      context.fillStyle = "rgba(2, 6, 18, 0.11)";
+      context.fillRect(0, 0, width, height);
+
+      for (let index = 0; index < columns; index += 1) {
+        const text = chars[Math.floor(Math.random() * chars.length)];
+        const x = index * fontSize;
+        const y = drops[index] * fontSize;
+
+        const glow = 0.48 + Math.random() * 0.5;
+        context.fillStyle = `rgba(122, 227, 215, ${glow.toFixed(2)})`;
+        context.fillText(text, x, y);
+
+        if (y > height && Math.random() > 0.975) {
+          drops[index] = 0;
+        }
+
+        drops[index] += 1;
+      }
+
+      animationFrame = window.requestAnimationFrame(drawRain);
+    };
+
+    setupCanvas();
+
+    if (prefersReducedMotion) {
+      drawStatic();
+    } else {
+      drawRain();
+    }
+
+    const onResize = () => {
+      setupCanvas();
+      if (prefersReducedMotion) {
+        drawStatic();
+      }
+    };
+
+    window.addEventListener("resize", onResize);
 
     return () => {
-      nameNode.removeEventListener("pointermove", handleMove);
-      nameNode.removeEventListener("pointerleave", handleLeave);
+      window.removeEventListener("resize", onResize);
+      if (animationFrame) {
+        window.cancelAnimationFrame(animationFrame);
+      }
     };
   }, []);
 
-  useGSAP(
-    () => {
-      if (!sectionRef.current || !contentRef.current || !backgroundLayerRef.current) {
-        return;
-      }
-
-      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const q = gsap.utils.selector(sectionRef);
-      const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
-
-      gsap.set(q("[data-hero-letter]"), {
-        yPercent: 110,
-        opacity: 0,
-        filter: "blur(10px)",
-      });
-      gsap.set(
-        q("[data-hero-badge], [data-hero-subtitle], [data-hero-quote], [data-hero-cta], [data-hero-social]"),
-        { autoAlpha: 0, y: 24 }
-      );
-      gsap.set(q("[data-hero-quote-word]"), {
-        autoAlpha: 0.15,
-        yPercent: 22,
-        filter: "blur(10px)",
-        clipPath: "inset(0 0 100% 0)",
-      });
-
-      tl.to(q("[data-hero-badge]"), {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.45,
-      })
-        .to(
-          q("[data-hero-letter]"),
-          {
-            yPercent: 0,
-            opacity: 1,
-            filter: "blur(0px)",
-            duration: 1.1,
-            stagger: 0.045,
-          },
-          "-=0.08"
-        )
-        .to(
-          q("[data-hero-subtitle], [data-hero-quote]"),
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.7,
-            stagger: 0.1,
-          },
-          "-=0.7"
-        )
-        .to(
-          q("[data-hero-cta], [data-hero-social]"),
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.55,
-            stagger: 0.08,
-          },
-          "-=0.35"
-        );
-
-      gsap.to(contentRef.current, {
-        yPercent: -18,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        },
-      });
-
-      gsap.to(backgroundLayerRef.current, {
-        yPercent: -8,
-        scale: 1.08,
-        ease: "none",
-        transformOrigin: "center center",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        },
-      });
-
-      gsap.to(indicatorRef.current, {
-        y: 12,
-        duration: 1.1,
-        ease: "sine.inOut",
-        repeat: -1,
-        yoyo: true,
-      });
-
-      gsap.to(q("[data-hero-quote-word]"), {
-        autoAlpha: 1,
-        yPercent: 0,
-        filter: "blur(0px)",
-        clipPath: "inset(0 0 0% 0)",
-        duration: prefersReducedMotion ? 0.35 : 0.8,
-        stagger: prefersReducedMotion ? 0.02 : 0.08,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 68%",
-          end: prefersReducedMotion ? "top 52%" : "top 18%",
-          scrub: prefersReducedMotion ? false : 0.45,
-        },
-      });
-    },
-    { scope: sectionRef }
-  );
-
-  const scrollToAbout = () => {
-    document.getElementById("about")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const scrollToProjects = () => {
+    document.getElementById("projects")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
     <section
+      id="about"
       ref={sectionRef}
-      className="relative isolate flex min-h-[100dvh] items-center justify-center overflow-hidden px-6 pb-24 pt-24 md:px-10 lg:px-12"
+      className="terminal-hero-section relative isolate flex min-h-[100dvh] items-center justify-center overflow-hidden px-6 pb-24 pt-24 md:px-10"
     >
-      <div ref={backgroundLayerRef} className="absolute inset-0">
-        <HeroLiquidDistortion containerRef={sectionRef} />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,23,0.28),rgba(2,6,23,0.74)_58%,rgba(2,6,23,0.92))]" />
-      </div>
+      <div className="terminal-hero-bg absolute inset-0" />
+      <canvas ref={canvasRef} className="terminal-rain-canvas" aria-hidden="true" />
+      <div className="terminal-scanlines absolute inset-0" />
+      <div className="terminal-vignette absolute inset-0" />
 
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-[14%] top-[14%] h-64 w-64 rounded-full bg-[rgba(99,102,241,0.12)] blur-[120px]" />
-        <div className="absolute right-[10%] top-[22%] h-80 w-80 rounded-full bg-[rgba(124,58,237,0.12)] blur-[140px]" />
-        <div className="absolute bottom-[8%] left-1/2 h-56 w-[36rem] -translate-x-1/2 rounded-full bg-[rgba(45,212,191,0.08)] blur-[110px]" />
-      </div>
+      <div className="relative z-10 mx-auto w-full max-w-6xl text-center">
+        <div className="terminal-shell mx-auto max-w-5xl rounded-2xl p-6 sm:p-8 md:p-10">
+          <p className="terminal-prompt mb-4 text-left text-xs uppercase tracking-[0.22em] sm:text-sm">
+            $ init --profile aditya_raj --mode production
+          </p>
 
-      <div ref={contentRef} className="relative z-10 mx-auto max-w-5xl text-center">
-        <div className="flex flex-col items-center gap-10">
-          <a
-            data-hero-badge
-            href="mailto:arajsinha4@gmail.com"
-            className="signature-pill inline-flex items-center gap-3 rounded-full px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] backdrop-blur-xl transition-transform duration-300 hover:-translate-y-0.5"
-          >
-            <span className="relative flex h-2.5 w-2.5">
-              <span
-                className="absolute inline-flex h-full w-full rounded-full opacity-75"
-                style={{
-                  backgroundColor: "rgba(99, 102, 241, 0.72)",
-                  animation: "pulse-ring 1.5s ease-out infinite",
-                }}
-              />
-              <span
-                className="relative inline-flex h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: "var(--signature)" }}
-              />
-            </span>
-            Open to SDE Internships &amp; New Grad Roles
-          </a>
+          <div className="flex flex-col items-center gap-5">
+            <pre
+              aria-hidden="true"
+              className="terminal-ascii w-full overflow-x-auto pb-1 text-left text-[0.38rem] leading-[1.08] sm:text-[0.52rem] md:text-[0.68rem]"
+            >
+              {asciiName.join("\n")}
+            </pre>
+            <h1 className="sr-only">Aditya Raj</h1>
 
-          <div className="flex flex-col items-center gap-6">
-            <div ref={nameRef} className="group relative">
-              <div className="pointer-events-none absolute inset-x-[10%] bottom-[10%] h-12 rounded-full bg-[rgba(99,102,241,0.18)] blur-[44px] transition-opacity duration-500 group-hover:opacity-100" />
-              <h1 className="display-title relative text-[clamp(4.8rem,13vw,9.4rem)] font-black uppercase leading-[0.84] text-white">
-                <span className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-                  {nameParts.map((part, partIndex) => (
-                    <span
-                      key={part.word}
-                      className={`inline-flex overflow-hidden ${part.accent ? "text-gradient" : ""}`}
-                    >
-                      {Array.from(part.word).map((letter, index) => {
-                        const letterIndex =
-                          nameParts
-                            .slice(0, partIndex)
-                            .reduce((total, item) => total + item.word.length, 0) + index;
+            <p className="terminal-typewriter text-lg text-[#d7fdf7] sm:text-xl md:text-2xl">
+              {typewriterText}
+              <span className="terminal-caret" aria-hidden="true">
+                _
+              </span>
+            </p>
 
-                        return (
-                          <span
-                            key={`${part.word}-${index}`}
-                            ref={(element) => {
-                              letterRefs.current[letterIndex] = element;
-                            }}
-                            data-hero-letter
-                            className="inline-block will-change-transform"
-                          >
-                            {letter}
-                          </span>
-                        );
-                      })}
-                    </span>
-                  ))}
-                </span>
-              </h1>
-            </div>
-
-            <div className="flex flex-col items-center gap-3">
-              <h2
-                data-hero-subtitle
-                className="text-2xl font-bold tracking-wide text-white sm:text-3xl"
-              >
-                Full-Stack Developer &amp; AI Engineer
-              </h2>
-
-              <p
-                data-hero-quote
-                className="measure-copy mt-3 text-lg font-medium italic text-slate-300 sm:text-xl"
-              >
-                <span className="sr-only">Building AI-powered products that ship.</span>
-                <span aria-hidden="true">
-                  {heroQuoteWords.map((word, index) => (
-                    <span key={word} className="inline-block overflow-hidden">
-                      <span data-hero-quote-word className="inline-block will-change-transform">
-                        {word}
-                      </span>
-                      {index < heroQuoteWords.length - 1 ? <span>&nbsp;</span> : null}
-                    </span>
-                  ))}
-                </span>
-              </p>
-            </div>
+            <p className="mx-auto max-w-3xl text-sm text-slate-300 sm:text-base">{heroQuote}</p>
           </div>
 
-          <div data-hero-cta className="mt-2 flex flex-wrap items-center justify-center gap-7">
-            <MagneticButton intensity={0.34} range={150}>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <MagneticButton intensity={0.26} range={120}>
               <a
                 href="#projects"
-                className="signature-button group relative inline-flex items-center gap-3 overflow-hidden whitespace-nowrap rounded-xl px-10 py-5 text-base font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:scale-105"
+                className="terminal-primary-btn inline-flex items-center gap-2 rounded-md px-5 py-3 text-sm font-semibold uppercase tracking-[0.12em]"
               >
-                <span
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                  style={{ animation: "shimmer 2s infinite" }}
-                />
-                <span className="relative flex items-center gap-3">
-                  View Projects
-                  <ArrowUpRight
-                    size={18}
-                    className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  />
-                </span>
+                View Projects
+                <ArrowUpRight size={16} />
               </a>
             </MagneticButton>
 
-            <MagneticButton intensity={0.3} range={140}>
+            <MagneticButton intensity={0.24} range={110}>
               <a
                 href="#contact"
-                className="signature-button group relative inline-flex items-center gap-3 overflow-hidden whitespace-nowrap rounded-xl px-10 py-5 text-base font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:scale-105"
+                className="terminal-ghost-btn inline-flex items-center gap-2 rounded-md px-5 py-3 text-sm font-semibold uppercase tracking-[0.12em]"
               >
-                <span
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                  style={{ animation: "shimmer 2s infinite" }}
-                />
-                <span className="relative flex items-center gap-3">
-                  Get in Touch
-                  <Mail
-                    size={18}
-                    className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  />
-                </span>
+                Get in Touch
+                <Mail size={16} />
               </a>
             </MagneticButton>
           </div>
 
-          <div data-hero-social className="mt-2 flex flex-wrap items-center justify-center gap-4">
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             {socialLinks.map((link) => {
               const Icon = link.icon;
-
               return (
-                <MagneticButton key={link.label} intensity={0.22} range={110}>
+                <MagneticButton key={link.label} intensity={0.2} range={95}>
                   <a
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={link.label}
-                    className="group relative inline-flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white/[0.06] text-slate-200 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:text-white"
-                    style={{
-                      boxShadow: `0 18px 36px -24px ${link.glow}`,
-                    }}
+                    className="terminal-icon-btn inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-xs font-medium uppercase tracking-[0.12em] text-slate-200"
                   >
-                    <span
-                      className="absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                      style={{
-                        background: `radial-gradient(circle, ${link.glow} 0%, transparent 68%)`,
-                      }}
-                    />
-                    <Icon
-                      size={18}
-                      className="relative z-10 transition-transform duration-300 group-hover:scale-110"
-                    />
+                    <Icon size={14} />
+                    {link.label}
                   </a>
                 </MagneticButton>
               );
@@ -413,12 +282,12 @@ export default function Hero() {
       <button
         ref={indicatorRef}
         type="button"
-        onClick={scrollToAbout}
-        className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2 text-xs font-semibold uppercase tracking-[0.28em] text-slate-400 transition-colors hover:text-white"
+        onClick={scrollToProjects}
+        className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#8ecbc3] transition-colors hover:text-[#d8fff8]"
       >
         <span>Scroll</span>
-        <span className="flex h-12 w-8 items-start justify-center rounded-full border border-white/12 bg-white/5 p-1.5">
-          <ArrowDown size={14} style={{ color: "var(--secondary-accent)" }} />
+        <span className="flex h-10 w-7 items-start justify-center rounded-full border border-[#2d6f66] bg-[#06211d]/70 p-1.5">
+          <ArrowDown size={13} />
         </span>
       </button>
     </section>

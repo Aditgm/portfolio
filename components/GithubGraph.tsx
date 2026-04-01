@@ -1,8 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
 import { ArrowUpRight, Flame, Github, Sparkles } from "lucide-react";
 import { GitHubCalendar } from "react-github-calendar";
+import { useGSAP } from "@/hooks/useGSAP";
 
 const totalContributions = "1,200+ contributions";
 const currentStreak = "365-day streak";
@@ -18,20 +19,35 @@ const monthlyTotal = monthlyBars.reduce((sum, item) => sum + item.value, 0);
 const maxMonthlyBar = Math.max(...monthlyBars.map((item) => item.value));
 
 export default function GithubGraph() {
+    const sectionRef = useRef<HTMLElement>(null);
+    const headerRef = useRef<HTMLDivElement>(null);
+    const cardRef = useRef<HTMLDivElement>(null);
+
+    const { createRevealAnimation } = useGSAP(sectionRef);
+
+    useGSAP(() => {
+        createRevealAnimation(headerRef, {
+            from: { autoAlpha: 0, y: 20, rotateX: 8 },
+            to: { autoAlpha: 1, y: 0, rotateX: 0 },
+            duration: 0.6,
+        });
+
+        createRevealAnimation(cardRef, {
+            from: { autoAlpha: 0, y: 24, rotateX: 8, scale: 0.98 },
+            to: { autoAlpha: 1, y: 0, rotateX: 0, scale: 1 },
+            duration: 0.6,
+            delay: 0.1,
+        });
+    }, [createRevealAnimation]);
+
     return (
-        <section className="section-container geo-divider-top relative">
+        <section ref={sectionRef} className="section-container geo-divider-top relative">
             <div className="pointer-events-none absolute inset-0 geo-grid opacity-40" />
             <div className="pointer-events-none absolute left-0 top-1/2 h-[400px] w-[400px] -translate-y-1/2 rounded-full bg-blue-600/[0.04] blur-[120px]" />
             <div className="pointer-events-none absolute right-0 top-1/2 h-[300px] w-[300px] -translate-y-1/2 rounded-full bg-purple-600/[0.04] blur-[100px]" />
 
             <div className="section-inner">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                    className="mb-14 max-w-2xl"
-                >
+                <div ref={headerRef} className="mb-14 max-w-2xl">
                     <div className="mb-4 flex items-center gap-3 section-label">
                         <Github size={18} />
                         <p className="m-0">Contributions</p>
@@ -43,13 +59,10 @@ export default function GithubGraph() {
                         A visual representation of open-source consistency, contribution rhythm, and sustained
                         coding habits.
                     </p>
-                </motion.div>
+                </div>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 24 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                <div
+                    ref={cardRef}
                     className="card border-trace mx-auto flex w-full flex-col items-center gap-8 overflow-hidden rounded-2xl bg-white/[0.02] p-6 sm:p-10"
                 >
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
@@ -120,7 +133,7 @@ export default function GithubGraph() {
                         View on GitHub
                         <ArrowUpRight size={15} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </a>
-                </motion.div>
+                </div>
             </div>
         </section>
     );

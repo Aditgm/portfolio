@@ -1,44 +1,86 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
 import { GraduationCap } from "lucide-react";
+import { useGSAP } from "@/hooks/useGSAP";
 
 const courses = ["Algorithms", "Data Structures", "Machine Learning", "Deep Learning", "Computer Networks", "DBMS"];
 
 export default function Education() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const courseRefs = useRef<Array<HTMLSpanElement | null>>([]);
+
+  const { createRevealAnimation, gsap, prefersReducedMotion, withContext } = useGSAP(sectionRef);
+
+  useGSAP(() => {
+    createRevealAnimation(headerRef, {
+      from: { autoAlpha: 0, y: 20, rotateX: 8 },
+      to: { autoAlpha: 1, y: 0, rotateX: 0 },
+      duration: 0.6,
+    });
+
+    createRevealAnimation(cardRef, {
+      from: { autoAlpha: 0, y: 24, rotateX: 8, scale: 0.98 },
+      to: { autoAlpha: 1, y: 0, rotateX: 0, scale: 1 },
+      duration: 0.6,
+    });
+  }, [createRevealAnimation]);
+
+  useGSAP(() => {
+    withContext(() => {
+      const courseElements = courseRefs.current.filter(
+        (el): el is HTMLSpanElement => el !== null
+      );
+
+      if (courseElements.length === 0) return;
+
+      gsap.fromTo(
+        courseElements,
+        {
+          autoAlpha: 0,
+          scale: 0.9,
+          y: 8,
+        },
+        {
+          autoAlpha: 1,
+          scale: 1,
+          y: 0,
+          duration: 0.5,
+          stagger: 0.04,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: cardRef.current,
+            start: "top 78%",
+            once: true,
+          },
+        }
+      );
+    });
+  }, [gsap, prefersReducedMotion, withContext]);
+
   return (
-    <section className="section-container geo-divider-top relative">
-      {/* Background */}
+    <section ref={sectionRef} className="section-container geo-divider-top relative">
       <div className="pointer-events-none absolute inset-0 geo-grid opacity-40" />
       <div className="pointer-events-none absolute left-1/2 top-0 h-[300px] w-[300px] -translate-x-1/2 rounded-full bg-cyan-600/[0.03] blur-[100px]" />
 
       <div className="section-inner">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-14 md:mb-16"
-        >
+        <div ref={headerRef} className="mb-14 md:mb-16">
           <p className="section-label mb-4">Education</p>
           <h2 className="section-title">
             Academic <span className="text-gradient-static">Background</span>
           </h2>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        <div
+          ref={cardRef}
           className="card border-trace group overflow-hidden"
         >
-          {/* Top gradient accent */}
           <div className="h-px w-full bg-gradient-to-r from-cyan-500/30 via-blue-500/20 to-transparent" />
 
           <div className="p-10 md:p-16">
             <div className="flex items-start gap-6 md:gap-8">
-              {/* Icon with geometric container */}
               <div className="relative flex h-14 w-14 shrink-0 items-center justify-center">
                 <div className="absolute inset-0 rounded-2xl border border-cyan-500/15 bg-gradient-to-br from-cyan-500/[0.08] to-transparent transition-all duration-300 group-hover:border-cyan-500/25" />
                 <div
@@ -61,10 +103,8 @@ export default function Education() {
                   <div className="text-right">
                     <p className="font-mono text-xs text-slate-500">Apr 2023 – Present</p>
 
-                    {/* GPA badge with geometric styling */}
                     <div className="mt-3 inline-flex items-center gap-2 rounded-xl border border-green-500/15 bg-green-500/[0.06] px-4 py-2">
                       <div className="relative h-8 w-8">
-                        {/* Circular progress ring SVG */}
                         <svg viewBox="0 0 36 36" className="h-8 w-8 -rotate-90">
                           <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="2" />
                           <circle
@@ -90,28 +130,24 @@ export default function Education() {
                   </div>
                 </div>
 
-                {/* Courses */}
                 <div className="mt-12 border-t border-white/[0.04] pt-10">
                   <p className="mb-4 text-[0.65rem] font-medium uppercase tracking-[0.15em] text-slate-500">Key Coursework</p>
                   <div className="flex flex-wrap gap-4">
                     {courses.map((c, i) => (
-                      <motion.span
+                      <span
                         key={c}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: i * 0.04 }}
+                        ref={(el) => { courseRefs.current[i] = el; }}
                         className="rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-xs font-semibold tracking-wide text-slate-300 transition-all duration-300 hover:border-white/[0.15] hover:bg-white/[0.06] hover:text-white"
                       >
                         {c}
-                      </motion.span>
+                      </span>
                     ))}
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
