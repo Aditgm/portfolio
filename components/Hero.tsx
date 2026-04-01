@@ -218,13 +218,17 @@ export default function Hero() {
           </p>
 
           <div className="flex flex-col items-center gap-5">
+            <h1 className="terminal-name-plain text-center text-[clamp(2.1rem,8.5vw,4.8rem)] font-black uppercase leading-[0.92] tracking-[0.08em] text-[#defff8]">
+              Aditya Raj
+            </h1>
+
             <pre
               aria-hidden="true"
-              className="terminal-ascii w-full overflow-x-auto pb-1 text-left text-[0.38rem] leading-[1.08] sm:text-[0.52rem] md:text-[0.68rem]"
+              className="terminal-ascii w-full overflow-x-auto pb-1 text-left text-[0.42rem] leading-[1.08] sm:text-[0.58rem] md:text-[0.74rem]"
             >
               {asciiName.join("\n")}
             </pre>
-            <h1 className="sr-only">Aditya Raj</h1>
+            <p className="sr-only">Aditya Raj</p>
 
             <p className="terminal-typewriter text-lg text-[#d7fdf7] sm:text-xl md:text-2xl">
               {typewriterText}
