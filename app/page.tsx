@@ -8,7 +8,6 @@ import Skills from "@/components/Skills";
 import Education from "@/components/Education";
 import Footer from "@/components/Footer";
 import ChatbotRAG from "@/components/ChatbotRAG";
-import SimpleBackground from "@/components/SimpleBackground";
 import StaticGeometry, { type StaticGeometryAccent } from "@/components/StaticGeometry";
 
 const ambientAccents: StaticGeometryAccent[] = [
@@ -49,7 +48,6 @@ const ambientAccents: StaticGeometryAccent[] = [
 export default function Home() {
   return (
     <main className="relative min-h-screen bg-transparent">
-      <SimpleBackground />
       <StaticGeometry accents={ambientAccents} className="z-[1] opacity-70" />
       <Navbar />
       <div className="relative z-10">

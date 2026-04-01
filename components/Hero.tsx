@@ -4,14 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDown, ArrowUpRight, Binary, Github, Mail, Trophy } from "lucide-react";
 import MagneticButton from "./MagneticButton";
 
-const asciiName = [
-  "      _    ____ ___ _______   ___    _   ____      _       ",
-  "     / \\  |  _ \\_ _|_   _\ \ / / \  | | |  _ \\    / \\      ",
-  "    / _ \\ | | | || |  | |  \\ V / _ \\ | | | |_) |  / _ \\     ",
-  "   / ___ \\| |_| || |  | |   | | / ___ \\| | |  _ <  / ___ \\    ",
-  "  /_/   \\_\\____/|___| |_|   |_|/_/   \\_\\_| |_| \\_\\/_/   \\_\\   ",
-];
-
 const rolePhrases = [
   "Full-Stack Developer",
   "AI Engineer",
@@ -221,13 +213,6 @@ export default function Hero() {
             <h1 className="terminal-name-plain text-center text-[clamp(2.1rem,8.5vw,4.8rem)] font-black uppercase leading-[0.92] tracking-[0.08em] text-[#defff8]">
               Aditya Raj
             </h1>
-
-            <pre
-              aria-hidden="true"
-              className="terminal-ascii w-full overflow-x-auto pb-1 text-left text-[0.42rem] leading-[1.08] sm:text-[0.58rem] md:text-[0.74rem]"
-            >
-              {asciiName.join("\n")}
-            </pre>
             <p className="sr-only">Aditya Raj</p>
 
             <p className="terminal-typewriter text-lg text-[#d7fdf7] sm:text-xl md:text-2xl">
