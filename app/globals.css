@@ -262,12 +262,56 @@ body {
   }
 }
 
-/* Chatbot FAB button */
-.chatbot-fab {
+/* Chatbot FAB wrapper for outer ripple */
+.chatbot-fab-wrapper {
   position: fixed;
   bottom: 24px;
   right: 24px;
   z-index: 9999;
+  pointer-events: none;
+}
+
+.chatbot-fab-wrapper > button {
+  pointer-events: auto;
+}
+
+/* Chatbot ripple - starts outside the icon */
+@keyframes ripple-outer {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+    border: 3px solid rgba(34, 211, 238, 0.8);
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+    border: 1px solid rgba(34, 211, 238, 0);
+  }
+}
+
+.chatbot-ripple-outer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 3px solid rgba(34, 211, 238, 0.8);
+  animation: ripple-outer 2s ease-out infinite;
+  pointer-events: none;
+}
+
+.chatbot-ripple-outer:nth-child(2) {
+  animation-delay: 0.6s;
+}
+
+.chatbot-ripple-outer:nth-child(3) {
+  animation-delay: 1.2s;
+}
+
+/* Chatbot FAB button */
+.chatbot-fab {
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -279,58 +323,13 @@ body {
   align-items: center;
   justify-content: center;
   color: white;
-  overflow: visible;
+  position: relative;
+  z-index: 2;
   transition: transform 0.3s ease;
-  pointer-events: auto;
 }
 
 .chatbot-fab:hover {
   transform: translateY(-4px);
-}
-
-.chatbot-fab:active {
-  transform: scale(0.95);
-}
-
-/* Chatbot ripple animation - starts from button boundary */
-@keyframes ping {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-    box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.7);
-  }
-  70% {
-    box-shadow: 0 0 0 20px rgba(34, 211, 238, 0);
-  }
-  100% {
-    transform: scale(1.8);
-    opacity: 0;
-    box-shadow: 0 0 0 30px rgba(34, 211, 238, 0);
-  }
-}
-
-@keyframes ripple-ring {
-  0% {
-    transform: scale(1);
-    opacity: 0.8;
-    border-width: 3px;
-  }
-  100% {
-    transform: scale(2.2);
-    opacity: 0;
-    border-width: 1px;
-  }
-}
-
-.chatbot-ripple {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 3px solid rgba(34, 211, 238, 0.8);
-  animation: ripple-ring 1.2s ease-out infinite;
-  pointer-events: none;
-  box-shadow: 0 0 15px 5px rgba(34, 211, 238, 0.4);
 }
 
 html.lenis, html.lenis body {

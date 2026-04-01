@@ -142,17 +142,23 @@ export default function ChatbotRAG() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={toggleChat}
-        aria-label={open ? "Close assistant" : "Open assistant"}
-        className="chatbot-fab"
-      >
-        <span style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          {!open && <span className="chatbot-ripple" />}
+      <div className="chatbot-fab-wrapper">
+        {!open && (
+          <>
+            <span className="chatbot-ripple-outer" />
+            <span className="chatbot-ripple-outer" />
+            <span className="chatbot-ripple-outer" />
+          </>
+        )}
+        <button
+          type="button"
+          onClick={toggleChat}
+          aria-label={open ? "Close assistant" : "Open assistant"}
+          className="chatbot-fab"
+        >
           {open ? <X size={20} /> : <MessageCircle size={20} />}
-        </span>
-      </button>
+        </button>
+      </div>
 
       {open ? (
         <div
