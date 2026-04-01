@@ -188,6 +188,80 @@ body {
   }
 }
 
+/* ═══════════════════════════════════════════════════
+   PROJECT GALLERY HOVER ANIMATIONS
+   ═══════════════════════════════════════════════════ */
+.project-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .project-gallery {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .project-gallery {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.project-gallery-item {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-gallery-item:hover,
+.project-gallery-item:focus-visible {
+  transform: scale(1.08);
+  box-shadow: 0 0 20px var(--signature-glow);
+}
+
+.project-gallery-item:focus-visible {
+  outline: 2px solid var(--signature);
+  outline-offset: 2px;
+}
+
+.project-gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.project-gallery-label {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-gallery-item {
+    transition: none;
+  }
+  .project-gallery-item:hover,
+  .project-gallery-item:focus-visible {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
 html.lenis, html.lenis body {
   height: auto;
 }

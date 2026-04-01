@@ -510,7 +510,7 @@ export default function Projects() {
                       data-project-overlay
                       className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,10,24,0.08),rgba(5,10,24,0.32)_52%,rgba(5,10,24,0.62))] opacity-45"
                     />
-                    <div className="absolute inset-x-0 bottom-0 flex items-end p-5 md:p-6">
+                      <div className="absolute inset-x-0 bottom-0 flex items-end p-5 md:p-6">
                       <span
                         data-project-label
                         className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-[#081120]/76 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/90 backdrop-blur-md"
@@ -520,6 +520,30 @@ export default function Projects() {
                       </span>
                     </div>
                   </div>
+
+                  {/* Project Gallery - Additional Images */}
+                  {project.gallery && project.gallery.length > 0 && (
+                    <div className="project-gallery mt-4">
+                      {project.gallery.map((galleryImage, galleryIndex) => (
+                        <button
+                          key={galleryIndex}
+                          className="project-gallery-item"
+                          aria-label={`${project.title} - Image ${galleryIndex + 2}`}
+                        >
+                          <Image
+                            src={galleryImage}
+                            alt=""
+                            fill
+                            className="object-cover"
+                            sizes="(min-width: 768px) 33vw, 50vw"
+                          />
+                          <span className="project-gallery-label">
+                            Image {galleryIndex + 2}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
                   <div className="flex flex-col justify-between p-6 md:p-7">
                     <div>

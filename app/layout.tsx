@@ -42,7 +42,7 @@ export const metadata: Metadata = {
       "Codeforces Master · LeetCode Guardian (Top 0.4%) · Amazon ML Summer School · MERN Stack · RAG/LLM",
     type: "website",
     locale: "en_US",
-    images: [{ url: "/og.svg", width: 1200, height: 630, alt: "Aditya Raj Portfolio" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Aditya Raj Portfolio" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -60,8 +60,6 @@ import { TransitionProvider } from "@/components/TransitionContext";
 import { SmoothScrollProvider } from "@/components/SmoothScroll";
 import AppShellEffects from "@/components/AppShellEffects";
 import Preloader from "@/components/Preloader";
-import FluidGradientBackground from "@/components/FluidGradientBackground";
-import CustomCursor from "@/components/CustomCursor";
 import ScrollProgress from "@/components/ScrollProgress";
 
 // Person schema for SEO
@@ -70,7 +68,7 @@ const personSchema = {
   "@type": "Person",
   name: "Aditya Raj",
   url: "https://adityaraj.dev",
-  image: "/og.svg",
+  image: "/og.png",
   sameAs: [
     "https://github.com/Aditgm",
     "https://leetcode.com/u/adityagm/",
@@ -106,8 +104,8 @@ export default function RootLayout({
         {/* Scroll progress indicator */}
         <ScrollProgress />
         
-        <FluidGradientBackground />
-        <CustomCursor enabled={true} />
+        {/* AppShellEffects includes CustomCursor + FluidGradientBackground */}
+        <AppShellEffects />
         <Preloader />
         <SmoothScrollProvider>
           <TransitionProvider>

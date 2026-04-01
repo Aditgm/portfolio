@@ -207,7 +207,7 @@ const buildSteps = {
         steps: [
             {
                 id: 1,
-                title: "需求分析",
+                title: "Requirements Analysis",
                 description: "Identified the need for a centralized platform where students can access 5,000+ questions across 30+ subjects specific to DIT University curriculum.",
                 icon: <Brain size={20} />,
                 color: "text-cyan-400",

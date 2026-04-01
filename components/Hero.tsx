@@ -75,6 +75,7 @@ export default function Hero() {
   const indicatorRef = useRef<HTMLButtonElement>(null);
   const isVisibleRef = useRef(true);
   const rafIdRef = useRef<number | null>(null);
+  const isRunningRef = useRef(false);
 
   const typewriterText = useTypewriter(rolePhrases);
 
@@ -83,6 +84,7 @@ export default function Hero() {
     []
   );
 
+  // Robust visibility-based animation control using IntersectionObserver
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) {
@@ -98,7 +100,6 @@ export default function Hero() {
     const chars = "01<>[]{}()$#@%&*+=-:/\\\\";
     const fontSize = 14;
 
-    let animationFrame = 0;
     let columns = 0;
     let drops: number[] = [];
 
@@ -140,8 +141,10 @@ export default function Hero() {
     };
 
     const drawRain = () => {
-      // Pause animation when hero is not visible to reduce CPU usage
+      // Only continue if visibility check passes
       if (!isVisibleRef.current) {
+        isRunningRef.current = false;
+        rafIdRef.current = null;
         return;
       }
 
@@ -167,9 +170,10 @@ export default function Hero() {
         drops[index] += 1;
       }
 
-      // Only schedule next frame if visible
-      if (isVisibleRef.current) {
-        animationFrame = window.requestAnimationFrame(drawRain);
+      // Continue animation loop only if visible
+      if (isVisibleRef.current && !rafIdRef.current) {
+        isRunningRef.current = true;
+        rafIdRef.current = window.requestAnimationFrame(drawRain);
       }
     };
 
@@ -177,25 +181,50 @@ export default function Hero() {
 
     if (prefersReducedMotion) {
       drawStatic();
-    } else {
-      // Start animation loop - will be gated by isVisibleRef
-      animationFrame = window.requestAnimationFrame(drawRain);
     }
 
-    // IntersectionObserver to pause/resume animation based on hero visibility
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        isVisibleRef.current = entry.isIntersecting;
+    // IntersectionObserver for robust visibility detection
+    const observerCallback: IntersectionObserverCallback = (entries) => {
+      const entry = entries[0];
+      const wasVisible = isVisibleRef.current;
+      isVisibleRef.current = entry.isIntersecting;
 
-        // Resume animation when hero comes back into view
-        if (entry.isIntersecting && !prefersReducedMotion && !rafIdRef.current) {
+      // Hero became visible - start/resume animation
+      if (entry.isIntersecting && !prefersReducedMotion) {
+        if (!isRunningRef.current && !rafIdRef.current) {
+          isRunningRef.current = true;
           rafIdRef.current = window.requestAnimationFrame(drawRain);
         }
-      },
-      { threshold: 0 }
-    );
-    observer.observe(canvas);
+      } 
+      // Hero became invisible - stop animation cleanly
+      else if (wasVisible && !entry.isIntersecting) {
+        if (rafIdRef.current) {
+          window.cancelAnimationFrame(rafIdRef.current);
+          rafIdRef.current = null;
+        }
+        isRunningRef.current = false;
+      }
+    };
+
+    const observer = new IntersectionObserver(observerCallback, {
+      threshold: 0,
+      rootMargin: "50px"
+    });
+    
+    // Observe the section element, not canvas (more reliable)
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    // Start initial animation if visible
+    if (!prefersReducedMotion && sectionRef.current) {
+      const rect = sectionRef.current.getBoundingClientRect();
+      const isOnScreen = rect.top < window.innerHeight && rect.bottom > 0;
+      if (isOnScreen && !rafIdRef.current) {
+        isRunningRef.current = true;
+        rafIdRef.current = window.requestAnimationFrame(drawRain);
+      }
+    }
 
     const onResize = () => {
       setupCanvas();
@@ -208,12 +237,11 @@ export default function Hero() {
 
     return () => {
       window.removeEventListener("resize", onResize);
-      if (animationFrame) {
-        window.cancelAnimationFrame(animationFrame);
-      }
       if (rafIdRef.current) {
         window.cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
       }
+      isRunningRef.current = false;
       observer.disconnect();
     };
   }, []);

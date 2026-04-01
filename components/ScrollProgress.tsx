@@ -18,10 +18,14 @@ export default function ScrollProgress() {
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
       
-      barRef.current!.style.width = `${scrollPercent}%`;
+      if (barRef.current) {
+        barRef.current.style.width = `${scrollPercent}%`;
+      }
       
       // Update ARIA
-      containerRef.current!.setAttribute("aria-valuenow", Math.round(scrollPercent).toString());
+      if (containerRef.current) {
+        containerRef.current.setAttribute("aria-valuenow", Math.round(scrollPercent).toString());
+      }
     };
 
     // Use requestAnimationFrame for smooth updates

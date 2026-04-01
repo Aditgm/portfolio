@@ -7,6 +7,7 @@ export type ProjectItem = {
   github: string;
   live: string;
   image: string;
+  gallery?: string[]; // Optional additional images for gallery (2-3 images)
   tag: string;
   tagColor: string;
   accentGradient: string;
@@ -44,7 +45,8 @@ export const projects: ProjectItem[] = [
     stack: ["Next.js", "MongoDB", "Express.js", "Node.js", "Tailwind CSS", "JWT"],
     github: "https://github.com/Aditgm/DIT-PYQ-hub",
     live: "https://dit-pyq-hub.vercel.app",
-    image: "/projects/dit-pyq-hub.svg",
+    image: "/projects/dit-pyq-hub.png",
+    gallery: ["/projects/dit-pyq-hub-2.png", "/projects/dit-pyq-hub-3.png"],
     tag: "Full-Stack + EdTech",
     tagColor: "border-cyan-500/20 bg-cyan-500/[0.07] text-cyan-400",
     accentGradient: "from-cyan-500/20 to-blue-500/5",
@@ -80,7 +82,8 @@ export const projects: ProjectItem[] = [
     stack: ["React", "Node.js", "LangChain", "OpenAI", "VS Code API", "Pinecone"],
     github: "https://github.com/Aditgm/Devsaathi",
     live: "https://devsaathi-tawny.vercel.app",
-    image: "/projects/devsaathi.svg",
+    image: "/projects/devsaathi.png",
+    gallery: ["/projects/devsaathi-2.png", "/projects/devsaathi-3.png"],
     tag: "AI + Developer Tools",
     tagColor: "border-orange-500/20 bg-orange-500/[0.07] text-orange-400",
     accentGradient: "from-orange-500/20 to-amber-500/5",
@@ -117,6 +120,7 @@ export const projects: ProjectItem[] = [
     github: "https://github.com/Aditgm/dengue-spot",
     live: "https://dengue-spot-gi3p.onrender.com/",
     image: "/projects/denguespot.png",
+    gallery: ["/projects/denguespot-2.png", "/projects/denguespot-3.png"],
     tag: "Full-Stack + AI/CV",
     tagColor: "border-red-500/20 bg-red-500/[0.07] text-red-400",
     accentGradient: "from-red-500/20 to-orange-500/5",
@@ -150,6 +154,7 @@ export const projects: ProjectItem[] = [
     github: "https://github.com/Aditgm/Legal_Lens",
     live: "https://aditgm.github.io/Legal_Lens/",
     image: "/projects/legallens.png",
+    gallery: ["/projects/legallens-2.png", "/projects/legallens-3.png"],
     tag: "AI/ML + RAG",
     tagColor: "border-purple-500/20 bg-purple-500/[0.07] text-purple-400",
     accentGradient: "from-purple-500/20 to-blue-500/5",
@@ -183,6 +188,7 @@ export const projects: ProjectItem[] = [
     github: "https://github.com/Aditgm/Youtubey",
     live: "https://youtubey-beige.vercel.app/",
     image: "/projects/youtubey.png",
+    gallery: ["/projects/youtubey-2.png", "/projects/youtubey-3.png"],
     tag: "AI + Full-Stack",
     tagColor: "border-blue-500/20 bg-blue-500/[0.07] text-blue-400",
     accentGradient: "from-blue-500/20 to-cyan-500/5",
@@ -216,6 +222,7 @@ export const projects: ProjectItem[] = [
     github: "https://github.com/Aditgm/indian-economic-dashboard",
     live: "https://aditgm-indian-economic-dashboard-app-oxnhak.streamlit.app/",
     image: "/projects/indian-economic-dashboard.png",
+    gallery: ["/projects/indian-economic-dashboard-2.png", "/projects/indian-economic-dashboard-3.png"],
     tag: "Data Science + FinTech",
     tagColor: "border-emerald-500/20 bg-emerald-500/[0.07] text-emerald-400",
     accentGradient: "from-emerald-500/20 to-teal-500/5",
