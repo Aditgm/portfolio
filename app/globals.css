@@ -267,7 +267,7 @@ body {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 9995;
+  z-index: 9999;
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -279,7 +279,9 @@ body {
   align-items: center;
   justify-content: center;
   color: white;
+  overflow: visible;
   transition: transform 0.3s ease;
+  pointer-events: auto;
 }
 
 .chatbot-fab:hover {

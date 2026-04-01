@@ -47,20 +47,22 @@ const ambientAccents: StaticGeometryAccent[] = [
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen bg-transparent">
-      <StaticGeometry accents={ambientAccents} className="z-[1] opacity-70" />
-      <Navbar />
-      <div className="relative z-10">
-        <Hero />
-        <Achievements />
-        <Experience />
-        <Projects />
-        <Skills />
-        <Education />
-        <GithubGraph />
-        <Footer />
-        <ChatbotRAG />
-      </div>
-    </main>
+    <>
+      <main className="relative min-h-screen bg-transparent">
+        <StaticGeometry accents={ambientAccents} className="z-[1] opacity-70" />
+        <Navbar />
+        <div className="relative z-10">
+          <Hero />
+          <Achievements />
+          <Experience />
+          <Projects />
+          <Skills />
+          <Education />
+          <GithubGraph />
+          <Footer />
+        </div>
+      </main>
+      <ChatbotRAG />
+    </>
   );
 }
