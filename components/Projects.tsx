@@ -20,6 +20,9 @@ type ProjectItem = {
   accentGradient: string;
   accentGlow: string;
   slug: string;
+  stars?: number;
+  forks?: number;
+  language?: string;
 };
 
 const projects: ProjectItem[] = [
@@ -47,14 +50,17 @@ const projects: ProjectItem[] = [
       "Secure authentication with JWT and role-based access",
     ],
     stack: ["Next.js", "MongoDB", "Express.js", "Node.js", "Tailwind CSS", "JWT"],
-    github: "https://github.com/Aditgm/dit-pyq-hub",
-    live: "https://dit-pyq-hub.vercel.app/",
+    github: "https://github.com/Aditgm/DIT-PYQ-hub",
+    live: "https://dit-pyq-hub.vercel.app",
     image: "/projects/dit-pyq-hub.png",
     tag: "Full-Stack + EdTech",
     tagColor: "border-cyan-500/20 bg-cyan-500/[0.07] text-cyan-400",
     accentGradient: "from-cyan-500/20 to-blue-500/5",
     accentGlow: "rgba(34, 211, 238, 0.2)",
     slug: "dit-pyq-hub",
+    stars: 2,
+    forks: 0,
+    language: "JavaScript",
   },
   {
     title: "DevSaathi",
@@ -80,14 +86,17 @@ const projects: ProjectItem[] = [
       "Knowledge base with 500+ documentation sources",
     ],
     stack: ["React", "Node.js", "LangChain", "OpenAI", "VS Code API", "Pinecone"],
-    github: "https://github.com/Aditgm/devsaathi",
-    live: "https://devsaathi.vercel.app/",
+    github: "https://github.com/Aditgm/Devsaathi",
+    live: "https://devsaathi-tawny.vercel.app",
     image: "/projects/devsaathi.png",
     tag: "AI + Developer Tools",
     tagColor: "border-orange-500/20 bg-orange-500/[0.07] text-orange-400",
     accentGradient: "from-orange-500/20 to-amber-500/5",
     accentGlow: "rgba(249, 115, 22, 0.2)",
     slug: "devsaathi",
+    stars: 2,
+    forks: 1,
+    language: "TypeScript",
   },
   {
     title: "Dengue-spot",
@@ -234,6 +243,7 @@ export default function Projects() {
   const cardRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const openFlipStateRef = useRef<{ state: Flip.FlipState; slug: string } | null>(null);
   const overflowRef = useRef("");
+  const scrollPositionRef = useRef({ x: 0, y: 0 });
   const [activeProject, setActiveProject] = useState<ProjectItem | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const { createRevealAnimation, gsap, prefersReducedMotion, withContext } = useGSAP(sectionRef);
@@ -243,6 +253,12 @@ export default function Projects() {
       if (activeProject || isAnimating) {
         return;
       }
+
+      // Save scroll position before opening modal
+      scrollPositionRef.current = {
+        x: window.scrollX,
+        y: window.scrollY,
+      };
 
       const sourceCard = cardRefs.current[project.slug];
 
@@ -304,6 +320,10 @@ export default function Projects() {
 
     setActiveProject(null);
 
+    // Store scroll position before flip animation
+    const scrollY = window.scrollY;
+    const scrollX = window.scrollX;
+
     requestAnimationFrame(() => {
       Flip.from(state, {
         targets: sourceCard,
@@ -312,7 +332,14 @@ export default function Projects() {
         ease: "power2.inOut",
         onComplete: () => {
           setIsAnimating(false);
+          // Restore scroll position after animation completes
+          window.scrollTo(scrollX, scrollY);
         },
+      });
+      
+      // Delay setting activeProject null until after flip animation
+      gsap.delayedCall(0.58, () => {
+        setActiveProject(null);
       });
     });
   }, [activeProject, gsap, isAnimating, prefersReducedMotion]);
@@ -737,15 +764,35 @@ export default function Projects() {
                     </div>
 
                     <div className="mt-8 flex items-center justify-between gap-4">
-                      <div className="flex flex-wrap gap-2">
-                        {project.stack.slice(0, 3).map((tech) => (
-                          <span
-                            key={tech}
-                            className="rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[0.72rem] font-medium tracking-wide text-slate-300"
-                          >
-                            {tech}
-                          </span>
-                        ))}
+                      <div className="flex flex-wrap items-center gap-3">
+                        <div className="flex flex-wrap gap-2">
+                          {project.stack.slice(0, 3).map((tech) => (
+                            <span
+                              key={tech}
+                              className="rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[0.72rem] font-medium tracking-wide text-slate-300"
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+                        {(project.stars !== undefined || project.language) && (
+                          <div className="flex items-center gap-2 text-xs text-slate-500">
+                            {project.language && (
+                              <span className="flex items-center gap-1">
+                                <span className="h-2 w-2 rounded-full bg-cyan-400/80" />
+                                {project.language}
+                              </span>
+                            )}
+                            {project.stars !== undefined && (
+                              <span className="flex items-center gap-1">
+                                <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 16 16">
+                                  <path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z" />
+                                </svg>
+                                {project.stars}
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
 
                       <span className="inline-flex items-center gap-2 text-sm font-semibold text-white/85">
@@ -888,6 +935,33 @@ export default function Projects() {
                     ))}
                   </div>
                 </div>
+
+                {(activeProject.stars !== undefined || activeProject.forks !== undefined || activeProject.language) && (
+                  <div className="mt-8 flex flex-wrap items-center gap-4 rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
+                    {activeProject.language && (
+                      <div className="flex items-center gap-2">
+                        <span className="h-3 w-3 rounded-full bg-cyan-400" />
+                        <span className="text-sm text-slate-300">{activeProject.language}</span>
+                      </div>
+                    )}
+                    {activeProject.stars !== undefined && (
+                      <div className="flex items-center gap-2 text-sm text-slate-300">
+                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z" />
+                        </svg>
+                        <span>{activeProject.stars}</span>
+                      </div>
+                    )}
+                    {activeProject.forks !== undefined && (
+                      <div className="flex items-center gap-2 text-sm text-slate-300">
+                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M5 3.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm0 2.122a2.25 2.25 0 10-1.5 0v.878A2.25 2.25 0 005.75 8.5h1.5v2.128a2.251 2.251 0 101.5 0V8.5h1.5a2.25 2.25 0 002.25-2.25v-.878a2.25 2.25 0 10-1.5 0v.878a.75.75 0 01-.75.75h-4.5A.75.75 0 015 6.25v-.878zm3.75 7.378a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm3-8.75a.75.75 0 100-1.5.75.75 0 000 1.5z" />
+                        </svg>
+                        <span>{activeProject.forks}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
