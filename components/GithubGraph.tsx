@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { ArrowUpRight, Flame, Github, Sparkles } from "lucide-react";
-import { GitHubCalendar } from "react-github-calendar";
+import GitHubCalendar from "react-github-calendar";
 import { useGSAP } from "@/hooks/useGSAP";
 
 const totalContributions = "1,200+ contributions";

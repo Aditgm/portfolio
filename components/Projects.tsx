@@ -8,17 +8,20 @@ import { useGSAP } from "@/hooks/useGSAP";
 import { projects, type ProjectItem } from "@/data/projects";
 
 const showcaseLabels = ["Overview", "Interface", "Flow"] as const;
+const showcasePlaceholderBackgrounds = [
+  "linear-gradient(135deg, rgba(30, 41, 59, 0.92), rgba(15, 23, 42, 0.98))",
+  "linear-gradient(135deg, rgba(30, 41, 59, 0.92), rgba(67, 56, 202, 0.35), rgba(15, 23, 42, 0.98))",
+  "linear-gradient(135deg, rgba(30, 41, 59, 0.92), rgba(14, 116, 144, 0.35), rgba(15, 23, 42, 0.98))",
+] as const;
 
 function getProjectShowcase(project: ProjectItem) {
   const images = [project.image, ...(project.gallery ?? [])].filter(Boolean);
 
-  while (images.length < 3) {
-    images.push(project.image);
-  }
-
-  return images.slice(0, 3).map((src, index) => ({
-    src,
-    label: showcaseLabels[index],
+  return showcaseLabels.map((label, index) => ({
+    src: images[index] ?? null,
+    label,
+    isPlaceholder: !images[index],
+    placeholderBackground: showcasePlaceholderBackgrounds[index],
   }));
 }
 
@@ -37,6 +40,7 @@ export default function Projects() {
   const [activeProject, setActiveProject] = useState<ProjectItem | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const { createRevealAnimation, gsap, prefersReducedMotion, withContext } = useGSAP(sectionRef);
+  const activeShowcase = activeProject ? getProjectShowcase(activeProject) : [];
 
   const openProject = useCallback(
     (project: ProjectItem) => {
@@ -757,17 +761,45 @@ export default function Projects() {
                   </div>
                 </div>
 
-                <div className="mt-6 overflow-hidden rounded-2xl border border-white/[0.08]">
-                  <div className="relative aspect-[16/8.8] w-full">
-                    <Image
-                      src={activeProject.image}
-                      alt={activeProject.title}
-                      fill
-                      className="object-cover object-top"
-                      sizes="(min-width: 1024px) 1100px, 100vw"
-                    />
-                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,23,0.05),rgba(2,6,23,0.38))]" />
-                  </div>
+                <div className="mt-6 grid gap-4 md:grid-cols-3">
+                  {activeShowcase.map((item, showcaseIndex) => (
+                    <div
+                      key={`modal-${activeProject.slug}-${item.label}`}
+                      className={`overflow-hidden rounded-2xl border border-white/[0.08] ${
+                        showcaseIndex === 0 ? "md:col-span-2" : ""
+                      }`}
+                    >
+                      <div className="relative aspect-[16/9] w-full">
+                        {item.src ? (
+                          <Image
+                            src={item.src}
+                            alt={`${activeProject.title} ${item.label.toLowerCase()} preview`}
+                            fill
+                            className="object-cover object-top"
+                            sizes={
+                              showcaseIndex === 0
+                                ? "(min-width: 1024px) 720px, 100vw"
+                                : "(min-width: 1024px) 360px, 100vw"
+                            }
+                          />
+                        ) : (
+                          <div
+                            className="absolute inset-0 flex items-center justify-center text-center"
+                            style={{ background: item.placeholderBackground }}
+                          >
+                            <span className="rounded-full border border-white/15 bg-[#081120]/65 px-4 py-2 text-[0.64rem] font-semibold uppercase tracking-[0.2em] text-slate-200">
+                              Placeholder image
+                            </span>
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,23,0.05),rgba(2,6,23,0.42))]" />
+                        <span className="absolute left-3 top-3 inline-flex items-center gap-2 rounded-full border border-white/12 bg-[#081120]/74 px-3 py-1.5 text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-slate-100 backdrop-blur-md">
+                          {item.label}
+                          {item.isPlaceholder ? " (soon)" : ""}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
                 <div className="mt-8">

@@ -344,7 +344,7 @@ export default function Footer() {
             ease: "power2.out",
           });
         }}
-        className="signature-outline fixed bottom-8 right-8 z-[60] inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#081120]/88 text-white backdrop-blur-md transition-colors hover:text-white"
+        className="signature-outline fixed bottom-8 right-[6.5rem] z-[60] inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#081120]/88 text-white backdrop-blur-md transition-colors hover:text-white sm:right-[7rem]"
       >
         <ArrowUp size={18} />
       </button>
