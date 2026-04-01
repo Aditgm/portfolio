@@ -171,7 +171,8 @@ export default function Hero() {
       }
 
       // Continue animation loop only if visible
-      if (isVisibleRef.current && !rafIdRef.current) {
+      // Use a post-frame callback to reset rafIdRef after the frame executes
+      if (isVisibleRef.current) {
         isRunningRef.current = true;
         rafIdRef.current = window.requestAnimationFrame(drawRain);
       }
@@ -189,21 +190,15 @@ export default function Hero() {
       const wasVisible = isVisibleRef.current;
       isVisibleRef.current = entry.isIntersecting;
 
-      // Hero became visible - start/resume animation
-      if (entry.isIntersecting && !prefersReducedMotion) {
-        if (!isRunningRef.current && !rafIdRef.current) {
-          isRunningRef.current = true;
-          rafIdRef.current = window.requestAnimationFrame(drawRain);
-        }
-      } 
       // Hero became invisible - stop animation cleanly
-      else if (wasVisible && !entry.isIntersecting) {
+      if (wasVisible && !entry.isIntersecting) {
         if (rafIdRef.current) {
           window.cancelAnimationFrame(rafIdRef.current);
           rafIdRef.current = null;
         }
         isRunningRef.current = false;
       }
+      // Hero became visible - drawRain will auto-restart on next frame check
     };
 
     const observer = new IntersectionObserver(observerCallback, {
@@ -220,7 +215,7 @@ export default function Hero() {
     if (!prefersReducedMotion && sectionRef.current) {
       const rect = sectionRef.current.getBoundingClientRect();
       const isOnScreen = rect.top < window.innerHeight && rect.bottom > 0;
-      if (isOnScreen && !rafIdRef.current) {
+      if (isOnScreen) {
         isRunningRef.current = true;
         rafIdRef.current = window.requestAnimationFrame(drawRain);
       }
