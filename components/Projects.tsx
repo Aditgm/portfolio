@@ -39,7 +39,7 @@ export default function Projects() {
   const scrollPositionRef = useRef({ x: 0, y: 0 });
   const [activeProject, setActiveProject] = useState<ProjectItem | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
-  const { createRevealAnimation, gsap, prefersReducedMotion, withContext } = useGSAP(sectionRef);
+  const { createRevealAnimation, gsap, prefersReducedMotion, refresh, withContext } = useGSAP(sectionRef);
   const activeShowcase = activeProject ? getProjectShowcase(activeProject) : [];
 
   const openProject = useCallback(
@@ -123,13 +123,19 @@ export default function Projects() {
         duration: 0.58,
         ease: "power2.inOut",
         onComplete: () => {
+          gsap.set(sourceCard, {
+            clearProps: "x,y,scale,rotate,rotation,rotationX,rotationY,transform,transformOrigin",
+          });
           openFlipStateRef.current = null;
           setIsAnimating(false);
           window.scrollTo(scrollPositionRef.current.x, scrollPositionRef.current.y);
+          requestAnimationFrame(() => {
+            refresh();
+          });
         },
       });
     });
-  }, [activeProject, gsap, isAnimating, prefersReducedMotion]);
+  }, [activeProject, gsap, isAnimating, prefersReducedMotion, refresh]);
 
   useEffect(() => {
     createRevealAnimation(headerRef, {
@@ -173,9 +179,7 @@ export default function Projects() {
           scrollTrigger: {
             trigger: gridRef.current,
             start: "top 78%",
-            end: prefersReducedMotion ? "top 68%" : "bottom 56%",
-            scrub: prefersReducedMotion ? false : 0.45,
-            once: prefersReducedMotion,
+            once: true,
             invalidateOnRefresh: true,
           },
         }

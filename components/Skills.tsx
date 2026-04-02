@@ -1,19 +1,27 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   ArrowUpRight,
   Brain,
   Braces,
+  Boxes,
+  Bot,
+  ChartCandlestick,
   Code2,
   Cpu,
   Database,
   GitBranch,
   Globe,
+  KeyRound,
   Layers3,
+  Search,
+  ShieldCheck,
   type LucideIcon,
   Server,
   Sparkles,
+  Trophy,
   Workflow,
 } from "lucide-react";
 import { useGSAP } from "@/hooks/useGSAP";
@@ -46,6 +54,249 @@ type SkillCard = {
   details: string[];
 };
 
+type SkillLogoVisual = {
+  glow: string;
+  iconClassName?: string;
+  imageSrc?: string;
+  icon?: LucideIcon;
+};
+
+const skillLogoVisuals: Record<string, SkillLogoVisual> = {
+  "Next.js": {
+    imageSrc: "https://cdn.simpleicons.org/nextdotjs/FFFFFF",
+    glow: "rgba(255,255,255,0.28)",
+  },
+  TypeScript: {
+    imageSrc: "https://cdn.simpleicons.org/typescript/3178C6",
+    glow: "rgba(49,120,198,0.42)",
+  },
+  Python: {
+    imageSrc: "https://cdn.simpleicons.org/python/3776AB",
+    glow: "rgba(55,118,171,0.4)",
+  },
+  OpenAI: {
+    imageSrc: "https://cdn.simpleicons.org/openai/FFFFFF",
+    glow: "rgba(255,255,255,0.28)",
+  },
+  RAG: {
+    icon: Search,
+    glow: "rgba(16,185,129,0.34)",
+    iconClassName: "text-emerald-300",
+  },
+  Llama: {
+    icon: Bot,
+    glow: "rgba(129,140,248,0.38)",
+    iconClassName: "text-indigo-300",
+  },
+  Gemini: {
+    imageSrc: "https://cdn.simpleicons.org/googlegemini/8B5CF6",
+    glow: "rgba(139,92,246,0.38)",
+  },
+  Pinecone: {
+    icon: Database,
+    glow: "rgba(20,184,166,0.36)",
+    iconClassName: "text-teal-300",
+  },
+  MongoDB: {
+    imageSrc: "https://cdn.simpleicons.org/mongodb/47A248",
+    glow: "rgba(71,162,72,0.38)",
+  },
+  "Node.js": {
+    imageSrc: "https://cdn.simpleicons.org/nodedotjs/5FA04E",
+    glow: "rgba(95,160,78,0.38)",
+  },
+  Express: {
+    imageSrc: "https://cdn.simpleicons.org/express/FFFFFF",
+    glow: "rgba(255,255,255,0.22)",
+  },
+  Azure: {
+    imageSrc: "https://cdn.simpleicons.org/microsoftazure/0078D4",
+    glow: "rgba(0,120,212,0.38)",
+  },
+  FastAPI: {
+    imageSrc: "https://cdn.simpleicons.org/fastapi/009688",
+    glow: "rgba(0,150,136,0.38)",
+  },
+  Docker: {
+    imageSrc: "https://cdn.simpleicons.org/docker/2496ED",
+    glow: "rgba(36,150,237,0.38)",
+  },
+  React: {
+    imageSrc: "https://cdn.simpleicons.org/react/61DAFB",
+    glow: "rgba(97,218,251,0.4)",
+  },
+  Tailwind: {
+    imageSrc: "https://cdn.simpleicons.org/tailwindcss/06B6D4",
+    glow: "rgba(6,182,212,0.38)",
+  },
+  Motion: {
+    icon: Sparkles,
+    glow: "rgba(45,212,191,0.36)",
+    iconClassName: "text-teal-200",
+  },
+  GSAP: {
+    imageSrc: "https://cdn.simpleicons.org/greensock/88CE02",
+    glow: "rgba(136,206,2,0.36)",
+  },
+  Framer: {
+    imageSrc: "https://cdn.simpleicons.org/framer/0055FF",
+    glow: "rgba(0,85,255,0.34)",
+  },
+  R3F: {
+    icon: Boxes,
+    glow: "rgba(125,211,252,0.34)",
+    iconClassName: "text-sky-300",
+  },
+  "Socket.io": {
+    imageSrc: "https://cdn.simpleicons.org/socketdotio/FFFFFF",
+    glow: "rgba(255,255,255,0.24)",
+  },
+  RBAC: {
+    icon: ShieldCheck,
+    glow: "rgba(16,185,129,0.34)",
+    iconClassName: "text-emerald-300",
+  },
+  OAuth: {
+    icon: KeyRound,
+    glow: "rgba(250,204,21,0.34)",
+    iconClassName: "text-amber-300",
+  },
+  JWT: {
+    icon: KeyRound,
+    glow: "rgba(59,130,246,0.34)",
+    iconClassName: "text-sky-300",
+  },
+  REST: {
+    icon: Workflow,
+    glow: "rgba(249,115,22,0.34)",
+    iconClassName: "text-orange-300",
+  },
+  Webhooks: {
+    icon: Workflow,
+    glow: "rgba(45,212,191,0.34)",
+    iconClassName: "text-cyan-300",
+  },
+  Validation: {
+    icon: ShieldCheck,
+    glow: "rgba(16,185,129,0.34)",
+    iconClassName: "text-emerald-300",
+  },
+  Pandas: {
+    imageSrc: "https://cdn.simpleicons.org/pandas/150458",
+    glow: "rgba(99,102,241,0.36)",
+  },
+  Postgres: {
+    imageSrc: "https://cdn.simpleicons.org/postgresql/4169E1",
+    glow: "rgba(65,105,225,0.36)",
+  },
+  Plotly: {
+    imageSrc: "https://cdn.simpleicons.org/plotly/3F4F75",
+    glow: "rgba(99,102,241,0.34)",
+  },
+  yFinance: {
+    icon: ChartCandlestick,
+    glow: "rgba(245,158,11,0.34)",
+    iconClassName: "text-amber-300",
+  },
+  SQL: {
+    icon: Database,
+    glow: "rgba(148,163,184,0.32)",
+    iconClassName: "text-slate-300",
+  },
+  Indexing: {
+    icon: Search,
+    glow: "rgba(45,212,191,0.32)",
+    iconClassName: "text-cyan-300",
+  },
+  ETL: {
+    icon: Workflow,
+    glow: "rgba(251,191,36,0.32)",
+    iconClassName: "text-amber-300",
+  },
+  Telemetry: {
+    icon: ChartCandlestick,
+    glow: "rgba(96,165,250,0.32)",
+    iconClassName: "text-sky-300",
+  },
+  DSA: {
+    icon: Braces,
+    glow: "rgba(56,189,248,0.32)",
+    iconClassName: "text-sky-300",
+  },
+  Graphs: {
+    icon: GitBranch,
+    glow: "rgba(99,102,241,0.32)",
+    iconClassName: "text-indigo-300",
+  },
+  Math: {
+    icon: Cpu,
+    glow: "rgba(45,212,191,0.3)",
+    iconClassName: "text-cyan-300",
+  },
+  Codeforces: {
+    imageSrc: "https://cdn.simpleicons.org/codeforces/1F8ACB",
+    glow: "rgba(31,138,203,0.34)",
+  },
+  LeetCode: {
+    imageSrc: "https://cdn.simpleicons.org/leetcode/FFA116",
+    glow: "rgba(255,161,22,0.36)",
+  },
+  CodeChef: {
+    imageSrc: "https://cdn.simpleicons.org/codechef/5B4638",
+    glow: "rgba(91,70,56,0.34)",
+  },
+  CSES: {
+    icon: Code2,
+    glow: "rgba(129,140,248,0.32)",
+    iconClassName: "text-indigo-300",
+  },
+  VJudge: {
+    icon: Trophy,
+    glow: "rgba(168,85,247,0.32)",
+    iconClassName: "text-violet-300",
+  },
+  GitHub: {
+    imageSrc: "https://cdn.simpleicons.org/github/FFFFFF",
+    glow: "rgba(255,255,255,0.24)",
+  },
+  Vercel: {
+    imageSrc: "https://cdn.simpleicons.org/vercel/FFFFFF",
+    glow: "rgba(255,255,255,0.24)",
+  },
+  Render: {
+    imageSrc: "https://cdn.simpleicons.org/render/46E3B7",
+    glow: "rgba(70,227,183,0.34)",
+  },
+  Streamlit: {
+    imageSrc: "https://cdn.simpleicons.org/streamlit/FF4B4B",
+    glow: "rgba(255,75,75,0.36)",
+  },
+  Git: {
+    imageSrc: "https://cdn.simpleicons.org/git/F05032",
+    glow: "rgba(240,80,50,0.36)",
+  },
+  "CI/CD": {
+    icon: GitBranch,
+    glow: "rgba(99,102,241,0.32)",
+    iconClassName: "text-indigo-300",
+  },
+  Testing: {
+    icon: Code2,
+    glow: "rgba(245,158,11,0.32)",
+    iconClassName: "text-amber-300",
+  },
+  Automation: {
+    icon: Cpu,
+    glow: "rgba(45,212,191,0.32)",
+    iconClassName: "text-teal-300",
+  },
+  Linux: {
+    icon: Server,
+    glow: "rgba(148,163,184,0.32)",
+    iconClassName: "text-slate-300",
+  },
+};
+
 const skillCards: SkillCard[] = [
   {
     id: "ai-systems",
@@ -64,6 +315,7 @@ const skillCards: SkillCard[] = [
       { mark: "NX", label: "Next.js", tone: "from-indigo-500/40 to-indigo-500/10" },
       { mark: "TS", label: "TypeScript", tone: "from-sky-500/35 to-sky-500/10" },
       { mark: "PY", label: "Python", tone: "from-amber-500/35 to-amber-500/10" },
+      { mark: "OA", label: "OpenAI", tone: "from-slate-500/35 to-slate-500/10" },
       { mark: "RG", label: "RAG", tone: "from-emerald-500/35 to-emerald-500/10" },
       { mark: "LM", label: "Llama", tone: "from-violet-500/35 to-violet-500/10" },
       { mark: "GM", label: "Gemini", tone: "from-cyan-500/35 to-cyan-500/10" },
@@ -72,6 +324,7 @@ const skillCards: SkillCard[] = [
       { mark: "NV", label: "Node.js", tone: "from-lime-500/35 to-lime-500/10" },
       { mark: "EX", label: "Express", tone: "from-slate-500/35 to-slate-500/10" },
       { mark: "AZ", label: "Azure", tone: "from-blue-500/35 to-blue-500/10" },
+      { mark: "FA", label: "FastAPI", tone: "from-teal-500/35 to-emerald-500/10" },
       { mark: "DK", label: "Docker", tone: "from-cyan-500/35 to-indigo-500/10" },
     ],
     metrics: [
@@ -101,9 +354,11 @@ const skillCards: SkillCard[] = [
       { mark: "RC", label: "React", tone: "from-cyan-500/35 to-cyan-500/10" },
       { mark: "NX", label: "Next.js", tone: "from-indigo-500/35 to-indigo-500/10" },
       { mark: "TW", label: "Tailwind", tone: "from-teal-500/35 to-teal-500/10" },
+      { mark: "MT", label: "Motion", tone: "from-teal-500/35 to-cyan-500/10" },
       { mark: "GS", label: "GSAP", tone: "from-violet-500/35 to-violet-500/10" },
       { mark: "FM", label: "Framer", tone: "from-fuchsia-500/35 to-fuchsia-500/10" },
       { mark: "R3", label: "R3F", tone: "from-sky-500/35 to-sky-500/10" },
+      { mark: "GH", label: "GitHub", tone: "from-slate-500/35 to-slate-500/10" },
     ],
     metrics: [
       { label: "Interaction Design", value: 88, tone: "from-teal-400 to-cyan-400" },
@@ -133,7 +388,10 @@ const skillCards: SkillCard[] = [
       { mark: "WS", label: "Socket.io", tone: "from-indigo-500/35 to-indigo-500/10" },
       { mark: "RB", label: "RBAC", tone: "from-emerald-500/35 to-emerald-500/10" },
       { mark: "OA", label: "OAuth", tone: "from-cyan-500/35 to-cyan-500/10" },
+      { mark: "JW", label: "JWT", tone: "from-sky-500/35 to-indigo-500/10" },
       { mark: "RT", label: "REST", tone: "from-orange-500/35 to-orange-500/10" },
+      { mark: "WH", label: "Webhooks", tone: "from-cyan-500/35 to-teal-500/10" },
+      { mark: "VL", label: "Validation", tone: "from-emerald-500/35 to-teal-500/10" },
     ],
     metrics: [
       { label: "API Design", value: 89, tone: "from-emerald-400 to-teal-400" },
@@ -160,10 +418,14 @@ const skillCards: SkillCard[] = [
     logos: [
       { mark: "MG", label: "MongoDB", tone: "from-emerald-500/35 to-teal-500/10" },
       { mark: "PN", label: "Pinecone", tone: "from-fuchsia-500/35 to-violet-500/10" },
+      { mark: "PG", label: "Postgres", tone: "from-blue-500/35 to-indigo-500/10" },
       { mark: "PD", label: "Pandas", tone: "from-sky-500/35 to-indigo-500/10" },
       { mark: "PL", label: "Plotly", tone: "from-violet-500/35 to-violet-500/10" },
       { mark: "YF", label: "yFinance", tone: "from-amber-500/35 to-orange-500/10" },
       { mark: "SQ", label: "SQL", tone: "from-slate-500/35 to-slate-500/10" },
+      { mark: "IX", label: "Indexing", tone: "from-cyan-500/35 to-teal-500/10" },
+      { mark: "ET", label: "ETL", tone: "from-amber-500/35 to-orange-500/10" },
+      { mark: "TM", label: "Telemetry", tone: "from-sky-500/35 to-blue-500/10" },
     ],
     metrics: [
       { label: "Semantic Retrieval", value: 88, tone: "from-violet-400 to-fuchsia-400" },
@@ -189,6 +451,8 @@ const skillCards: SkillCard[] = [
     layout: "lg:col-span-4",
     logos: [
       { mark: "DS", label: "DSA", tone: "from-sky-500/35 to-sky-500/10" },
+      { mark: "GR", label: "Graphs", tone: "from-indigo-500/35 to-indigo-500/10" },
+      { mark: "MA", label: "Math", tone: "from-cyan-500/35 to-cyan-500/10" },
       { mark: "CF", label: "Codeforces", tone: "from-orange-500/35 to-orange-500/10" },
       { mark: "LC", label: "LeetCode", tone: "from-amber-500/35 to-amber-500/10" },
       { mark: "CC", label: "CodeChef", tone: "from-emerald-500/35 to-emerald-500/10" },
@@ -221,9 +485,13 @@ const skillCards: SkillCard[] = [
       { mark: "GH", label: "GitHub", tone: "from-slate-500/35 to-slate-500/10" },
       { mark: "VR", label: "Vercel", tone: "from-indigo-500/35 to-indigo-500/10" },
       { mark: "RD", label: "Render", tone: "from-cyan-500/35 to-cyan-500/10" },
+      { mark: "CI", label: "CI/CD", tone: "from-indigo-500/35 to-violet-500/10" },
       { mark: "DK", label: "Docker", tone: "from-sky-500/35 to-sky-500/10" },
       { mark: "ST", label: "Streamlit", tone: "from-rose-500/35 to-rose-500/10" },
+      { mark: "TS", label: "Testing", tone: "from-amber-500/35 to-orange-500/10" },
+      { mark: "AU", label: "Automation", tone: "from-teal-500/35 to-cyan-500/10" },
       { mark: "GT", label: "Git", tone: "from-orange-500/35 to-orange-500/10" },
+      { mark: "LX", label: "Linux", tone: "from-slate-500/35 to-slate-500/10" },
     ],
     metrics: [
       { label: "Deployment Flow", value: 86, tone: "from-amber-400 to-orange-400" },
@@ -421,10 +689,13 @@ export default function Skills() {
               return (
                 <span
                   key={item.label}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-slate-300"
+                  title={item.label}
+                  className="group/mark relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-slate-300 shadow-[0_0_0_1px_rgba(255,255,255,0.03)_inset] transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-300/25 hover:bg-white/[0.08] hover:text-white hover:shadow-[0_12px_28px_-18px_rgba(45,212,191,0.55),0_0_28px_-12px_rgba(99,102,241,0.5)]"
                 >
                   <Icon size={14} style={{ color: "var(--secondary-accent)" }} />
-                  {item.label}
+                  <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 -translate-x-1/2 rounded-full border border-white/[0.08] bg-[#071120]/95 px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-slate-200 opacity-0 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.85)] transition-all duration-200 group-hover/mark:translate-y-0 group-hover/mark:opacity-100">
+                    {item.label}
+                  </span>
                 </span>
               );
             })}
@@ -494,31 +765,65 @@ export default function Skills() {
                     </p>
 
                     <div
-                      className={`grid gap-3 ${card.hero ? "grid-cols-2 sm:grid-cols-3 xl:grid-cols-4" : "grid-cols-2"}`}
+                      className={`grid gap-3 ${card.hero ? "grid-cols-4 sm:grid-cols-5 xl:grid-cols-7" : "grid-cols-3"}`}
                     >
                       {card.logos.map((logo, logoIndex) => (
-                        <div
-                          key={logo.label}
-                          ref={(element) => {
-                            if (!logoRefs.current[cardIndex]) {
-                              logoRefs.current[cardIndex] = [];
-                            }
-                            logoRefs.current[cardIndex][logoIndex] = element;
-                          }}
-                          className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#071120]/78 p-3.5"
-                        >
-                          <div
-                            className={`absolute inset-0 bg-gradient-to-br ${logo.tone} opacity-35`}
-                          />
-                          <div className="relative z-10">
-                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.06] text-[0.75rem] font-black tracking-[0.18em] text-white">
-                              {logo.mark}
-                            </span>
-                            <p className="mt-3 text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-slate-200">
-                              {logo.label}
-                            </p>
-                          </div>
-                        </div>
+                        (() => {
+                          const visual = skillLogoVisuals[logo.label];
+
+                          return (
+                            <div
+                              key={logo.label}
+                              ref={(element) => {
+                                if (!logoRefs.current[cardIndex]) {
+                                  logoRefs.current[cardIndex] = [];
+                                }
+                                logoRefs.current[cardIndex][logoIndex] = element;
+                              }}
+                              title={logo.label}
+                              aria-label={logo.label}
+                              className="skill-logo-card relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#071120]/78"
+                              style={
+                                {
+                                  "--skill-ripple": visual?.glow ?? "rgba(99,102,241,0.32)",
+                                } as CSSProperties
+                              }
+                            >
+                              <span className="skill-logo-ripple" aria-hidden="true" />
+                              <span className="skill-logo-glow" aria-hidden="true" />
+                              <div
+                                className={`absolute inset-0 bg-gradient-to-br ${logo.tone} opacity-35`}
+                              />
+                              <div className="relative z-10 flex h-full items-center justify-center p-3">
+                                <span className="skill-logo-badge inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.06] text-[0.75rem] font-black tracking-[0.18em] text-white">
+                                  {visual?.imageSrc ? (
+                                    <Image
+                                      src={visual.imageSrc}
+                                      alt={`${logo.label} logo`}
+                                      width={24}
+                                      height={24}
+                                      unoptimized
+                                      className="h-6 w-6 object-contain"
+                                    />
+                                  ) : visual?.icon ? (
+                                    <visual.icon
+                                      size={19}
+                                      className={visual.iconClassName ?? "text-white"}
+                                    />
+                                  ) : (
+                                    logo.mark
+                                  )}
+                                </span>
+                                <span className="sr-only">
+                                  {logo.label}
+                                </span>
+                                <span className="skill-logo-tooltip" aria-hidden="true">
+                                  {logo.label}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })()
                       ))}
                     </div>
 

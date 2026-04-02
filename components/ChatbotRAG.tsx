@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState, type TouchEvent, type WheelEvent } from "react";
-import { Bot, MessageCircle, Send, X } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState, type TouchEvent, type WheelEvent } from "react";
+import { Bot, Send, X } from "lucide-react";
 
 type SourceRef = {
   id: string;
@@ -39,7 +39,10 @@ export default function ChatbotRAG() {
   const endRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
   const fabRef = useRef<HTMLButtonElement>(null);
+  const fabIconRef = useRef<HTMLSpanElement>(null);
   const ripplesRef = useRef<HTMLDivElement>(null);
+  const burstTimeoutRef = useRef<number | null>(null);
+  const [isBursting, setIsBursting] = useState(false);
 
   const canSend = input.trim().length > 0 && !loading;
 
@@ -49,11 +52,40 @@ export default function ChatbotRAG() {
     return latestWithSources?.sources ?? [];
   }, [messages]);
 
+  useEffect(() => {
+    return () => {
+      if (burstTimeoutRef.current !== null) {
+        window.clearTimeout(burstTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const scrollToBottom = () => {
     requestAnimationFrame(() => {
       endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
     });
   };
+
+  const triggerFabBurst = useCallback(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (burstTimeoutRef.current !== null) {
+      window.clearTimeout(burstTimeoutRef.current);
+      burstTimeoutRef.current = null;
+    }
+
+    setIsBursting(false);
+
+    requestAnimationFrame(() => {
+      setIsBursting(true);
+      burstTimeoutRef.current = window.setTimeout(() => {
+        setIsBursting(false);
+        burstTimeoutRef.current = null;
+      }, 620);
+    });
+  }, []);
 
   const handleMessagesWheel = (event: WheelEvent<HTMLDivElement>) => {
     const container = messagesRef.current;
@@ -72,39 +104,20 @@ export default function ChatbotRAG() {
     event.stopPropagation();
   };
 
-  // Compute point on circle boundary along line from center to click
-  const getBorderIntersection = useCallback(
-    (clickX: number, clickY: number) => {
-      const icon = fabRef.current;
-      if (!icon) return { x: 0, y: 0 };
-      const rect = icon.getBoundingClientRect();
-      const cx = rect.width / 2;
-      const cy = rect.height / 2;
-      const r = Math.min(cx, cy);
-      const dx = clickX - cx;
-      const dy = clickY - cy;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist === 0) return { x: cx, y: cy - r }; // default top
-      const originX = cx + (dx / dist) * r;
-      const originY = cy + (dy / dist) * r;
-      return { x: originX, y: originY };
-    },
-    []
-  );
-
-  // Create a ripple element at the computed intersection point
-  const createRipple = useCallback(
-    (clickX: number, clickY: number) => {
+  const createRipple = useCallback(() => {
       const container = ripplesRef.current;
-      const icon = fabRef.current;
-      if (!container || !icon) return;
+      const button = fabRef.current;
+      const icon = fabIconRef.current;
+      if (!container || !button || !icon) return;
 
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       if (reducedMotion) return;
 
-      const origin = getBorderIntersection(clickX, clickY);
-      const iconSize = icon.getBoundingClientRect().width;
-      const size = iconSize * 3;
+      const buttonRect = button.getBoundingClientRect();
+      const iconRect = icon.getBoundingClientRect();
+      const originX = iconRect.left - buttonRect.left + iconRect.width / 2;
+      const originY = iconRect.top - buttonRect.top + iconRect.height / 2;
+      const size = Math.max(buttonRect.width, buttonRect.height) * 1.7;
 
       const ripple = document.createElement("span");
       ripple.className = "chatbot-ripple-particle";
@@ -112,12 +125,12 @@ export default function ChatbotRAG() {
         position: absolute;
         width: ${size}px;
         height: ${size}px;
-        left: ${origin.x - size / 2}px;
-        top: ${origin.y - size / 2}px;
+        left: ${originX - size / 2}px;
+        top: ${originY - size / 2}px;
         border-radius: 50%;
         pointer-events: none;
-        background: radial-gradient(circle, var(--chatbot-ripple-color, rgba(34, 211, 238, 0.5)) 0%, transparent 70%);
-        animation: chatbot-ripple-expand var(--chatbot-ripple-duration, 0.6s) ease-out forwards;
+        background: radial-gradient(circle, var(--chatbot-ripple-color, rgba(103, 232, 249, 0.58)) 0%, rgba(96, 165, 250, 0.22) 36%, transparent 72%);
+        animation: chatbot-ripple-expand var(--chatbot-ripple-duration, 0.72s) cubic-bezier(0.22, 1, 0.36, 1) forwards;
       `;
 
       container.appendChild(ripple);
@@ -125,35 +138,27 @@ export default function ChatbotRAG() {
       ripple.addEventListener("animationend", () => ripple.remove(), { once: true });
       setTimeout(() => {
         if (ripple.parentElement) ripple.remove();
-      }, 700);
-    },
-    [getBorderIntersection]
-  );
+      }, 820);
+    }, []);
 
-  const handleIconClick = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      const rect = fabRef.current!.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const clickY = e.clientY - rect.top;
-      createRipple(clickX, clickY);
-      setOpen((prev) => !prev);
-    },
-    [createRipple]
-  );
+  const toggleChatbot = useCallback(() => {
+    triggerFabBurst();
+    createRipple();
+    setOpen((prev) => !prev);
+  }, [createRipple, triggerFabBurst]);
+
+  const handleIconClick = useCallback(() => {
+    toggleChatbot();
+  }, [toggleChatbot]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLButtonElement>) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        const icon = fabRef.current;
-        if (icon) {
-          const rect = icon.getBoundingClientRect();
-          createRipple(rect.width / 2, 0);
-        }
-        setOpen((prev) => !prev);
+        toggleChatbot();
       }
     },
-    [createRipple]
+    [toggleChatbot]
   );
 
   const sendMessage = async (text: string) => {
@@ -215,13 +220,19 @@ export default function ChatbotRAG() {
           onKeyDown={handleKeyDown}
           aria-label={open ? "Close chatbot" : "Open chatbot"}
           aria-expanded={open}
+          data-burst={isBursting}
           data-open={open}
           className="chatbot-fab"
         >
           <span className="chatbot-fab-aura" aria-hidden="true" />
           <div ref={ripplesRef} className="chatbot-ripple-container" />
-          <span className="chatbot-fab-icon">
-            {open ? <X size={20} /> : <MessageCircle size={20} />}
+          <span ref={fabIconRef} className="chatbot-fab-icon" aria-hidden="true">
+            <span className="chatbot-fab-glyph chatbot-fab-glyph--bot">
+              <Bot size={20} />
+            </span>
+            <span className="chatbot-fab-glyph chatbot-fab-glyph--close">
+              <X size={20} />
+            </span>
           </span>
         </button>
       </div>
